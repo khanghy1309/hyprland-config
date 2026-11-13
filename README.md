@@ -188,6 +188,13 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 
 ## Hình nền
 
+Có sẵn ba hình nền trong `~/Pictures/Wallpapers`:
+- `ridge.png`: núi lúc hoàng hôn (mặc định)
+- `dem-anh-dao.jpg`: đêm trăng tím hồng, cành anh đào
+- `dem-anh-dao.mp4`: bản động của `dem-anh-dao.jpg`, có hoa rơi, sao nhấp nháy, đồi lay nhẹ; video 16 giây lặp liền mạch
+
+Đổi hình nền trong Cài đặt → Hình nền, hoặc chạy `~/.config/hypr/scripts/wallpaper.sh ~/Pictures/Wallpapers/dem-anh-dao.mp4`. Muốn sửa màu, số cánh hoa…: mở `wallpapers/src/dem-anh-dao.html`, rồi vẽ lại bằng `node wallpapers/src/render.js 3840 2160 out.png` và `node wallpapers/src/video.js 2560 1440 30 out.mp4` (cần Node, Playwright và ffmpeg).
+
 Bỏ ảnh (`.png`, `.jpg`, `.webp`), ảnh động (`.gif`) hoặc video (`.mp4`, `.webm`, `.mkv`) vào `~/Pictures/Wallpapers`, rồi:
 
 ```bash

@@ -1,0 +1,207 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+</head><body>
+<canvas id="c"></canvas>
+<script>
+// Cảnh hình nền "Đêm anh đào": đồi pastel, trăng, sao, cành anh đào, cánh hoa rơi.
+// draw(t) với t tính bằng giây; mọi chuyển động tuần hoàn theo LOOP giây để video lặp liền mạch.
+const LOOP = 16;
+const params = new URLSearchParams(location.search);
+const W = +params.get("w") || 3840, H = +params.get("h") || 2160;
+const c = document.getElementById("c");
+c.width = W; c.height = H;
+const g = c.getContext("2d");
+const S = W / 1920;                       // tỉ lệ so với khung gốc 1920×1080
+const TAU = Math.PI * 2;
+
+// số ngẫu nhiên cố định để mọi khung hình giống nhau
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+const stars = Array.from({ length: 260 }, () => ({
+  x: rnd() * 1920, y: rnd() * 620, r: 0.4 + rnd() * 1.5, ph: rnd(), sp: 1 + Math.floor(rnd() * 3), a: 0.35 + rnd() * 0.65
+}));
+const blobs = [
+  { x: 300, y: 380, r: 420, c: "255,179,217", a: 0.20 },
+  { x: 1560, y: 520, r: 480, c: "158,242,220", a: 0.12 },
+  { x: 980, y: 700, r: 560, c: "201,182,255", a: 0.18 },
+  { x: 1750, y: 160, r: 300, c: "255,179,217", a: 0.10 },
+  { x: 600, y: 120, r: 260, c: "158,242,220", a: 0.07 }
+];
+// cánh hoa: vị trí theo t là hàm tuần hoàn để lặp liền mạch
+const petals = Array.from({ length: 70 }, () => ({
+  x0: rnd() * 2300 - 200, ph: rnd(), size: 7 + rnd() * 9, sway: 30 + rnd() * 70,
+  swaySp: 1 + Math.floor(rnd() * 3), spin: (rnd() < .5 ? -1 : 1) * (1 + Math.floor(rnd() * 2)),
+  tint: rnd(), depth: 0.6 + rnd() * 0.6
+}));
+
+const waves = [
+  ["M0,640 C260,560 520,600 780,560 C1060,515 1300,470 1560,520 C1720,550 1840,540 1920,520 L1920,1120 L0,1120Z",
+   ["rgba(201,182,255,.55)", "rgba(125,107,214,.25)"], 520],
+  ["M0,760 C240,700 470,730 720,690 C980,650 1200,610 1460,660 C1660,700 1800,690 1920,660 L1920,1120 L0,1120Z",
+   ["rgba(255,179,217,.6)", "rgba(196,106,168,.35)"], 690],
+  ["M0,860 C300,800 560,850 860,810 C1140,775 1380,760 1640,800 C1780,820 1860,815 1920,800 L1920,1120 L0,1120Z",
+   ["rgba(158,242,220,.55)", "rgba(63,143,154,.45)"], 800],
+  ["M0,950 C320,910 640,960 960,930 C1260,900 1560,905 1920,930 L1920,1120 L0,1120Z",
+   ["rgba(58,47,110,.9)", "rgba(26,22,56,1)"], 910]
+].map(([d, cols, top]) => ({ p: new Path2D(d), cols, top }));
+
+function sky() {
+  const gr = g.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, "#15122e");
+  gr.addColorStop(0.35, "#2b2360");
+  gr.addColorStop(0.58, "#5b4aa6");
+  gr.addColorStop(0.75, "#a98bd8");
+  gr.addColorStop(0.9, "#f0b4d6");
+  g.fillStyle = gr;
+  g.fillRect(0, 0, W, H);
+}
+
+function glow(x, y, r, rgb, a) {
+  const gr = g.createRadialGradient(x * S, y * S, 0, x * S, y * S, r * S);
+  gr.addColorStop(0, `rgba(${rgb},${a})`);
+  gr.addColorStop(1, `rgba(${rgb},0)`);
+  g.fillStyle = gr;
+  g.fillRect((x - r) * S, (y - r) * S, 2 * r * S, 2 * r * S);
+}
+
+function drawStars(t) {
+  for (const s of stars) {
+    const tw = 0.55 + 0.45 * Math.sin(TAU * (s.ph + s.sp * t / LOOP));
+    g.fillStyle = `rgba(255,250,240,${s.a * tw})`;
+    g.beginPath(); g.arc(s.x * S, s.y * S, s.r * S, 0, TAU); g.fill();
+  }
+}
+
+function moon() {
+  const x = 1430, y = 250, r = 74;
+  glow(x, y, 330, "255,236,214", 0.16);
+  glow(x, y, 160, "255,232,210", 0.28);
+  const gr = g.createRadialGradient((x - 22) * S, (y - 24) * S, 4 * S, x * S, y * S, r * S);
+  gr.addColorStop(0, "#fffaf0"); gr.addColorStop(0.7, "#fbe8d8"); gr.addColorStop(1, "#f2d2cf");
+  g.fillStyle = gr;
+  g.beginPath(); g.arc(x * S, y * S, r * S, 0, TAU); g.fill();
+  // vết mờ trên trăng
+  g.fillStyle = "rgba(214,180,190,.22)";
+  for (const [dx, dy, rr] of [[-22, 14, 15], [18, -20, 10], [24, 22, 8], [-6, -30, 6]]) {
+    g.beginPath(); g.arc((x + dx) * S, (y + dy) * S, rr * S, 0, TAU); g.fill();
+  }
+}
+
+function drawWaves(t) {
+  waves.forEach((w, i) => {
+    g.save();
+    // đồi lay rất nhẹ, tuần hoàn
+    const dy = Math.sin(TAU * (t / LOOP + i * 0.17)) * (2 + i) * S;
+    g.translate(0, dy);
+    g.scale(S, S);
+    const gr = g.createLinearGradient(0, w.top, 0, 1080);
+    gr.addColorStop(0, w.cols[0]); gr.addColorStop(1, w.cols[1]);
+    g.fillStyle = gr;
+    g.fill(w.p);
+    // mép sáng mảnh trên đỉnh đồi cho rõ lớp
+    g.strokeStyle = `rgba(255,240,250,${0.22 - i * 0.04})`;
+    g.lineWidth = 1.6;
+    g.stroke(w.p);
+    g.restore();
+  });
+  // sương mỏng giữa các lớp đồi
+  const fog = g.createLinearGradient(0, 640 * S, 0, 900 * S);
+  fog.addColorStop(0, "rgba(255,220,240,0)");
+  fog.addColorStop(0.5, "rgba(255,220,240,.08)");
+  fog.addColorStop(1, "rgba(255,220,240,0)");
+  g.fillStyle = fog;
+  g.fillRect(0, 640 * S, W, 260 * S);
+}
+
+// một bông hoa 5 cánh
+function blossom(x, y, r, rot, a) {
+  g.save();
+  g.translate(x * S, y * S); g.rotate(rot);
+  for (let k = 0; k < 5; k++) {
+    g.rotate(TAU / 5);
+    const gr = g.createRadialGradient(0, -r * 0.55 * S, 0, 0, -r * 0.55 * S, r * 0.7 * S);
+    gr.addColorStop(0, `rgba(255,236,246,${a})`);
+    gr.addColorStop(1, `rgba(255,170,210,${a})`);
+    g.fillStyle = gr;
+    g.beginPath();
+    g.ellipse(0, -r * 0.55 * S, r * 0.42 * S, r * 0.6 * S, 0, 0, TAU);
+    g.fill();
+  }
+  g.fillStyle = `rgba(214,90,140,${a})`;
+  g.beginPath(); g.arc(0, 0, r * 0.18 * S, 0, TAU); g.fill();
+  g.restore();
+}
+
+// cành anh đào từ góc trên bên trái, lay nhẹ
+function branch(t) {
+  const sw = Math.sin(TAU * t / LOOP) * 0.006;
+  g.save();
+  g.translate(-40 * S, -30 * S);
+  g.rotate(sw);
+  g.lineCap = "round";
+  g.strokeStyle = "rgba(48,30,58,.92)";
+  const twig = (pts, w) => {
+    g.lineWidth = w * S;
+    g.beginPath(); g.moveTo(pts[0] * S, pts[1] * S);
+    g.bezierCurveTo(pts[2] * S, pts[3] * S, pts[4] * S, pts[5] * S, pts[6] * S, pts[7] * S);
+    g.stroke();
+  };
+  twig([0, 60, 180, 90, 330, 150, 520, 170], 16);
+  twig([520, 170, 620, 180, 700, 160, 790, 200], 8);
+  twig([300, 130, 330, 200, 360, 250, 420, 300], 7);
+  twig([180, 95, 220, 40, 270, 20, 330, 10], 6);
+  twig([620, 178, 640, 230, 670, 260, 720, 290], 5);
+  twig([420, 160, 460, 110, 500, 90, 560, 80], 5);
+  // hoa và nụ dọc cành
+  const fl = [[120, 92, 22], [210, 70, 18], [265, 34, 16], [330, 14, 14], [305, 150, 20], [360, 238, 18], [420, 300, 22],
+              [395, 270, 13], [470, 120, 17], [540, 84, 18], [505, 172, 21], [590, 182, 17], [660, 255, 18], [720, 292, 20],
+              [700, 175, 15], [790, 200, 19], [760, 188, 12], [440, 168, 14], [160, 110, 13], [585, 160, 11]];
+  fl.forEach(([x, y, r], i) => blossom(x, y, r, i * 0.7, 0.95));
+  g.restore();
+}
+
+function petal(x, y, s, rot, a, tint) {
+  g.save();
+  g.translate(x * S, y * S); g.rotate(rot);
+  g.scale(1, 0.55 + 0.45 * Math.abs(Math.cos(rot * 1.3)));   // lật mặt khi rơi
+  g.fillStyle = tint < 0.5 ? `rgba(255,190,222,${a})` : `rgba(255,222,238,${a})`;
+  g.beginPath();
+  g.moveTo(0, -s * S);
+  g.bezierCurveTo(s * 0.9 * S, -s * 0.6 * S, s * 0.7 * S, s * 0.7 * S, 0, s * S);
+  g.bezierCurveTo(-s * 0.7 * S, s * 0.7 * S, -s * 0.9 * S, -s * 0.6 * S, 0, -s * S);
+  g.fill();
+  g.restore();
+}
+
+function drawPetals(t) {
+  for (const p of petals) {
+    // mỗi cánh rơi hết khung trong đúng LOOP/k giây
+    const u = (p.ph + t / LOOP) % 1;
+    const y = -60 + u * 1200;
+    const x = p.x0 - u * 260 + Math.sin(TAU * (p.ph + p.swaySp * t / LOOP)) * p.sway;
+    const rot = TAU * (p.ph + p.spin * t / LOOP);
+    const fade = Math.min(1, u * 8, (1 - u) * 6);
+    petal(x, y, p.size * p.depth, rot, 0.85 * fade * p.depth, p.tint);
+  }
+}
+
+function draw(t) {
+  sky();
+  for (const b of blobs) glow(b.x, b.y, b.r, b.c, b.a);
+  drawStars(t);
+  moon();
+  drawWaves(t);
+  branch(t);
+  drawPetals(t);
+  // làm tối nhẹ góc dưới để thanh dock/đảo kính nổi bật
+  const v = g.createRadialGradient(W / 2, H * 0.45, H * 0.4, W / 2, H * 0.45, H * 1.05);
+  v.addColorStop(0, "rgba(10,8,25,0)"); v.addColorStop(1, "rgba(10,8,25,.35)");
+  g.fillStyle = v; g.fillRect(0, 0, W, H);
+}
+window.draw = draw;
+window.LOOP = LOOP;
+draw(0);
+</script>
+</body></html>
