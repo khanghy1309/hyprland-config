@@ -1,0 +1,207 @@
+# Liquid Glass — màn hình khởi động Plymouth
+#
+#   khởi động:  chữ "hello" tự viết ra  →  mờ dần, bay lên  →  chữ ký tự viết  →  chữ ký sáng nhịp nhàng
+#   mật khẩu ổ đĩa (LUKS):  ô kính dưới chữ ký, mỗi ký tự là một chấm
+#   tắt máy / khởi động lại:  chữ ký hiện dần và một dòng chữ
+#
+# Khung hình được vẽ sẵn (plymouth/src/render.js) ở cỡ dành cho màn hình 4K và thu nhỏ khi nạp.
+# Mỗi khung có hai ảnh: nét chữ sắc (hello-i.png) và quầng sáng mờ lưu nhỏ 4 lần (hello-glow-i.png).
+
+# ───────────── thông số (lấy từ layout.txt khi dựng) ─────────────
+FPS = 24;
+HELLO_N = 56;   HELLO_DX = -492;  HELLO_DY = -203;
+SIG_N   = 47;   SIG_DX   = -209;  SIG_DY   = -220;
+
+# thời điểm (giây)
+T_HELLO      = 0.4;                       # bắt đầu viết hello
+T_HELLO_END  = T_HELLO + HELLO_N / FPS;   # viết xong
+T_FADE       = T_HELLO_END + 0.6;         # bắt đầu mờ hello
+FADE_LEN     = 0.55;
+T_SIG        = T_FADE + 0.35;             # bắt đầu viết chữ ký
+T_SIG_END    = T_SIG + SIG_N / FPS;
+
+# ───────────── nền ─────────────
+Window.SetBackgroundTopColor(0.082, 0.071, 0.180);
+Window.SetBackgroundBottomColor(0.165, 0.137, 0.314);
+
+SW = Window.GetWidth();
+SH = Window.GetHeight();
+CX = Window.GetX() + SW / 2;
+CY = Window.GetY() + SH / 2 - SH * 0.04;    # hơi cao hơn giữa một chút cho cân mắt
+
+# ảnh được vẽ ở cỡ 1200×560; chữ hello rộng khoảng một phần ba màn hình
+K = SH / 1600;
+if (K > 1.35) K = 1.35;
+if (K < 0.3)  K = 0.3;
+
+fun load(name, up) {
+    img = Image(name);
+    w = Math.Int(img.GetWidth() * up * K + 0.5);
+    h = Math.Int(img.GetHeight() * up * K + 0.5);
+    if (w != img.GetWidth() || h != img.GetHeight())
+        img = img.Scale(w, h);
+    return img;
+}
+
+mode = Plymouth.GetMode();
+booting = (mode == "boot" || mode == "resume" || mode == "updates" || mode == "system-upgrade" || mode == "firmware-upgrade");
+
+# ───────────── nạp ảnh ─────────────
+# khi tắt máy chỉ cần khung cuối của chữ ký, đỡ tốn thời gian
+if (booting) {
+    for (i = 0; i < HELLO_N; i++) {
+        hello[i] = load("hello-" + i + ".png", 1);
+        helloGlow[i] = load("hello-glow-" + i + ".png", 4);
+    }
+    for (i = 0; i < SIG_N; i++) {
+        sig[i] = load("sig-" + i + ".png", 1);
+        sigGlow[i] = load("sig-glow-" + i + ".png", 4);
+    }
+} else {
+    sig[SIG_N - 1] = load("sig-" + (SIG_N - 1) + ".png", 1);
+    sigGlow[SIG_N - 1] = load("sig-glow-" + (SIG_N - 1) + ".png", 4);
+}
+halo = load("sig-halo.png", 4);
+
+helloX = CX + HELLO_DX * K;   helloY = CY + HELLO_DY * K;
+sigX   = CX + SIG_DX * K;     sigY   = CY + SIG_DY * K;
+
+helloGlowSprite = Sprite();  helloGlowSprite.SetPosition(helloX, helloY, 1);
+helloSprite     = Sprite();  helloSprite.SetPosition(helloX, helloY, 2);
+haloSprite      = Sprite(halo);   haloSprite.SetPosition(sigX, sigY, 0);  haloSprite.SetOpacity(0);
+sigGlowSprite   = Sprite();  sigGlowSprite.SetPosition(sigX, sigY, 1);
+sigSprite       = Sprite();  sigSprite.SetPosition(sigX, sigY, 2);
+
+# ba chấm chờ dưới chữ ký
+dotImg = load("dot.png", 1);     # chấm 18 px ở 4K, nhỏ theo màn hình
+for (i = 0; i < 3; i++) {
+    dots[i] = Sprite(dotImg);
+    dots[i].SetPosition(CX + (i - 1) * 34 * K - dotImg.GetWidth() / 2, sigY + sig[SIG_N - 1].GetHeight() + 70 * K, 3);
+    dots[i].SetOpacity(0);
+}
+
+# ───────────── chữ khi tắt máy ─────────────
+if (booting == 0) {
+    if (mode == "reboot") label = load("text-reboot.png", 1);
+    else label = load("text-shutdown.png", 1);
+    labelSprite = Sprite(label);
+    labelSprite.SetPosition(CX - label.GetWidth() / 2, sigY + sig[SIG_N - 1].GetHeight() + 60 * K, 3);
+    labelSprite.SetOpacity(0);
+}
+
+fun ease(x) {
+    if (x < 0) return 0;
+    if (x > 1) return 1;
+    return x * x * (3 - 2 * x);
+}
+
+# ───────────── mật khẩu ổ đĩa ─────────────
+asking = 0;
+boxImg = load("box.png", 1);
+promptImg = load("text-password.png", 1);
+boxSprite = Sprite(boxImg);       boxSprite.SetOpacity(0);
+promptSprite = Sprite(promptImg); promptSprite.SetOpacity(0);
+BOX_X = CX - boxImg.GetWidth() / 2;
+BOX_Y = CY + SH * 0.22;
+boxSprite.SetPosition(BOX_X, BOX_Y, 10);
+promptSprite.SetPosition(CX - promptImg.GetWidth() / 2, BOX_Y - promptImg.GetHeight() - 24 * K, 10);
+bulletImg = load("dot.png", 1);
+# tạo sẵn 24 chấm (hàm gọi lại không tạo biến toàn cục mới được)
+for (i = 0; i < 24; i++) {
+    bullet[i] = Sprite(bulletImg);
+    bullet[i].SetPosition(BOX_X + 40 * K + i * 28 * K, BOX_Y + boxImg.GetHeight() / 2 - bulletImg.GetHeight() / 2, 11);
+    bullet[i].SetOpacity(0);
+}
+msgSprite = Sprite();
+msgSprite.SetZ(20);
+
+fun password_cb(prompt, bullets) {
+    asking = 1;
+    boxSprite.SetOpacity(1);
+    promptSprite.SetOpacity(1);
+    # ẩn chấm chờ cho đỡ rối
+    for (i = 0; i < 3; i++) dots[i].SetOpacity(0);
+    # vẽ lại các chấm mật khẩu (tối đa 24)
+    for (i = 0; i < 24; i++) {
+        if (i < bullets) bullet[i].SetOpacity(1);
+        else bullet[i].SetOpacity(0);
+    }
+}
+Plymouth.SetDisplayPasswordFunction(password_cb);
+
+fun normal_cb() {
+    asking = 0;
+    boxSprite.SetOpacity(0);
+    promptSprite.SetOpacity(0);
+    for (i = 0; i < 24; i++) bullet[i].SetOpacity(0);
+}
+Plymouth.SetDisplayNormalFunction(normal_cb);
+
+# thông báo của hệ thống (ít khi có): một dòng chữ nhỏ ở đáy màn hình
+fun message_cb(text) {
+    msgImg = Image.Text(text, 0.85, 0.82, 0.95, 1, "Sans 12");
+    msgSprite.SetImage(msgImg);
+    msgSprite.SetPosition(CX - msgImg.GetWidth() / 2, Window.GetY() + SH - msgImg.GetHeight() - 40, 20);
+}
+Plymouth.SetMessageFunction(message_cb);
+
+# ───────────── hoạt ảnh ─────────────
+tick = 0;
+fun refresh_cb() {
+    tick = tick + 1;
+    t = tick / 50;      # Plymouth gọi tối đa 50 lần mỗi giây
+
+    if (booting == 0) {
+        # tắt máy: chữ ký và dòng chữ hiện dần, chữ ký sáng nhịp nhàng
+        a = ease(t / 0.8);
+        sigSprite.SetImage(sig[SIG_N - 1]);         sigSprite.SetOpacity(a);
+        sigGlowSprite.SetImage(sigGlow[SIG_N - 1]); sigGlowSprite.SetOpacity(a * 0.9);
+        haloSprite.SetOpacity(a * (0.30 + 0.12 * Math.Sin(t * 2.2)));
+        labelSprite.SetOpacity(ease((t - 0.4) / 0.8));
+        return;
+    }
+
+    # ── hello tự viết ──
+    if (t >= T_HELLO && t < T_FADE + FADE_LEN) {
+        i = Math.Int((t - T_HELLO) * FPS);
+        if (i > HELLO_N - 1) i = HELLO_N - 1;
+        helloSprite.SetImage(hello[i]);
+        helloGlowSprite.SetImage(helloGlow[i]);
+        a = 1 - ease((t - T_FADE) / FADE_LEN);
+        # mờ dần và bay lên một chút
+        lift = (1 - a) * 46 * K;
+        helloSprite.SetY(helloY - lift);
+        helloGlowSprite.SetY(helloY - lift);
+        helloSprite.SetOpacity(a);
+        helloGlowSprite.SetOpacity(a * 0.95);
+    } else {
+        helloSprite.SetOpacity(0);
+        helloGlowSprite.SetOpacity(0);
+    }
+
+    # ── chữ ký tự viết ──
+    if (t >= T_SIG) {
+        i = Math.Int((t - T_SIG) * FPS);
+        if (i > SIG_N - 1) i = SIG_N - 1;
+        sigSprite.SetImage(sig[i]);
+        sigGlowSprite.SetImage(sigGlow[i]);
+        sigSprite.SetOpacity(1);
+        # nét mới viết sáng hơn, sau đó dịu lại
+        sigGlowSprite.SetOpacity(1);
+    }
+
+    # ── viết xong: quầng sáng thở chậm, ba chấm chờ ──
+    if (t >= T_SIG_END) {
+        u = t - T_SIG_END;
+        bloom = ease(u / 0.6);
+        haloSprite.SetOpacity(bloom * (0.32 + 0.14 * Math.Sin(u * 1.9)));
+        sigGlowSprite.SetOpacity(0.75 + 0.25 * Math.Sin(u * 1.9 + 0.8));
+        if (asking == 0) {
+            for (i = 0; i < 3; i++) {
+                w = 0.5 + 0.5 * Math.Sin(u * 4 - i * 0.9);
+                dots[i].SetOpacity(ease((u - 0.3) / 0.5) * (0.25 + 0.6 * w));
+            }
+        }
+    }
+}
+Plymouth.SetRefreshFunction(refresh_cb);

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Liquid Glass
+Description=Chữ hello tự viết, rồi chữ ký; nền đêm tím của Liquid Glass
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/liquid-glass
+ScriptFile=/usr/share/plymouth/themes/liquid-glass/liquid-glass.script

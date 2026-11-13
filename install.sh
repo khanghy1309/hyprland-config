@@ -299,6 +299,14 @@ if ask "Cài theme đăng nhập Liquid Glass vào $THEME_DIR (cần sudo)?"; th
 fi
 echo
 
+# ───────────────────────── màn hình khởi động ─────────────────────────
+bold "7. Màn hình khởi động (Plymouth)"
+info "Chữ hello tự viết rồi chuyển thành chữ ký, hiện lúc bật máy, nhập mật khẩu ổ đĩa và tắt máy."
+if ask "Cài màn hình khởi động? (sẽ hỏi trước khi sửa mkinitcpio và dòng lệnh kernel)"; then
+    "$HERE/plymouth/install-plymouth.sh"
+fi
+echo
+
 bold "Xong cả 5 đợt."
 cat <<'EOF'
 

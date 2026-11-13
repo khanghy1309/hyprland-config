@@ -13,6 +13,7 @@
 | **3** | Màn hình khóa, tự khóa khi rời máy, menu nguồn, màn hình đăng nhập | **có** |
 | **4** | Toàn cảnh workspace, bảng phím tắt, bảng chụp/quay, đọc chữ, bộ nhớ tạm và emoji | **có** |
 | **5** | Ứng dụng Cài đặt | **có** |
+| **+** | Màn hình khởi động Plymouth (hello → chữ ký) | **có** |
 
 Viết cho **Hyprland 0.57.2** (cấu hình bằng Lua) và **Quickshell 0.3.2**, là bản đang có trong kho Arch lúc soạn (12/11/2026). Mình đã kiểm tra cú pháp của mọi file và đối chiếu tên lệnh, tên tuỳ chọn với mã nguồn của hai phần mềm này, nhưng **chưa chạy thử trên một máy Arch thật**. Lần đầu khởi động có thể còn lỗi nhỏ; xem mục "Sự cố thường gặp".
 
@@ -185,6 +186,16 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 - Thử theme mà không cần đăng xuất: `sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/liquid-glass`
 - Ảnh đại diện: lưu một ảnh vuông thành `~/.face` rồi chạy lại `./install.sh`. Không có ảnh thì hiện chữ cái đầu của tên.
 - Đổi ảnh nền hoặc phông: sửa `/usr/share/sddm/themes/liquid-glass/theme.conf` (cần `sudo`).
+
+## Màn hình khởi động
+
+Lúc bật máy: chữ **hello** tự viết ra bằng nét sáng tím hồng, mờ dần và bay lên, rồi **chữ ký** tự viết theo đúng thứ tự nét; viết xong chữ ký sáng nhịp nhàng, có ba chấm chờ bên dưới. Máy có ổ đĩa mã hoá thì ô nhập mật khẩu hiện ngay dưới chữ ký. Lúc tắt máy hoặc khởi động lại: chữ ký hiện dần kèm dòng "Đang tắt máy…" / "Đang khởi động lại…".
+
+Cài bằng `./install.sh` (bước 7) hoặc riêng: `./plymouth/install-plymouth.sh`. Script hỏi trước khi sửa `/etc/mkinitcpio.conf` và dòng lệnh kernel (GRUB, systemd-boot hoặc `/etc/kernel/cmdline`), và sao lưu từng file trước khi sửa.
+
+- Xem thử không cần khởi động lại: `sudo plymouthd; sudo plymouth --show-splash; sleep 8; sudo plymouth --quit`
+- Đổi chữ ký hoặc chữ hello: sửa danh sách điểm trong `plymouth/src/anim.html`, rồi chạy `node plymouth/src/render.js /tmp/khung` và `python3 plymouth/src/pack.py /tmp/khung plymouth/liquid-glass`, cập nhật số khung trong `liquid-glass.script` theo `layout.txt`, rồi cài lại.
+- Gỡ: `sudo plymouth-set-default-theme -R bgrt`.
 
 ## Hình nền
 
