@@ -1,117 +1,198 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<style>html,body{margin:0;background:transparent}svg{display:block}</style>
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
 </head><body>
-<!-- Khung vẽ 1200×560 (gấp đôi khung 600×280). Dùng: render.js gọi frame(kind, p) rồi chụp. -->
-<svg id="s" width="1200" height="560" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="0.3">
-      <stop offset="0" stop-color="#d9ccff"/>
-      <stop offset="0.5" stop-color="#ffd1e8"/>
-      <stop offset="1" stop-color="#c8f5ea"/>
-    </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="5"/>
-    </filter>
-    <filter id="tipglow" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur stdDeviation="3.5"/>
-    </filter>
-  </defs>
-  <g id="glowLayer" filter="url(#glow)" opacity="0.55"></g>
-  <g id="inkLayer"></g>
-  <circle id="tip" r="5" fill="#fff" filter="url(#tipglow)" opacity="0"/>
-  <circle id="tip2" r="1.8" fill="#fff" opacity="0"/>
-</svg>
+<!-- Khung vẽ 1200×560 (gấp đôi khung 600×280).
+     render.js gọi:  write(p, layer)  — viết chữ hello tới tiến độ p
+                     morph(t, layer)  — hello biến dần thành chữ ký (t: 0 → 1)
+     layer: "ink" (nét sắc) | "glow" (quầng sáng) | "all" -->
+<canvas id="c" width="1200" height="560"></canvas>
 <script>
-// Catmull-Rom qua các điểm → đường cong Bézier mượt
-function smooth(pts, tension = 0.5) {
-  let d = `M${pts[0][0]},${pts[0][1]}`;
+const SCALE = 2;
+const c = document.getElementById("c"), g = c.getContext("2d");
+
+// ───────── hình học ─────────
+function catmull(pts, steps = 20) {
+  const out = [];
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
-    const c1 = [p1[0] + (p2[0] - p0[0]) * tension / 3, p1[1] + (p2[1] - p0[1]) * tension / 3];
-    const c2 = [p2[0] - (p3[0] - p1[0]) * tension / 3, p2[1] - (p3[1] - p1[1]) * tension / 3];
-    d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0]},${p2[1]}`;
+    for (let k = 0; k < steps; k++) {
+      const t = k / steps, t2 = t * t, t3 = t2 * t;
+      out.push([0, 1].map(j => 0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * t
+        + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3)));
+    }
   }
-  return d;
+  out.push(pts[pts.length - 1].slice());
+  return out;
+}
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+function lengthOf(poly) { let L = 0; for (let i = 1; i < poly.length; i++) L += dist(poly[i - 1], poly[i]); return L; }
+// lấy điểm cách đều theo chiều dài
+function resample(poly, n) {
+  const L = lengthOf(poly), out = [];
+  let i = 1, acc = 0;
+  for (let k = 0; k < n; k++) {
+    const target = L * k / (n - 1);
+    while (i < poly.length - 1 && acc + dist(poly[i - 1], poly[i]) < target) { acc += dist(poly[i - 1], poly[i]); i++; }
+    const seg = dist(poly[i - 1], poly[i]) || 1, f = Math.min(1, (target - acc) / seg);
+    out.push([poly[i - 1][0] + (poly[i][0] - poly[i - 1][0]) * f, poly[i - 1][1] + (poly[i][1] - poly[i - 1][1]) * f]);
+  }
+  return out;
 }
 
-// "hello" viết liền một nét (tự thiết kế), toạ độ trong khung 600×280
-const HELLO = [[
+// độ dày nét như bút: mỏng ở hai đầu, dày ở giữa; nét đi lên mỏng hơn nét đi xuống
+function widths(pts, base, upThin = 0.55, minEnd = 0.18) {
+  const n = pts.length;
+  return pts.map((p, i) => {
+    const s = i / (n - 1);
+    const taper = minEnd + (1 - minEnd) * Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, s))), 0.45);
+    const a = pts[Math.max(0, i - 2)], b = pts[Math.min(n - 1, i + 2)];
+    const dy = b[1] - a[1], len = dist(a, b) || 1;
+    const down = (dy / len + 1) / 2;            // 1: đi xuống, 0: đi lên
+    return base * taper * (upThin + (1 - upThin) * down);
+  });
+}
+
+// ───────── chữ "hello" (một nét, tự thiết kế) ─────────
+const HELLO_PTS = [
   [70, 196], [96, 186], [124, 160], [148, 118], [160, 82], [158, 60], [146, 56], [136, 70], [130, 110], [126, 160], [124, 196],
   [128, 172], [140, 150], [156, 140], [170, 146], [174, 166], [172, 190], [184, 198], [204, 186],
   [222, 170], [240, 160], [250, 147], [244, 136], [228, 138], [216, 156], [216, 180], [232, 196], [256, 194], [276, 178],
   [296, 146], [310, 104], [312, 70], [302, 58], [292, 70], [288, 110], [290, 160], [300, 192], [318, 194], [334, 180],
   [352, 146], [366, 104], [368, 70], [358, 58], [348, 70], [344, 110], [346, 160], [356, 192], [374, 194], [392, 182],
   [404, 164], [418, 146], [438, 142], [452, 158], [448, 184], [430, 196], [412, 188], [410, 166], [424, 148], [446, 144], [470, 142], [500, 132]
-]];
-
-// chữ ký: theo nét tay gốc (khung 300×337), dời và phóng vào giữa khung vẽ
-const SIG_RAW = [
-  // nét 1: móc trên, thân dọc, giọt lá bên trái, gạch ngang, lên đỉnh phải
-  [[58, 103], [70, 88], [88, 80], [95, 92], [96, 125], [92, 150], [80, 175], [62, 198], [56, 180], [58, 158],
-   [72, 140], [92, 124], [112, 123], [132, 128], [150, 120], [163, 105]],
-  // nét 2: thân phải xuống, vòng nhỏ, móc dưới, nét quét chéo
-  [[163, 105], [160, 140], [154, 170], [143, 196], [128, 184], [108, 178], [100, 192], [106, 212], [122, 216], [140, 200],
-   [150, 220], [150, 240], [132, 251], [106, 252], [102, 264], [118, 268], [140, 252], [160, 262], [178, 275]],
-  // hai dấu nhỏ bên phải
-  [[193, 80], [205, 83], [211, 95], [206, 106], [198, 111]],
-  [[237, 68], [247, 77], [248, 89], [236, 95], [224, 100]]
 ];
-const SIG = SIG_RAW.map(st => st.map(([x, y]) => [Math.round((x - 150) * 0.92 + 300), Math.round((y - 175) * 0.92 + 145)]));
 
-const NS = "http://www.w3.org/2000/svg";
-function build(strokes, width) {
-  const ink = document.getElementById("inkLayer"), glow = document.getElementById("glowLayer");
-  ink.innerHTML = ""; glow.innerHTML = "";
-  const out = [];
-  for (const st of strokes) {
-    const d = smooth(st);
-    const mk = (parent, w, color) => {
-      const p = document.createElementNS(NS, "path");
-      p.setAttribute("d", d); p.setAttribute("fill", "none");
-      p.setAttribute("stroke", color); p.setAttribute("stroke-width", w);
-      p.setAttribute("stroke-linecap", "round"); p.setAttribute("stroke-linejoin", "round");
-      parent.appendChild(p);
-      return p;
-    };
-    const g = mk(glow, width * 2.6, "#e8d8ff");
-    const p = mk(ink, width, "url(#ink)");
-    const len = p.getTotalLength();
-    for (const q of [g, p]) { q.style.strokeDasharray = len + " " + len; q.style.strokeDashoffset = len; }
-    out.push({ p, g, len });
+// ───────── chữ ký (làm đẹp từ nét tay gốc, khung 300×337) ─────────
+// nét mềm hơn, vòng tròn đều hơn, nghiêng nhẹ sang phải, nét cuối kéo dài và vuốt nhọn
+const SIG_RAW = [
+  // nét 1: móc mở đầu → thân dọc → giọt lá trái → gạch ngang → vút lên đỉnh phải
+  [[52, 108], [60, 94], [74, 83], [88, 80], [96, 90], [97, 112], [94, 138], [86, 162], [72, 184], [60, 197], [54, 186],
+   [56, 164], [66, 146], [82, 132], [100, 124], [118, 125], [134, 129], [148, 124], [158, 114], [165, 102]],
+  // nét 2: thân phải buông xuống → vòng nhỏ → móc đáy → nét quét chéo dài
+  [[165, 102], [163, 128], [158, 156], [150, 180], [140, 196], [126, 184], [110, 178], [100, 188], [102, 206], [116, 216],
+   [132, 210], [143, 200], [151, 216], [153, 234], [145, 247], [126, 253], [106, 254], [99, 263], [108, 270], [124, 266],
+   [142, 254], [160, 260], [182, 274], [200, 284]],
+  // hai dấu nhỏ
+  [[192, 82], [203, 84], [210, 93], [208, 104], [199, 111]],
+  [[234, 70], [245, 76], [249, 87], [242, 95], [226, 101]]
+];
+const CX = 150, CY = 178, SLANT = 0.14, S = 1.1;
+const SIG_PTS = SIG_RAW.map(st => st.map(([x, y]) => [
+  (x - CX + SLANT * (CY - y)) * S + 300, (y - CY) * S + 142]));
+
+// ───────── chuẩn bị điểm ─────────
+const N = 1400;
+const helloDense = catmull(HELLO_PTS);
+const HELLO = resample(helloDense, N);
+const HELLO_W = widths(HELLO, 7.2, 0.5, 0.25);
+
+// chữ ký: các nét nối nhau bằng đoạn "nhấc bút" (độ dày 0) để ghép được với hello một-nét
+let SIG = [], SIG_W = [];
+(function () {
+  const strokes = SIG_PTS.map(st => catmull(st));
+  const parts = [];
+  strokes.forEach((st, k) => {
+    parts.push({ poly: st, pen: true, base: k < 2 ? 6.4 : 5.2 });
+    if (k < strokes.length - 1) parts.push({ poly: [st[st.length - 1], strokes[k + 1][0]], pen: false });
+  });
+  const lens = parts.map(p => lengthOf(p.poly)), total = lens.reduce((a, b) => a + b, 0);
+  parts.forEach((p, k) => {
+    const n = Math.max(2, Math.round(N * lens[k] / total));
+    const pts = resample(p.poly, n);
+    const w = p.pen ? widths(pts, p.base, 0.45, 0.12) : pts.map(() => 0);
+    SIG.push(...pts); SIG_W.push(...w);
+  });
+  // làm tròn đúng N điểm
+  while (SIG.length > N) { SIG.pop(); SIG_W.pop(); }
+  while (SIG.length < N) { SIG.push(SIG[SIG.length - 1]); SIG_W.push(0); }
+})();
+
+// ───────── vẽ ─────────
+function inkStyle() {
+  const gr = g.createLinearGradient(150 * SCALE, 40 * SCALE, 470 * SCALE, 240 * SCALE);
+  gr.addColorStop(0, "#e2d6ff");
+  gr.addColorStop(0.5, "#ffd6ea");
+  gr.addColorStop(1, "#cdf7ec");
+  return gr;
+}
+function strokePoly(pts, ws, upto, widthMul, color, ctx = g) {
+  const g = ctx;
+  g.strokeStyle = color;
+  g.lineCap = "round";
+  g.lineJoin = "round";
+  for (let i = 0; i < Math.min(upto, pts.length) - 1; i++) {
+    const w = (ws[i] + ws[i + 1]) / 2 * widthMul;
+    if (w < 0.35) continue;
+    g.lineWidth = w * SCALE;
+    g.beginPath();
+    g.moveTo(pts[i][0] * SCALE, pts[i][1] * SCALE);
+    g.lineTo(pts[i + 1][0] * SCALE, pts[i + 1][1] * SCALE);
+    g.stroke();
   }
-  return out;
+}
+function tipAt(p, layer) {
+  if (!p) return;
+  const [x, y] = [p[0] * SCALE, p[1] * SCALE];
+  if (layer !== "ink") {
+    const gr = g.createRadialGradient(x, y, 0, x, y, 26);
+    gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = gr; g.fillRect(x - 26, y - 26, 52, 52);
+  }
+  if (layer !== "glow") { g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, 3.2, 0, Math.PI * 2); g.fill(); }
+}
+// quầng sáng: vẽ nét đặc lên tấm riêng rồi làm mờ một lần (tránh cộng dồn độ sáng ở chỗ nối)
+const off = document.createElement("canvas"); off.width = c.width; off.height = c.height;
+const og = off.getContext("2d");
+function glowPass(pts, ws, upto, widthMul, alpha, blur) {
+  og.clearRect(0, 0, off.width, off.height);
+  strokePoly(pts, ws, upto, widthMul, "#e9dcff", og);
+  g.save(); g.filter = `blur(${blur}px)`; g.globalAlpha = alpha;
+  g.drawImage(off, 0, 0);
+  g.restore();
+}
+function paint(pts, ws, upto, layer, glowBoost = 1, tip = null) {
+  g.clearRect(0, 0, c.width, c.height);
+  if (layer !== "ink") {
+    glowPass(pts, ws, upto, 2.2, Math.min(0.95, 0.5 * glowBoost), 9);
+    glowPass(pts, ws, upto, 1.2, Math.min(0.8, 0.35 * glowBoost), 3);
+  }
+  if (layer !== "glow") strokePoly(pts, ws, upto, 1, inkStyle());
+  tipAt(tip, layer);
 }
 
-let cur = null, curKind = "";
-// vẽ đến tiến độ p (0..1) của toàn bộ nét; tip = hiện đầu bút sáng
-// layer: "all" | "ink" (nét sắc) | "glow" (quầng sáng, Plymouth phóng to lại)
-window.frame = function (kind, p, tip = true, layer = "all") {
-  document.getElementById("inkLayer").style.display = layer === "glow" ? "none" : "";
-  document.getElementById("glowLayer").style.display = layer === "ink" ? "none" : "";
-  if (curKind !== kind) { cur = build(kind === "hello" ? HELLO : SIG, kind === "hello" ? 6 : 5.2); curKind = kind; }
-  const total = cur.reduce((a, s) => a + s.len, 0);
-  let left = p * total, tipPt = null;
-  for (const s of cur) {
-    const shown = Math.max(0, Math.min(s.len, left));
-    for (const q of [s.p, s.g]) q.style.strokeDashoffset = s.len - shown;
-    if (shown > 0 && shown < s.len) tipPt = s.p.getPointAtLength(shown);
-    left -= s.len;
-  }
-  for (const id of ["tip", "tip2"]) {
-    const c = document.getElementById(id);
-    const want = id === "tip" ? layer !== "ink" : layer !== "glow";
-    c.setAttribute("opacity", tip && tipPt && want ? 1 : 0);
-    if (tipPt) { c.setAttribute("cx", tipPt.x); c.setAttribute("cy", tipPt.y); }
-  }
+// viết hello tới tiến độ p
+window.write = function (p, layer = "all") {
+  const k = Math.max(2, Math.round(p * N));
+  paint(HELLO, HELLO_W, k, layer, 1, p < 1 ? HELLO[k - 1] : null);
 };
-// ảnh hào quang riêng của chữ ký (để Plymouth làm nhịp sáng)
-window.glowOnly = function () {
-  frame("sig", 1, false);
-  document.getElementById("inkLayer").style.display = "none";
-  const gl = document.getElementById("glowLayer");
-  gl.setAttribute("opacity", "0.9");
-  gl.querySelectorAll("path").forEach(p => p.setAttribute("stroke-width", 16));
+
+// hello → chữ ký: từng điểm trượt về chỗ mới, lan từ trái sang phải như chất lỏng
+const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+window.morph = function (t, layer = "all") {
+  const D = 0.38;                        // độ trễ lan giữa điểm đầu và điểm cuối
+  const pts = [], ws = [];
+  for (let i = 0; i < N; i++) {
+    const u = ease((t - D * i / N) / (1 - D));
+    // đường đi cong nhẹ lên trên giữa chừng cho mềm
+    const lift = Math.sin(Math.PI * u) * 18;
+    pts.push([HELLO[i][0] + (SIG[i][0] - HELLO[i][0]) * u,
+              HELLO[i][1] + (SIG[i][1] - HELLO[i][1]) * u - lift]);
+    // giữa chừng nét hơi mảnh lại, rồi dày lên đúng độ dày chữ ký
+    const mid = 1 - 0.35 * Math.sin(Math.PI * u);
+    // đoạn "nhấc bút" của chữ ký tan đi nhanh hơn để không thành sợi chỉ nối các nét
+    const w = SIG_W[i] > 0 ? HELLO_W[i] + (SIG_W[i] - HELLO_W[i]) * u : HELLO_W[i] * Math.pow(1 - u, 3);
+    ws.push(w * mid);
+  }
+  // quầng sáng bừng lên khi đang biến hình
+  paint(pts, ws, N, layer, 1 + 0.8 * Math.sin(Math.PI * Math.min(1, t)));
 };
+
+// quầng sáng lớn quanh chữ ký (Plymouth cho nhịp thở)
+window.halo = function () {
+  g.clearRect(0, 0, c.width, c.height);
+  glowPass(SIG, SIG_W, N, 4, 0.75, 20);
+};
+write(1);
 </script>
 </body></html>

@@ -189,7 +189,7 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 
 ## Màn hình khởi động
 
-Lúc bật máy: chữ **hello** tự viết ra bằng nét sáng tím hồng, mờ dần và bay lên, rồi **chữ ký** tự viết theo đúng thứ tự nét; viết xong chữ ký sáng nhịp nhàng, có ba chấm chờ bên dưới. Máy có ổ đĩa mã hoá thì ô nhập mật khẩu hiện ngay dưới chữ ký. Lúc tắt máy hoặc khởi động lại: chữ ký hiện dần kèm dòng "Đang tắt máy…" / "Đang khởi động lại…".
+Lúc bật máy, trên nền đen: chữ **hello** tự viết ra bằng nét sáng tím hồng, rồi từng đoạn nét trôi như chất lỏng từ trái sang phải và **biến thành chữ ký**; xong chữ ký sáng nhịp nhàng, có ba chấm chờ bên dưới. Máy có ổ đĩa mã hoá thì ô nhập mật khẩu hiện ngay dưới chữ ký. Lúc tắt máy hoặc khởi động lại: chữ ký hiện dần kèm dòng "Đang tắt máy…" / "Đang khởi động lại…".
 
 Cài bằng `./install.sh` (bước 7) hoặc riêng: `./plymouth/install-plymouth.sh`. Script hỏi trước khi sửa `/etc/mkinitcpio.conf` và dòng lệnh kernel (GRUB, systemd-boot hoặc `/etc/kernel/cmdline`), và sao lưu từng file trước khi sửa.
 

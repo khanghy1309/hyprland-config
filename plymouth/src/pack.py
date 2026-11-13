@@ -26,11 +26,11 @@ def save(im, path):
     q = im.quantize(256, method=Image.Quantize.FASTOCTREE)
     q.save(path, optimize=True)
 
-for kind in ("hello", "sig"):
+for kind in ("hello", "morph"):
     files = sorted((p for p in glob.glob(f"{src}/{kind}-*.png") if p.rsplit("-", 1)[1][:-4].isdigit() and "-glow-" not in p),
                    key=lambda p: int(p.rsplit("-", 1)[1][:-4]))
     glows = [f.replace(f"/{kind}-", f"/{kind}-glow-") for f in files]
-    box = bbox_of(files + glows + ([f"{src}/sig-halo.png"] if kind == "sig" else []))
+    box = bbox_of(files + glows + ([f"{src}/sig-halo.png"] if kind == "morph" else []))
     # khung chia hết cho GLOW_DOWN để phóng lại khớp từng điểm ảnh
     x0, y0, x1, y1 = box
     x1 = x0 + -(-(x1 - x0) // GLOW_DOWN) * GLOW_DOWN
@@ -39,7 +39,7 @@ for kind in ("hello", "sig"):
     for f, gf in zip(files, glows):
         save(Image.open(f).crop(box), f"{dst}/{os.path.basename(f)}")
         save_glow(Image.open(gf).crop(box), f"{dst}/{os.path.basename(gf)}")
-    if kind == "sig":
+    if kind == "morph":
         save_glow(Image.open(f"{src}/sig-halo.png").crop(box), f"{dst}/sig-halo.png")
     # độ lệch tâm so với giữa khung gốc, và số khung
     lines.append(f"{kind} {len(files)} {x0 - W // 2} {y0 - H // 2} {x1 - x0} {y1 - y0}")

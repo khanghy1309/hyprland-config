@@ -1,28 +1,26 @@
 # Liquid Glass — màn hình khởi động Plymouth
 #
-#   khởi động:  chữ "hello" tự viết ra  →  mờ dần, bay lên  →  chữ ký tự viết  →  chữ ký sáng nhịp nhàng
+#   khởi động:  chữ "hello" tự viết ra  →  nét chữ trôi như chất lỏng và biến thành chữ ký  →  chữ ký sáng nhịp nhàng
 #   mật khẩu ổ đĩa (LUKS):  ô kính dưới chữ ký, mỗi ký tự là một chấm
 #   tắt máy / khởi động lại:  chữ ký hiện dần và một dòng chữ
 #
 # Khung hình được vẽ sẵn (plymouth/src/render.js) ở cỡ dành cho màn hình 4K và thu nhỏ khi nạp.
-# Mỗi khung có hai ảnh: nét chữ sắc (hello-i.png) và quầng sáng mờ lưu nhỏ 4 lần (hello-glow-i.png).
+# Mỗi khung có hai ảnh: nét chữ sắc (hello-i.png, morph-i.png) và quầng sáng mờ lưu nhỏ 4 lần (…-glow-i.png).
 
 # ───────────── thông số (lấy từ layout.txt khi dựng) ─────────────
 FPS = 24;
-HELLO_N = 56;   HELLO_DX = -492;  HELLO_DY = -203;
-SIG_N   = 47;   SIG_DX   = -209;  SIG_DY   = -220;
+HELLO_N = 34;   HELLO_DX = -483;  HELLO_DY = -194;
+SIG_N   = 36;   SIG_DX   = -474;  SIG_DY   = -278;     # khung biến hình hello → chữ ký
 
 # thời điểm (giây)
-T_HELLO      = 0.4;                       # bắt đầu viết hello
+T_HELLO      = 0.3;                       # bắt đầu viết hello
 T_HELLO_END  = T_HELLO + HELLO_N / FPS;   # viết xong
-T_FADE       = T_HELLO_END + 0.6;         # bắt đầu mờ hello
-FADE_LEN     = 0.55;
-T_SIG        = T_FADE + 0.35;             # bắt đầu viết chữ ký
+T_SIG        = T_HELLO_END + 0.35;        # dừng một nhịp rồi biến thành chữ ký
 T_SIG_END    = T_SIG + SIG_N / FPS;
 
 # ───────────── nền ─────────────
-Window.SetBackgroundTopColor(0.082, 0.071, 0.180);
-Window.SetBackgroundBottomColor(0.165, 0.137, 0.314);
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
 
 SW = Window.GetWidth();
 SH = Window.GetHeight();
@@ -54,12 +52,12 @@ if (booting) {
         helloGlow[i] = load("hello-glow-" + i + ".png", 4);
     }
     for (i = 0; i < SIG_N; i++) {
-        sig[i] = load("sig-" + i + ".png", 1);
-        sigGlow[i] = load("sig-glow-" + i + ".png", 4);
+        sig[i] = load("morph-" + i + ".png", 1);
+        sigGlow[i] = load("morph-glow-" + i + ".png", 4);
     }
 } else {
-    sig[SIG_N - 1] = load("sig-" + (SIG_N - 1) + ".png", 1);
-    sigGlow[SIG_N - 1] = load("sig-glow-" + (SIG_N - 1) + ".png", 4);
+    sig[SIG_N - 1] = load("morph-" + (SIG_N - 1) + ".png", 1);
+    sigGlow[SIG_N - 1] = load("morph-glow-" + (SIG_N - 1) + ".png", 4);
 }
 halo = load("sig-halo.png", 4);
 
@@ -161,25 +159,20 @@ fun refresh_cb() {
         return;
     }
 
-    # ── hello tự viết ──
-    if (t >= T_HELLO && t < T_FADE + FADE_LEN) {
+    # ── hello tự viết, giữ nguyên tới lúc biến hình ──
+    if (t >= T_HELLO && t < T_SIG) {
         i = Math.Int((t - T_HELLO) * FPS);
         if (i > HELLO_N - 1) i = HELLO_N - 1;
         helloSprite.SetImage(hello[i]);
         helloGlowSprite.SetImage(helloGlow[i]);
-        a = 1 - ease((t - T_FADE) / FADE_LEN);
-        # mờ dần và bay lên một chút
-        lift = (1 - a) * 46 * K;
-        helloSprite.SetY(helloY - lift);
-        helloGlowSprite.SetY(helloY - lift);
-        helloSprite.SetOpacity(a);
-        helloGlowSprite.SetOpacity(a * 0.95);
+        helloSprite.SetOpacity(1);
+        helloGlowSprite.SetOpacity(0.95);
     } else {
         helloSprite.SetOpacity(0);
         helloGlowSprite.SetOpacity(0);
     }
 
-    # ── chữ ký tự viết ──
+    # ── hello biến thành chữ ký (khung đầu của morph trùng khít hello cuối) ──
     if (t >= T_SIG) {
         i = Math.Int((t - T_SIG) * FPS);
         if (i > SIG_N - 1) i = SIG_N - 1;
