@@ -155,10 +155,12 @@ Item {
         spacing: 14
         readonly property real colW: (dash.width - 44 - spacing) / 2
 
-        // ── lịch ──
+        // ── lịch ── (cao bằng cột bên phải cho hai cột thẳng hàng)
         Card {
             width: body.colW
+            height: Math.max(calCol.implicitHeight + 28, rightCol.height)
             Column {
+                id: calCol
                 width: parent.width
                 spacing: 4
 
@@ -290,6 +292,7 @@ Item {
         }
 
         Column {
+            id: rightCol
             width: body.colW
             spacing: 14
 
