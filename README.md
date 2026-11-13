@@ -138,7 +138,7 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - Đổi kích thước, tắt phóng to, tắt tự ẩn: Cài đặt → Dock.
 
 **Cài đặt** (`Super + ,`, hoặc gõ "cài đặt" trong launcher): một cửa sổ kính, đổi gì là áp dụng ngay, không có nút Lưu.
-- *Giao diện:* kiểu kính (acrylic / mờ thường / tắt), độ mờ, độ đậm của các bảng kính, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
+- *Giao diện:* phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kiểu kính (acrylic / mờ thường / tắt), độ mờ, độ đậm của các bảng kính, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
 - *Hình nền:* bấm vào ảnh để đổi. Video và GIF có nhãn ở góc. Chọn lúc nào video tạm dừng (khi có cửa sổ toàn màn hình, khi có bất kỳ cửa sổ nào, hoặc không bao giờ), có dùng ảnh tĩnh khi chạy pin không, và hiệu ứng khi đổi ảnh.
 - *Touchpad và bàn phím:* cuộn tự nhiên, chạm để bấm, tắt touchpad khi gõ, tốc độ cuộn và con trỏ, bật/tắt từng cử chỉ, tốc độ lặp phím (có ô gõ thử).
 - *Wi-Fi:* bật/tắt, danh sách mạng xung quanh, bấm để kết nối (mạng có khoá thì hiện ô mật khẩu ngay bên dưới), quên mạng, ngắt kết nối.
@@ -296,6 +296,7 @@ config/
   kitty/
     kitty.conf, glass-theme.conf
 sddm/liquid-glass/   theme màn hình đăng nhập (Main.qml, GlassBox.qml...)
+fonts/               Geist, Geist Mono, Be Vietnam Pro, Onest (giấy phép SIL OFL)
 wallpapers/ridge.png  hình nền mặc định (4K)
 install.sh
 ```

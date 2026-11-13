@@ -29,8 +29,9 @@ Singleton {
     readonly property color scrim: Qt.rgba(6 / 255, 12 / 255, 16 / 255, 0.40)
 
     // Phông
-    readonly property string font: "Inter"
-    readonly property string mono: "JetBrains Mono"
+    // phông chữ chọn trong Cài đặt → Giao diện (mặc định Geist / Geist Mono)
+    readonly property string font: Settings.look.font
+    readonly property string mono: Settings.look.monoFont
 
     // Kích thước thanh trên
     readonly property int barTop: 18

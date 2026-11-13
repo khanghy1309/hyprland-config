@@ -208,6 +208,33 @@ FloatingWindow {
             }
 
             Group {
+                title: "Phông chữ"
+                Repeater {
+                    // [tên phông, mô tả]; tất cả đều đủ dấu tiếng Việt và đi kèm bộ cài
+                    model: [["Geist", "Gọn, hiện đại, gần với phông của macOS"],
+                            ["Inter", "Rõ ở cỡ nhỏ, rất phổ biến"],
+                            ["Be Vietnam Pro", "Thiết kế riêng cho tiếng Việt, dấu đặt đẹp"],
+                            ["Onest", "Tròn, mềm, thân thiện"]]
+                    delegate: PickRow {
+                        required property var modelData
+                        label: "Thứ Sáu, 13 tháng 11 · " + modelData[0]
+                        labelFont: modelData[0]
+                        note: modelData[1]
+                        on: Settings.look.font === modelData[0]
+                        onPicked: Settings.look.font = modelData[0]
+                    }
+                }
+                SegRow {
+                    label: "Phông chữ số và mã"
+                    note: "Dùng cho số liệu trên thanh trên, đồng hồ đếm giờ… Terminal kitty đặt riêng trong kitty.conf."
+                    options: [["Geist Mono", "Geist Mono"], ["JetBrains Mono", "JetBrains Mono"]]
+                    current: Settings.look.monoFont
+                    onPicked: v => Settings.look.monoFont = v
+                    last: true
+                }
+            }
+
+            Group {
                 title: "Chuyển động"
                 SwitchRow {
                     label: "Hiệu ứng chuyển động"
@@ -1427,6 +1454,7 @@ FloatingWindow {
     component RowBase: Item {
         id: rb
         property string label
+        property string labelFont: Theme.font
         property string note: ""
         property bool last: false
         // phần bên phải dành cho nút/thanh trượt; dòng nào có nút rộng thì tăng lên
@@ -1445,7 +1473,7 @@ FloatingWindow {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: rb.label
-                font.family: Theme.font
+                font.family: rb.labelFont
                 font.pixelSize: 14
                 color: Theme.fg
             }

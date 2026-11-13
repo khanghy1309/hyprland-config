@@ -17,7 +17,7 @@ Rectangle {
     readonly property color accent: "#f4f6f7"
     readonly property color ink: "#14181b"
     readonly property color danger: "#f28b82"
-    readonly property string font: config.font ? config.font : "Inter"
+    readonly property string font: config.font ? config.font : "Geist"
 
     // ── người dùng và phiên ──
     property var users: []
@@ -307,7 +307,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 34
         text: sddm.hostName
-        font.family: "JetBrains Mono"
+        font.family: "Geist Mono"
         font.pixelSize: 13
         color: root.fg
     }

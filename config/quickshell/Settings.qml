@@ -55,6 +55,8 @@ Singleton {
                 property bool borders: true
                 property bool animations: true
                 property real animScale: 1           // 0,7 nhanh · 1 vừa · 1,4 chậm
+                property string font: "Geist"         // Geist | Inter | Be Vietnam Pro | Onest
+                property string monoFont: "Geist Mono" // Geist Mono | JetBrains Mono
             }
             property JsonObject input: JsonObject {
                 property bool naturalScroll: true
@@ -146,6 +148,10 @@ Singleton {
         interval: 300
         onTriggered: Quickshell.execDetached(["hyprctl", "reload"])
     }
+
+    // ── phông chữ cho ứng dụng GTK (Tệp, Firefox...) đổi theo ──
+    readonly property string uiFont: look.font
+    onUiFontChanged: if (ready) Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "font-name", uiFont + " 11"])
 
     // ── hình nền khi rút / cắm sạc ──
     readonly property bool onBattery: UPower.onBattery
