@@ -28,6 +28,22 @@ Singleton {
     function toggleMute() { if (sink && sink.audio) sink.audio.muted = !sink.audio.muted; }
     function toggleMic() { if (source && source.audio) source.audio.muted = !source.audio.muted; }
 
+    // ── chế độ chơi game (scripts/gamemode.sh) ──
+    readonly property string gameScript: Quickshell.env("HOME") + "/.config/hypr/scripts/gamemode.sh"
+    property bool gaming: false
+    function toggleGaming() {
+        gameSet.command = [gameScript, gaming ? "off" : "on"];
+        gaming = !gaming;                 // hiện ngay, đọc lại trạng thái thật khi lệnh xong
+        gameSet.running = true;
+    }
+    Process { id: gameSet; onExited: gameGet.running = true }
+    Process {
+        id: gameGet
+        command: [root.gameScript, "status"]
+        running: true
+        stdout: StdioCollector { onStreamFinished: root.gaming = text.trim() === "on" }
+    }
+
     PwObjectTracker { objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource] }
 
     // ── Wi-Fi ──

@@ -283,6 +283,10 @@ PanelWindow {
         height: column.implicitHeight + 28
         anchors.horizontalCenter: parent.horizontalCenter
         y: parent.height * 0.17
+        // viền kính sáng lên ở chỗ gần con trỏ
+        glow: cardHover.hovered ? 0.8 : 0
+        glowPos: cardHover.point.position
+        HoverHandler { id: cardHover }
 
         opacity: root.visible ? 1 : 0
         scale: root.visible ? 1 : 0.97

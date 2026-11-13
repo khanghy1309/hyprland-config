@@ -14,6 +14,7 @@
 | **4** | Toàn cảnh workspace, bảng phím tắt, bảng chụp/quay, đọc chữ, bộ nhớ tạm và emoji | **có** |
 | **5** | Ứng dụng Cài đặt | **có** |
 | **+** | Màn hình khởi động Plymouth (hello → chữ ký) | **có** |
+| **+** | Kính khúc xạ, hiệu ứng thần đèn khi thu nhỏ, chuyển động lò xo, chế độ chơi game | **có** |
 
 Viết cho **Hyprland 0.57.2** (cấu hình bằng Lua) và **Quickshell 0.3.2**, là bản đang có trong kho Arch lúc soạn (12/11/2026). Mình đã kiểm tra cú pháp của mọi file và đối chiếu tên lệnh, tên tuỳ chọn với mã nguồn của hai phần mềm này, nhưng **chưa chạy thử trên một máy Arch thật**. Lần đầu khởi động có thể còn lỗi nhỏ; xem mục "Sự cố thường gặp".
 
@@ -60,7 +61,7 @@ Sau đó đăng xuất, chọn phiên **Hyprland** ở màn hình đăng nhập.
 | `Super + N` | Trung tâm điều khiển và thông báo |
 | `Super + Q` hoặc `Alt + F4` | Đóng cửa sổ |
 | `Alt + Tab` | Chuyển cửa sổ (giữ Alt, bấm Tab để chọn, thả Alt để chuyển) |
-| `Super + H` | Thu nhỏ cửa sổ xuống dock |
+| `Super + H` | Thu nhỏ cửa sổ xuống dock (hiệu ứng thần đèn) |
 | `Ctrl + Shift + Esc` | Trình quản lý tác vụ |
 | `Super + V` | Bật/tắt cửa sổ nổi |
 | `Super + F` | Toàn màn hình |
@@ -113,7 +114,9 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 5. Đang quay màn hình: chấm đỏ và thời gian quay. Bấm vào để dừng.
 6. Bình thường: ngày giờ. Bấm để đảo mở rộng thành bảng widget. Có chấm trắng nhỏ khi còn thông báo chưa xoá.
 
-**Trung tâm điều khiển** (`Super + N`): công tắc Wi-Fi, Bluetooth, Không làm phiền, Tiết kiệm pin, Ánh sáng đêm, Micro; thanh âm lượng và độ sáng (độ sáng chỉ hiện trên laptop); trình phát nhạc; danh sách thông báo. Khi bật Không làm phiền, thông báo vẫn được lưu nhưng không hiện lên đảo (trừ thông báo khẩn).
+**Trung tâm điều khiển** (`Super + N`): công tắc Wi-Fi, Bluetooth, Không làm phiền, Tiết kiệm pin, Ánh sáng đêm, Micro, Chơi game, nút Chụp màn hình; thanh âm lượng và độ sáng (độ sáng chỉ hiện trên laptop); trình phát nhạc; danh sách thông báo. Khi bật Không làm phiền, thông báo vẫn được lưu nhưng không hiện lên đảo (trừ thông báo khẩn). Xoá một thông báo (hoặc *Xóa hết*) thì thẻ tan thành bụi bay lên.
+
+**Chơi game** (trong trung tâm điều khiển): tắt làm mờ, bóng đổ và chuyển động của Hyprland, dừng hẳn hình nền video, chuyển máy sang chạy hết công suất. Bấm lần nữa là mọi thứ về như cũ. Lệnh tay: `~/.config/hypr/scripts/gamemode.sh on|off`.
 
 **Bảng widget** (bấm vào đồng hồ trên đảo động, `Super + W`, hoặc vuốt 4 ngón sang phải): đảo động giãn ra thành một bảng kính ngay giữa phía trên, gồm giờ lớn và ngày, thời tiết (bấm vào để đặt vị trí), lịch tháng (mũi tên để xem tháng khác), trình phát nếu đang có nhạc, ghi chú nhanh tự lưu vào `~/notes/quick.md`, CPU/RAM/ổ đĩa. Bấm ra ngoài hoặc `Esc` để thu lại.
 
@@ -139,10 +142,11 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - Giữ và kéo một biểu tượng đã ghim sang trái/phải để đổi chỗ.
 - **Ghim ứng dụng chưa mở:** trong launcher, chọn ứng dụng rồi bấm `Ctrl + P` (hoặc chuột phải vào nó); bấm lại để bỏ ghim. Hoặc vào Cài đặt → Dock, gõ tên ứng dụng ở ô *Thêm ứng dụng*. Trang đó cũng có nút ↑ ↓ để đổi thứ tự và *Bỏ ghim*.
 - **Tự ẩn** (mặc định): dock lùi xuống khi có cửa sổ che chỗ của nó, nên cửa sổ vẫn dùng hết màn hình. Đưa chuột sát mép dưới màn hình (khoảng giữa) hoặc bấm `Super + D` để hiện lại. Workspace trống thì dock luôn hiện.
+- **Thu nhỏ** (`Super + H`, hoặc chuột phải → thu nhỏ): cửa sổ bị hút vào biểu tượng của nó trên dock như macOS; bấm biểu tượng thì cửa sổ bay ngược ra. Đổi sang kiểu thu nhỏ thường hoặc tắt: Cài đặt → Dock.
 - Đổi kích thước, tắt phóng to, tắt tự ẩn: Cài đặt → Dock.
 
 **Cài đặt** (`Super + ,`, hoặc gõ "cài đặt" trong launcher): một cửa sổ kính, đổi gì là áp dụng ngay, không có nút Lưu.
-- *Giao diện:* phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kiểu kính (acrylic / mờ thường / tắt), độ mờ, độ đậm của các bảng kính, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
+- *Giao diện:* phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kính của cửa sổ (acrylic / mờ thường / tắt), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
 - *Hình nền:* bấm vào ảnh để đổi. Video và GIF có nhãn ở góc. Chọn lúc nào video tạm dừng (khi có cửa sổ toàn màn hình, khi có bất kỳ cửa sổ nào, hoặc không bao giờ), có dùng ảnh tĩnh khi chạy pin không, và hiệu ứng khi đổi ảnh.
 - *Touchpad và bàn phím:* cuộn tự nhiên, chạm để bấm, tắt touchpad khi gõ, tốc độ cuộn và con trỏ, bật/tắt từng cử chỉ, tốc độ lặp phím (có ô gõ thử).
 - *Wi-Fi:* bật/tắt, danh sách mạng xung quanh, bấm để kết nối (mạng có khoá thì hiện ô mật khẩu ngay bên dưới), quên mạng, ngắt kết nối.
@@ -156,6 +160,10 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - *Giới thiệu:* tên máy, phiên bản Hyprland, Quickshell, kernel; kiểm tra cập nhật, mở kho ứng dụng.
 
 Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprland được ghi ra `~/.config/hypr/lg_settings.lua` (đừng sửa tay file này, nó sẽ bị ghi đè; muốn chỉnh thêm thì dùng `user.lua`).
+
+**Kính lỏng.** Thanh trên, dock, đảo động và các bảng không chỉ làm mờ phía sau: khi phía sau chỉ có hình nền, mép kính bẻ cong hình nền như nhìn qua tấm kính lồi thật, có tách màu nhẹ ở viền và vệt sáng ở mép trên. Khi có cửa sổ nằm sau, kính tự chuyển sang chỉ làm mờ cộng vệt sáng (shell chỉ có ảnh hình nền, không có ảnh của cửa sổ, nên không giả vờ khúc xạ cửa sổ). Hình nền sáng thì chữ trên thanh trên tự chuyển sang màu tối và đảo động đậm lại để chữ vẫn rõ. Hình nền video: mặc định chỉ có vệt sáng, vì kính chỉ có một khung hình tĩnh của video; bật *Khúc xạ cả hình nền video* nếu vẫn muốn. Máy yếu: chọn *Viền sáng* hoặc *Phẳng* trong Cài đặt → Giao diện.
+
+**Chuyển động.** Đảo động, dock và trung tâm điều khiển chạy bằng lò xo: đổi ý giữa chừng (ví dụ thông báo tới khi đảo đang mở) thì đảo rẽ mượt sang cỡ mới thay vì giật. Giờ và tên bài hát đổi bằng hiệu ứng nhoè. Công tắc trong Cài đặt phồng thành viên kính khi gạt; thanh trượt phồng nhẹ khi kéo. Tắt hết: Cài đặt → Giao diện → Hiệu ứng chuyển động.
 
 **Bảng phím tắt** (`Super + /`): toàn bộ phím tắt và cử chỉ, gõ để lọc (gõ không dấu cũng được). Nếu bạn đổi phím trong `lg_keybinds.lua`, sửa thêm `Cheatsheet.qml` cho bảng khớp.
 
@@ -248,6 +256,10 @@ Sửa file nào thì Hyprland và Quickshell tự tải lại, không cần đă
 
 **Không có sóng âm.** Cần gói `cava`; sóng âm chỉ chạy khi đang phát nhạc.
 
+**Kính trông phẳng, không có vệt sáng / thu nhỏ không có hiệu ứng.** Shader chưa dựng được cho bản Qt trên máy. Cài `qt6-shadertools` rồi chạy `~/.config/quickshell/shaders/build.sh`. Chạy `qs` trong terminal sẽ thấy dòng `[glass] shader:` hoặc `[thu nhỏ]` nếu còn lỗi.
+
+**Máy giật khi mở bảng.** Cài đặt → Giao diện → Kính của thanh trên, dock, bảng → *Viền sáng* (hoặc *Phẳng*).
+
 **Màn hình giật khi kéo cửa sổ.** Đổi `variant = 8` thành `variant = 0` trong `lg_look.lua`, hoặc giảm `passes` từ 3 xuống 2.
 
 **Không gõ được tiếng Việt.** Chạy `fcitx5-configtool`, kiểm tra Unikey có trong danh sách bộ gõ. Đổi Anh/Việt bằng `Ctrl + Space`.
@@ -291,14 +303,22 @@ config/
     lg_settings.lua   do ứng dụng Cài đặt tự ghi (không sửa tay)
     hyprlock.conf     màn hình khóa
     hypridle.conf     tự khóa khi không dùng máy
-    scripts/wallpaper.sh, capture.sh, vndate.sh, battery.sh
+    scripts/wallpaper.sh, capture.sh, vndate.sh, battery.sh, gamemode.sh
   quickshell/
     shell.qml         điểm vào
     Theme.qml         màu, phông, kích thước
     Config.qml        giá trị dùng chung (đọc từ Settings), nơi lưu ghi chú
     Settings.qml      đọc/ghi lựa chọn của ứng dụng Cài đặt
     SettingsApp.qml   ứng dụng Cài đặt
-    GlassPill.qml     viên kính dùng chung
+    GlassPill.qml     viên kính dùng chung (vẽ bằng shaders/glass.frag)
+    Glass.qml         hình nền cho kính, cửa sổ nào nằm sau kính
+    shaders/          glass.frag (kính), genie.vert/.frag (thu nhỏ), dust.frag (tan thành bụi), build.sh
+    Spring.qml        chuyển động lò xo
+    MorphText.qml     chữ đổi bằng hiệu ứng nhoè
+    LiquidSwitch.qml  công tắc kính lỏng
+    Dissolve.qml      thẻ tan thành bụi
+    MinimizeFx.qml    hiệu ứng thu nhỏ vào dock
+    SafeShot.qml, CaptureGate.js   chụp cửa sổ an toàn (tránh làm sập shell)
     Icon.qml, Icons.qml   biểu tượng nét mảnh
     SysStats.qml      đọc CPU, RAM
     Bar.qml           thanh trên
@@ -333,3 +353,7 @@ fonts/               Geist, Geist Mono, Be Vietnam Pro, Onest (giấy phép SIL 
 wallpapers/ridge.png  hình nền mặc định (4K)
 install.sh
 ```
+
+## Ghi công
+
+Kính khúc xạ, hiệu ứng thần đèn, chuyển động lò xo, chữ nhoè, công tắc kính, thẻ tan thành bụi, chụp cửa sổ an toàn và chế độ chơi game học cách làm từ [MacShell](https://github.com/0-ss/MacShell) của Rickky (giấy phép MIT). Mã ở đây được viết lại cho repo này; chỗ nào học ý tưởng đều ghi trong chú thích đầu tệp.

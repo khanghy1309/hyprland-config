@@ -40,7 +40,7 @@ echo
 # ───────────────────────── gói phần mềm ─────────────────────────
 PKGS=(
     # nền
-    hyprland xdg-desktop-portal-hyprland hyprpolkitagent quickshell qt6-5compat
+    hyprland xdg-desktop-portal-hyprland hyprpolkitagent quickshell qt6-5compat qt6-shadertools
     # hình nền
     awww
     # terminal, tệp, trình duyệt
@@ -142,6 +142,8 @@ chmod +x "$CONFIG/hypr/scripts/"*.sh
 
 mkdir -p "$CONFIG/quickshell" "$CONFIG/kitty"
 cp -a "$HERE/config/quickshell/." "$CONFIG/quickshell/"
+# shader của kính và hiệu ứng thu nhỏ: dựng lại bằng qsb của máy (khớp đúng bản Qt đang cài)
+bash "$CONFIG/quickshell/shaders/build.sh" || warn "Không dựng lại được shader, dùng bản có sẵn"
 cp -a "$HERE/config/kitty/." "$CONFIG/kitty/"
 info "Đã chép hypr, quickshell, kitty"
 

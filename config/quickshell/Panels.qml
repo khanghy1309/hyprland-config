@@ -16,7 +16,7 @@ PanelWindow {
         if (shown) { hideTimer.stop(); alive = true; }
         else hideTimer.restart();
     }
-    Timer { id: hideTimer; interval: Theme.normal + 60; onTriggered: win.alive = false }
+    Timer { id: hideTimer; interval: 420; onTriggered: win.alive = false }
 
     visible: alive
     screen: Quickshell.screens.find(s => Hyprland.focusedMonitor && s.name === Hyprland.focusedMonitor.name)
@@ -53,9 +53,9 @@ PanelWindow {
         // bắt đầu dưới thanh trên, không đè lên nó
         y: Theme.barTop + Theme.barHeight + 10
         height: parent.height - y - 16
-        x: open ? parent.width - width - 16 : parent.width + 40
+        x: slide.value
         opacity: open ? 1 : 0
-        Behavior on x { NumberAnimation { duration: Theme.normal; easing.type: Easing.OutCubic } }
+        Spring { id: slide; target: control.open ? win.width - control.width - 16 : win.width + 40; response: 0.38; damping: 0.92 }
         Behavior on opacity { NumberAnimation { duration: Theme.normal } }
         MouseArea { anchors.fill: parent; z: -1 }
     }

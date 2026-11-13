@@ -33,8 +33,9 @@ hl.bind(S .. " + SHIFT + V", sh("qs ipc call launcher clipboard"))
 -------------------------------------------------------------------
 hl.bind(S .. " + Q", hl.dsp.window.close())
 hl.bind("ALT + F4", hl.dsp.window.close())                       -- như Windows
--- thu nhỏ: cất cửa sổ vào workspace ẩn; bấm biểu tượng trên dock hoặc Alt + Tab để hiện lại
-hl.bind(S .. " + H", hl.dsp.window.move({ workspace = "special:minimized", follow = false }))
+-- thu nhỏ: cất cửa sổ vào workspace ẩn (có hiệu ứng genie vào dock); bấm biểu tượng trên dock
+-- hoặc Alt + Tab để hiện lại. Quickshell chưa chạy thì vẫn thu nhỏ được, chỉ là không có hiệu ứng.
+hl.bind(S .. " + H", sh([[qs ipc call window minimize || hyprctl dispatch 'hl.dsp.window.move({ workspace = "special:minimized", follow = false })']]))
 hl.bind(S .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(S .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind(S .. " + J", hl.dsp.layout("togglesplit"))

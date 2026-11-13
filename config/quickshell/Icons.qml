@@ -24,5 +24,7 @@ Singleton {
     readonly property string chevronLeft: "M15 6l-6 6 6 6"
     readonly property string chevronRight: "M9 6l6 6-6 6"
     readonly property string cloud: "M7 19h10a4 4 0 0 0 .6-8 6 6 0 0 0-11.5 1.7A3.2 3.2 0 0 0 7 19z"
+    readonly property string gamepad: "M6 9h4M8 7v4M15 10h.01M18 8h.01M7 4h10a5 5 0 0 1 4.9 6l-1 5a3 3 0 0 1-5.2 1.4L14 15h-4l-1.7 1.4A3 3 0 0 1 3.1 15l-1-5A5 5 0 0 1 7 4z"
+    readonly property string camera: "M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
     readonly property string pin: "M12 3v4M12 15v6M9 4h6l-1 6 4 4H6l4-4z"
 }

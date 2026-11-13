@@ -140,10 +140,10 @@ PanelWindow {
                     radius: 12
                     color: Theme.chip
                     opacity: card.mini ? 0.55 : 1
-                    ScreencopyView {
+                    SafeShot {
                         id: shot
                         anchors.fill: parent
-                        captureSource: root.visible ? card.modelData.wayland : null
+                        want: root.visible ? card.modelData.wayland : null
                         live: false
                     }
                     Image {

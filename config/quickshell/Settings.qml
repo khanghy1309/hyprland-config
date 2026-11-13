@@ -59,6 +59,8 @@ Singleton {
                 property real animScale: 1           // 0,7 nhanh · 1 vừa · 1,4 chậm
                 property string font: "Geist"         // Geist | Inter | Be Vietnam Pro | Onest
                 property string monoFont: "Geist Mono" // Geist Mono | JetBrains Mono
+                property string material: "liquid"   // liquid | rim | flat  (xem Glass.qml)
+                property bool refractVideo: false    // khúc xạ cả khi hình nền là video (dùng một khung hình tĩnh)
             }
             property JsonObject input: JsonObject {
                 property bool naturalScroll: true
@@ -106,6 +108,7 @@ Singleton {
                 property bool autoHide: true          // ẩn khi có cửa sổ che chỗ của dock
                 property int iconSize: 48
                 property bool magnify: true           // phóng to biểu tượng khi rê chuột
+                property string minimizeFx: "genie"   // genie | scale | off  (xem MinimizeFx.qml)
                 // id của tệp .desktop, theo thứ tự trên dock
                 property list<string> pinned: ["org.gnome.Nautilus", "firefox", "kitty", "liquid-glass-settings"]
             }

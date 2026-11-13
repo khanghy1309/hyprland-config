@@ -117,6 +117,9 @@ PanelWindow {
                 height: 200
                 radius: 40
                 color: isSel ? Theme.accent : Theme.panelStrong
+                glow: tileHover.hovered && !isSel ? 1 : 0
+                glowPos: tileHover.point.position
+                HoverHandler { id: tileHover }
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
 
                 Column {

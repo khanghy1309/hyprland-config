@@ -75,6 +75,22 @@ GlassPill {
                 sub: !Controls.source ? "Không có" : Controls.micMuted ? "Đang tắt tiếng" : "Bật"
                 onClicked: Controls.toggleMic()
             }
+            Tile {
+                width: parent.cellW
+                label: "Chơi game"
+                iconPath: Icons.gamepad
+                on: Controls.gaming
+                sub: Controls.gaming ? "Hết công suất" : "Tắt"
+                onClicked: Controls.toggleGaming()
+            }
+            Tile {
+                width: parent.cellW
+                label: "Chụp màn hình"
+                iconPath: Icons.camera
+                on: false
+                sub: "Super + Shift + S"
+                onClicked: { PanelState.close(); Quickshell.execDetached(["qs", "ipc", "call", "capture", "open"]); }
+            }
         }
 
         // ── âm lượng, độ sáng ──
@@ -228,7 +244,14 @@ GlassPill {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Notifs.clearAll()
+                    // các thẻ tan thành bụi lần lượt từ trên xuống, xong thì xoá thật
+                    onClicked: {
+                        if (clearLater.running) return;
+                        Notifs.clearing();
+                        clearLater.interval = Math.min(list.count, 8) * 70 + (Settings.look.animations ? 950 : 200);
+                        clearLater.restart();
+                    }
+                    Timer { id: clearLater; onTriggered: Notifs.clearAll() }
                 }
             }
         }
@@ -248,10 +271,23 @@ GlassPill {
         model: Notifs.list.slice().reverse()       // mới nhất ở trên
         boundsBehavior: Flickable.StopAtBounds
 
-        delegate: NotifCard {
+        delegate: Dissolve {
+            id: dz
             required property var modelData
+            required property int index
             width: list.width
-            notif: modelData
+            height: card.implicitHeight
+            NotifCard {
+                id: card
+                width: dz.width
+                notif: dz.modelData
+                customClose: true
+                onCloseClicked: dz.dissolve(0, () => Notifs.dismiss(dz.modelData))
+            }
+            Connections {
+                target: Notifs
+                function onClearing() { dz.dissolve(Math.min(dz.index, 8) * 70, null); }
+            }
         }
 
         Text {

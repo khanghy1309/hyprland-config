@@ -252,11 +252,11 @@ PanelWindow {
                                     border.width: win.focused ? 2 : 1
                                     border.color: win.focused ? Theme.accent : Qt.rgba(1, 1, 1, 0.22)
 
-                                    ScreencopyView {
+                                    SafeShot {
                                         id: shot
                                         anchors.fill: parent
                                         // chụp một lần mỗi khi mở toàn cảnh, không quay liên tục cho nhẹ máy
-                                        captureSource: root.visible ? win.modelData.wayland : null
+                                        want: root.visible ? win.modelData.wayland : null
                                         live: false
                                     }
 

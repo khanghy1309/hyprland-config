@@ -6,7 +6,7 @@ import Quickshell
 
 ShellRoot {
     // Khởi động sẵn các dịch vụ chạy nền (nhận thông báo, theo dõi âm lượng, nhạc...)
-    readonly property var services: [Settings, Notifs, Osd, Media, Controls, Weather, Recorder, Updates]
+    readonly property var services: [Settings, Glass, Notifs, Osd, Media, Controls, Weather, Recorder, Updates]
 
     // Mỗi màn hình một thanh trên
     Variants {
@@ -40,6 +40,9 @@ ShellRoot {
 
     // Bảng phím tắt (Super + /)
     Cheatsheet {}
+
+    // Hiệu ứng thu nhỏ cửa sổ vào dock (genie)
+    MinimizeFx {}
 
     // Ứng dụng Cài đặt (Super + ,)
     SettingsApp {}

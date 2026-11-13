@@ -26,6 +26,9 @@ Singleton {
         if (n) n.dismiss();
     }
 
+    // bảng thông báo nghe tín hiệu này để cho từng thẻ tan thành bụi, rồi mới gọi clearAll()
+    signal clearing()
+
     function clearAll() {
         for (const n of root.list.slice()) n.dismiss();
         root.popups = [];

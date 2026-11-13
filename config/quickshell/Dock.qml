@@ -158,7 +158,10 @@ PanelWindow {
     }
 
     property bool peek: false
-    readonly property bool want: !Settings.dock.autoHide || !covered || peek
+    // hiện dock một lúc khi có cửa sổ đang thu nhỏ vào nó / hiện lại từ nó
+    property bool flashing: false
+    Timer { id: flashTimer; interval: 1300; onTriggered: dock.flashing = false }
+    readonly property bool want: !Settings.dock.autoHide || !covered || peek || flashing
         || hoverDock.hovered || menu.visible || dragFrom >= 0
     property bool revealed: true
     onWantChanged: {
@@ -167,7 +170,24 @@ PanelWindow {
     }
     Timer { id: hideTimer; interval: 450; onTriggered: dock.revealed = false }
     // lúc mới khởi động: nếu đã có cửa sổ che thì ẩn luôn
-    Component.onCompleted: if (!want) hideTimer.restart()
+    Component.onCompleted: {
+        if (!want) hideTimer.restart();
+        WinOps.slotFor = w => dock.slotFor(w);
+        WinOps.flashDock = () => { dock.flashing = true; flashTimer.restart(); };
+    }
+
+    // chỗ của cửa sổ trên dock (toạ độ chung của Hyprland), cho hiệu ứng thu nhỏ.
+    // Tính theo bố cục chưa phóng to và theo vị trí dock lúc đang hiện, kể cả khi dock đang ẩn.
+    function slotFor(w) {
+        if (!visible || !monitor) return null;
+        const id = idFor(w);
+        const i = apps.findIndex(a => a.id === id);
+        const left = (width - baseRowWidth) / 2;
+        const cx = left + (i >= 0 ? centerOf(i) : baseRowWidth / 2);
+        const sh = monitor.height / monitor.scale;
+        const top = sh - margin - pad - base;
+        return { x: monitor.x + cx - base / 2, y: monitor.y + top, width: base, height: base };
+    }
 
     // vị trí cửa sổ không có sự kiện riêng: hỏi lại Hyprland sau mỗi sự kiện (gom lại 120 ms)
     Connections {
@@ -233,11 +253,12 @@ PanelWindow {
         id: body
         tone: "dark"
         radius: 24
+        smoothWidth: false
         height: dock.base + dock.pad * 2
         width: row.width + dock.pad * 2
         anchors.horizontalCenter: parent.horizontalCenter
-        y: dock.revealed ? parent.height - height - dock.margin : parent.height + 6
-        Behavior on y { NumberAnimation { duration: Theme.normal; easing.type: Easing.OutCubic } }
+        y: slide.value
+        Spring { id: slide; target: dock.revealed ? dock.height - body.height - dock.margin : dock.height + 6; response: 0.36 }
         Behavior on width { NumberAnimation { duration: 90 } }
 
         Row {

@@ -9,6 +9,9 @@ Rectangle {
     required property var notif
     property bool compact: false     // trên đảo động: nội dung tối đa 2 dòng
     property color fill: Theme.chip
+    // true: bấm nút đóng chỉ phát closeClicked() (để chỗ chứa cho tan thành bụi rồi mới xoá)
+    property bool customClose: false
+    signal closeClicked()
 
     implicitHeight: Math.max(64, body.implicitHeight + 28)
     radius: 22
@@ -140,7 +143,7 @@ Rectangle {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: Notifs.dismiss(card.notif)
+            onClicked: card.customClose ? card.closeClicked() : Notifs.dismiss(card.notif)
         }
     }
 }

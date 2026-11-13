@@ -161,11 +161,25 @@ FloatingWindow {
             Group {
                 title: "Kính"
                 SegRow {
-                    label: "Kiểu kính"
+                    label: "Kính của cửa sổ"
                     note: "Acrylic có mép cong khúc xạ như macOS. Máy yếu hoặc thấy giật thì chọn Mờ thường."
                     options: [["acrylic", "Acrylic"], ["blur", "Mờ thường"], ["off", "Tắt"]]
                     current: Settings.look.glass
                     onPicked: v => Settings.look.glass = v
+                }
+                SegRow {
+                    label: "Kính của thanh trên, dock, bảng"
+                    note: "Kính lỏng: hình nền bị bẻ cong ở mép như kính thật (khi phía sau không có cửa sổ). Viền sáng: chỉ vệt sáng ở mép, nhẹ máy hơn."
+                    options: [["liquid", "Kính lỏng"], ["rim", "Viền sáng"], ["flat", "Phẳng"]]
+                    current: Settings.look.material
+                    onPicked: v => Settings.look.material = v
+                }
+                SwitchRow {
+                    label: "Khúc xạ cả hình nền video"
+                    note: "Kính dùng một khung hình tĩnh của video, nên chỗ mép có thể lệch với video đang chạy"
+                    enabled: Settings.look.material === "liquid"
+                    on: Settings.look.refractVideo
+                    onToggled: Settings.look.refractVideo = !Settings.look.refractVideo
                 }
                 SliderRow {
                     label: "Độ mờ phía sau"
@@ -551,6 +565,13 @@ FloatingWindow {
                     enabled: Settings.dock.enabled
                     on: Settings.dock.magnify
                     onToggled: Settings.dock.magnify = !Settings.dock.magnify
+                }
+                SegRow {
+                    label: "Hiệu ứng thu nhỏ cửa sổ"
+                    note: "Thần đèn: cửa sổ bị hút vào biểu tượng trên dock như macOS. Bấm Super + H để thu nhỏ."
+                    options: [["genie", "Thần đèn"], ["scale", "Thu nhỏ"], ["off", "Tắt"]]
+                    current: Settings.dock.minimizeFx
+                    onPicked: v => Settings.dock.minimizeFx = v
                 }
                 SliderRow {
                     label: "Kích thước biểu tượng"
@@ -2037,28 +2058,16 @@ FloatingWindow {
         id: sr
         property bool on: false
         signal toggled()
-        Rectangle {
+        LiquidSwitch {
             anchors.right: parent.right
             anchors.rightMargin: 18
             anchors.verticalCenter: parent.verticalCenter
-            width: 46
-            height: 28
-            radius: 14
-            color: sr.on ? Theme.accent : Theme.chip
-            border.width: 1
-            border.color: Theme.line
-            Behavior on color { ColorAnimation { duration: Theme.fast } }
-            Rectangle {
-                x: sr.on ? parent.width - width - 3 : 3
-                anchors.verticalCenter: parent.verticalCenter
-                width: 22
-                height: 22
-                radius: 11
-                color: sr.on ? Theme.ink : Theme.fg
-                Behavior on x { NumberAnimation { duration: Theme.fast; easing.type: Easing.OutCubic } }
-            }
+            on: sr.on
+            held: srArea.pressed
+            interactive: false
         }
         MouseArea {
+            id: srArea
             anchors.fill: parent
             enabled: sr.enabled
             cursorShape: Qt.PointingHandCursor

@@ -68,15 +68,19 @@ PanelWindow {
     GlassPill {
         id: body
         tone: "dark"
+        // nền sau thanh trên sáng: đảo đậm gần như đen (như đảo động thật) để chữ trắng vẫn rõ
+        color: Glass.topBright ? Qt.rgba(0.08, 0.09, 0.11, 0.84) : Theme.panel
         anchors.horizontalCenter: parent.horizontalCenter
         y: Theme.barTop
-        width: win.size.width
-        height: win.size.height
+        // co giãn bằng lò xo: đổi trạng thái giữa chừng thì rẽ mượt sang cỡ mới, nảy nhẹ như đảo động của iPhone
+        width: sw.value
+        height: sh.value
+        smoothWidth: false
         radius: Math.min(height / 2, 28)
         clip: true
 
-        Behavior on height { NumberAnimation { duration: Theme.normal; easing.type: Easing.OutBack; easing.overshoot: 0.6 } }
-        Behavior on width { NumberAnimation { duration: Theme.normal; easing.type: Easing.OutCubic } }
+        Spring { id: sw; target: win.size.width; response: 0.42; damping: 0.78 }
+        Spring { id: sh; target: win.size.height; response: 0.42; damping: 0.74 }
 
         HoverHandler {
             id: hover
@@ -118,14 +122,13 @@ PanelWindow {
         // ── đồng hồ ──
         Fader {
             on: win.mode === "clock"
-            Text {
+            // phút đổi thì chữ nhoè rồi hiện rõ lại (MorphText.qml)
+            MorphText {
                 id: clockText
                 anchors.centerIn: parent
                 text: clock.date.toLocaleString(Qt.locale("vi_VN"), "ddd, dd/MM") + "  ·  "
                       + Qt.formatDateTime(clock.date, Settings.misc.clock24 ? "HH:mm" : "h:mm AP")
-                font.family: Theme.font
-                font.pixelSize: 14
-                font.weight: Font.DemiBold
+                font: Qt.font({ family: Theme.font, pixelSize: 14, weight: Font.DemiBold })
                 color: Theme.fg
             }
             // chấm nhỏ khi có thông báo chưa xem
@@ -171,14 +174,12 @@ PanelWindow {
                         color: Theme.dim
                     }
                 }
-                Text {
+                MorphText {
                     width: Math.min(implicitWidth, 250)
                     elide: Text.ElideRight
                     anchors.verticalCenter: parent.verticalCenter
                     text: Media.player ? (Media.player.trackTitle || Media.player.identity) : ""
-                    font.family: Theme.font
-                    font.pixelSize: 14
-                    font.weight: Font.DemiBold
+                    font: Qt.font({ family: Theme.font, pixelSize: 14, weight: Font.DemiBold })
                     color: Theme.fg
                 }
                 Row {
