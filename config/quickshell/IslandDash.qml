@@ -1,10 +1,11 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "lunar.js" as Lunar
 
 // Nội dung đảo động khi mở rộng thành bảng widget (bấm vào đồng hồ, Super + W, vuốt 4 ngón sang phải).
 //   hàng trên:  giờ lớn, ngày  ·  thời tiết
-//   trái:       lịch tháng
+//   trái:       lịch tháng có âm lịch và ngày lễ; bấm vào một ngày để xem chi tiết
 //   phải:       nhạc đang phát (nếu có), ghi chú nhanh, tài nguyên máy
 Item {
     id: dash
@@ -22,7 +23,10 @@ Item {
 
     // tháng đang xem: 0 = tháng này, -1 = tháng trước...
     property int monthOffset: 0
-    onActiveChanged: if (active) monthOffset = 0
+    // ngày đang chọn (mặc định hôm nay)
+    property date picked: new Date()
+    onActiveChanged: if (active) { monthOffset = 0; picked = clock.date; }
+    readonly property var pickedInfo: Lunar.info(picked.getDate(), picked.getMonth() + 1, picked.getFullYear())
     readonly property date shownMonth: {
         const d = clock.date;
         return new Date(d.getFullYear(), d.getMonth() + monthOffset, 1);
@@ -37,7 +41,9 @@ Item {
         for (let i = 0; i < lead; i++) out.push({ n: "", today: false, weekend: false });
         for (let i = 1; i <= count; i++) {
             const dow = (lead + i - 1) % 7;
-            out.push({ n: String(i), weekend: dow === 6,
+            const li = Lunar.info(i, m + 1, y);
+            out.push({ n: String(i), weekend: dow === 6, date: new Date(y, m, i),
+                       lunar: li.short, holiday: li.holiday, off: li.dayOff, firstLunar: li.lunar.day === 1,
                        today: y === today.getFullYear() && m === today.getMonth() && i === today.getDate() });
         }
         return out;
@@ -56,7 +62,7 @@ Item {
             spacing: 16
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: Qt.formatDateTime(clock.date, "HH:mm")
+                text: Qt.formatDateTime(clock.date, Settings.misc.clock24 ? "HH:mm" : "h:mm AP")
                 font.family: Theme.font
                 font.pixelSize: 46
                 font.weight: Font.Light
@@ -173,6 +179,7 @@ Item {
                 }
 
                 Grid {
+                    id: calGrid
                     columns: 7
                     width: parent.width
                     readonly property real cell: width / 7
@@ -196,25 +203,87 @@ Item {
                         delegate: Item {
                             id: day
                             required property var modelData
+                            readonly property bool isPicked: !!modelData.date && modelData.date.getTime() === new Date(dash.picked.getFullYear(), dash.picked.getMonth(), dash.picked.getDate()).getTime()
                             width: parent.cell
-                            height: 32
+                            height: 40
+                            // hôm nay: nền sáng; ngày đang chọn: viền
                             Rectangle {
                                 anchors.centerIn: parent
-                                width: 30
-                                height: 30
-                                radius: 15
-                                visible: day.modelData.today
-                                color: Theme.accent
+                                width: 36
+                                height: 38
+                                radius: 12
+                                visible: !!day.modelData.n && (day.modelData.today || day.isPicked)
+                                color: day.modelData.today ? Theme.accent : "transparent"
+                                border.width: day.isPicked && !day.modelData.today ? 1.5 : 0
+                                border.color: Theme.fg
                             }
-                            Text {
+                            Column {
                                 anchors.centerIn: parent
-                                text: day.modelData.n
-                                font.family: Theme.font
-                                font.pixelSize: 13
-                                font.weight: day.modelData.today ? Font.Bold : Font.Medium
-                                color: day.modelData.today ? Theme.ink : day.modelData.weekend ? Theme.dim : Theme.fg
+                                spacing: -1
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: day.modelData.n
+                                    font.family: Theme.font
+                                    font.pixelSize: 13
+                                    font.weight: day.modelData.today ? Font.Bold : Font.Medium
+                                    // ngày nghỉ lễ: màu đỏ nhạt
+                                    color: day.modelData.today ? Theme.ink
+                                         : day.modelData.off ? "#ff8a80"
+                                         : day.modelData.weekend ? Theme.dim : Theme.fg
+                                }
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: day.modelData.lunar || ""
+                                    font.family: Theme.font
+                                    font.pixelSize: 9
+                                    font.weight: day.modelData.firstLunar ? Font.DemiBold : Font.Normal
+                                    color: day.modelData.today ? Theme.inkDim : Theme.dim
+                                    opacity: day.modelData.today ? 1 : 0.85
+                                }
+                            }
+                            // ngày lễ không nghỉ: chấm nhỏ
+                            Rectangle {
+                                visible: !!day.modelData.holiday && !day.modelData.off
+                                anchors.top: parent.top
+                                anchors.topMargin: 3
+                                anchors.right: parent.right
+                                anchors.rightMargin: parent.width / 2 - 14
+                                width: 4
+                                height: 4
+                                radius: 2
+                                color: day.modelData.today ? Theme.ink : "#ffcc80"
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled: !!day.modelData.date
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: dash.picked = day.modelData.date
                             }
                         }
+                    }
+                }
+
+                // ngày đang chọn: âm lịch đầy đủ và ngày lễ
+                Column {
+                    width: parent.width
+                    topPadding: 6
+                    leftPadding: 6
+                    spacing: 2
+                    Text {
+                        width: parent.width - 6
+                        elide: Text.ElideRight
+                        text: dash.picked.toLocaleString(Qt.locale("vi_VN"), "dddd, dd/MM") + " · âm lịch " + dash.pickedInfo.text
+                        font.family: Theme.font
+                        font.pixelSize: 12
+                        color: Theme.fg
+                    }
+                    Text {
+                        visible: dash.pickedInfo.holiday.length > 0
+                        text: dash.pickedInfo.holiday + (dash.pickedInfo.dayOff ? " · ngày nghỉ" : "")
+                        font.family: Theme.font
+                        font.pixelSize: 12
+                        font.weight: Font.DemiBold
+                        color: dash.pickedInfo.dayOff ? "#ff8a80" : "#ffcc80"
                     }
                 }
             }

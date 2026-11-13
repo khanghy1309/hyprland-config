@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 
 // Ứng dụng Cài đặt (Super + , hoặc tìm "Cài đặt" trong launcher).
 // Là một cửa sổ thường: kéo, thu nhỏ, đóng bằng Super + Q hoặc Esc như mọi ứng dụng.
@@ -22,12 +23,16 @@ FloatingWindow {
 
     readonly property var pages: [
         { id: "look",      label: "Giao diện",            path: "M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.6 0-.9-.7-1.4-.7-2.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4.3-4-7.6-9-7.6zM7.5 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM10.5 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM15 8.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" },
+        { id: "display",   label: "Màn hình",             path: "M3 4h18v12H3zM8 20h8M12 16v4" },
         { id: "dock",      label: "Dock",                 path: "M3 15h18v5H3zM6 17.5h.01M10 17.5h.01M14 17.5h.01M18 17.5h.01M8 4h8v8H8z" },
         { id: "wallpaper", label: "Hình nền",             path: "M3 5h18v14H3zM3 15l5-5 4 4 3-3 6 6M15.5 8.5h.01" },
         { id: "input",     label: "Touchpad và bàn phím", path: "M4 4h16v10H4zM12 14v6M8 20h8" },
         { id: "wifi",      label: "Wi-Fi",                path: Icons.wifi },
         { id: "bluetooth", label: "Bluetooth",            path: Icons.bluetooth },
         { id: "sound",     label: "Âm thanh",             path: Icons.volume },
+        { id: "power",     label: "Nguồn điện",           path: "M13 3L5 14h6l-1 7 8-11h-6l1-7z" },
+        { id: "datetime",  label: "Ngày giờ",             path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2" },
+        { id: "apps",      label: "Ứng dụng mặc định",    path: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" },
         { id: "weather",   label: "Thời tiết",            path: Icons.cloud },
         { id: "about",     label: "Giới thiệu",           path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8h.01" }
     ]
@@ -59,11 +64,18 @@ FloatingWindow {
         height: parent.height
         color: Qt.rgba(1, 1, 1, 0.04)
 
+        // danh sách trang cuộn được khi cửa sổ thấp
+        Flickable {
+            anchors.fill: parent
+            contentHeight: sideCol.implicitHeight + 44
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
         Column {
+            id: sideCol
             x: 14
             y: 22
             width: parent.width - 28
-            spacing: 4
+            spacing: 2
 
             Text {
                 x: 12
@@ -82,8 +94,8 @@ FloatingWindow {
                     required property var modelData
                     readonly property bool on: win.page === modelData.id
                     width: parent.width
-                    height: 42
-                    radius: 13
+                    height: 38
+                    radius: 12
                     color: on ? Theme.accent : im.containsMouse ? Theme.chip : "transparent"
                     Behavior on color { ColorAnimation { duration: Theme.fast } }
                     Row {
@@ -111,6 +123,8 @@ FloatingWindow {
             }
         }
 
+        }
+
         Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Theme.line }
     }
 
@@ -130,7 +144,7 @@ FloatingWindow {
             x: 36
             y: 30
             width: flick.width - 72
-            sourceComponent: ({ look: lookPage, dock: dockPage, wallpaper: wallPage, input: inputPage, wifi: wifiPage, bluetooth: btPage, sound: soundPage,
+            sourceComponent: ({ look: lookPage, display: displayPage, dock: dockPage, wallpaper: wallPage, input: inputPage, wifi: wifiPage, bluetooth: btPage, sound: soundPage, power: powerPage, datetime: dtPage, apps: appsPage,
                                 weather: weatherPage, about: aboutPage })[win.page]
             onLoaded: flick.contentY = 0
         }
@@ -266,6 +280,246 @@ FloatingWindow {
                     options: [[3000, "3 giây"], [5000, "5 giây"], [8000, "8 giây"]]
                     current: Settings.misc.notifTimeout
                     onPicked: v => Settings.misc.notifTimeout = v
+                    last: true
+                }
+            }
+        }
+    }
+
+    Component {
+        id: displayPage
+        Column {
+            id: dp
+            spacing: 26
+
+            // thông tin thật từ Hyprland: hyprctl monitors all -j
+            property var mons: []
+            property bool loaded: false
+            // bản nháp đang chỉnh: { tên: { mode, scale, position, disabled } }
+            property var draft: ({})
+            // để hoàn tác nếu người dùng không bấm "Giữ"
+            property var previous: null
+            property int countdown: 0
+            property string openModes: ""      // màn hình đang mở danh sách độ phân giải
+
+            function read() { monProc.running = false; monProc.running = true; }
+            Component.onCompleted: read()
+            Process {
+                id: monProc
+                command: ["hyprctl", "monitors", "all", "-j"]
+                stdout: StdioCollector {
+                    onStreamFinished: {
+                        try { dp.mons = JSON.parse(text); } catch (e) { dp.mons = []; }
+                        dp.loaded = true;
+                        if (Object.keys(dp.draft).length === 0) dp.resetDraft();
+                    }
+                }
+            }
+
+            function current(m) {
+                const saved = (Settings.display.monitors || {})[m.name];
+                if (saved) return Object.assign({}, saved);
+                return { mode: m.width + "x" + m.height + "@" + Math.round(m.refreshRate),
+                         scale: m.scale, position: "auto", disabled: !!m.disabled };
+            }
+            function resetDraft() {
+                const d = {};
+                for (const m of mons) d[m.name] = current(m);
+                draft = d;
+            }
+            function setDraft(name, key, val) {
+                const d = Object.assign({}, draft);
+                d[name] = Object.assign({}, d[name]);
+                d[name][key] = val;
+                draft = d;
+            }
+            readonly property bool dirty: JSON.stringify(draft) !== JSON.stringify((() => {
+                const d = {}; for (const m of mons) d[m.name] = current(m); return d;
+            })())
+
+            // "1920x1080@60.00Hz" → { res: "1920x1080", hz: 60 }
+            function modesOf(m) {
+                return (m.availableModes || []).map(s => {
+                    const mm = s.match(/^(\d+)x(\d+)@([\d.]+)/);
+                    return mm ? { w: +mm[1], h: +mm[2], hz: Math.round(+mm[3]) } : null;
+                }).filter(x => x);
+            }
+            function resolutions(m) {
+                const seen = {}, out = [];
+                for (const x of modesOf(m)) {
+                    const k = x.w + "x" + x.h;
+                    if (!seen[k]) { seen[k] = true; out.push(x); }
+                }
+                return out.sort((a, b) => b.w * b.h - a.w * a.h);
+            }
+            function ratesFor(m, res) {
+                const out = [];
+                for (const x of modesOf(m)) if (x.w + "x" + x.h === res && out.indexOf(x.hz) < 0) out.push(x.hz);
+                return out.sort((a, b) => b - a);
+            }
+            function resOf(mode) { return (mode || "").split("@")[0]; }
+            function hzOf(mode) { return Math.round(+((mode || "").split("@")[1] || 60)); }
+
+            // vị trí màn hình phụ so với màn hình đầu tiên
+            function placeOf(name) {
+                const p = (draft[name] || {}).position || "auto";
+                if (p === "auto") return "right";
+                const first = dp.mons[0], fd = draft[first.name] || {};
+                const [x, y] = p.split("x").map(Number);
+                return x < 0 ? "left" : y < 0 ? "above" : y > 0 && x === 0 ? "below" : "right";
+            }
+            function logicalSize(name) {
+                const d = draft[name] || {}, m = dp.mons.find(x => x.name === name);
+                const r = resOf(d.mode).split("x").map(Number);
+                const sc = +(d.scale || 1);
+                return { w: Math.round((r[0] || m.width) / sc), h: Math.round((r[1] || m.height) / sc) };
+            }
+            function setPlace(name, where) {
+                const first = dp.mons[0].name;
+                const a = logicalSize(first), b = logicalSize(name);
+                const pos = { right: a.w + "x0", left: (-b.w) + "x0", above: "0x" + (-b.h), below: "0x" + a.h }[where];
+                setDraft(first, "position", "0x0");
+                setDraft(name, "position", pos);
+            }
+
+            function apply() {
+                previous = JSON.parse(JSON.stringify(Settings.display.monitors || {}));
+                Settings.display.monitors = JSON.parse(JSON.stringify(draft));
+                countdown = 15;
+            }
+            function keep() { countdown = 0; previous = null; dp.read(); }
+            function revert() {
+                if (previous !== null) Settings.display.monitors = previous;
+                countdown = 0;
+                previous = null;
+                draft = ({});
+                revertRead.restart();
+            }
+            Timer { id: revertRead; interval: 1500; onTriggered: dp.read() }
+            Timer {
+                running: dp.countdown > 0
+                repeat: true
+                interval: 1000
+                onTriggered: { dp.countdown--; if (dp.countdown === 0) dp.revert(); }
+            }
+
+            PageTitle { text: "Màn hình" }
+
+            Text {
+                visible: !dp.loaded
+                text: "Đang đọc thông tin màn hình…"
+                font.family: Theme.font
+                font.pixelSize: 14
+                color: Theme.dim
+            }
+
+            // hỏi lại sau khi áp dụng, như Windows: không bấm gì thì tự quay lại
+            Group {
+                visible: dp.countdown > 0
+                title: ""
+                ButtonsRow {
+                    buttons: [["Quay lại", () => dp.revert()], ["Giữ thay đổi", () => dp.keep()]]
+                    note: "Giữ cài đặt màn hình này? Tự quay lại sau " + dp.countdown + " giây."
+                    last: true
+                }
+            }
+
+            Repeater {
+                model: dp.mons
+                delegate: Group {
+                    id: mg
+                    required property var modelData
+                    required property int index
+                    readonly property var m: modelData
+                    readonly property var d: dp.draft[m.name] || {}
+                    title: (m.description || m.name).replace(/\s*\(.*\)$/, "") + "  ·  " + m.name
+
+                    SwitchRow {
+                        visible: dp.mons.length > 1
+                        label: "Dùng màn hình này"
+                        note: mg.index === 0 ? "Màn hình chính" : ""
+                        on: !mg.d.disabled
+                        // không cho tắt màn hình cuối cùng đang bật
+                        enabled: !(!mg.d.disabled && dp.mons.filter(x => !(dp.draft[x.name] || {}).disabled).length <= 1)
+                        onToggled: dp.setDraft(mg.m.name, "disabled", !mg.d.disabled)
+                    }
+
+                    // độ phân giải: bấm để mở danh sách
+                    RowBase {
+                        enabled: !mg.d.disabled
+                        label: "Độ phân giải"
+                        Text {
+                            anchors.right: parent.right
+                            anchors.rightMargin: 18
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: dp.resOf(mg.d.mode).replace("x", " × ") + (dp.openModes === mg.m.name ? "  ▴" : "  ▾")
+                            font.family: Theme.font
+                            font.pixelSize: 14
+                            font.weight: Font.Medium
+                            color: Theme.fg
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: dp.openModes = dp.openModes === mg.m.name ? "" : mg.m.name
+                        }
+                    }
+                    Repeater {
+                        model: dp.openModes === mg.m.name ? dp.resolutions(mg.m) : []
+                        delegate: PickRow {
+                            required property var modelData
+                            required property int index
+                            readonly property string res: modelData.w + "x" + modelData.h
+                            // độ phân giải lớn nhất thường là độ phân giải gốc của màn hình
+                            label: modelData.w + " × " + modelData.h + (index === 0 ? "  (gốc)" : "")
+                            on: dp.resOf(mg.d.mode) === res
+                            onPicked: {
+                                const rates = dp.ratesFor(mg.m, res);
+                                const hz = rates.indexOf(dp.hzOf(mg.d.mode)) >= 0 ? dp.hzOf(mg.d.mode) : rates[0];
+                                dp.setDraft(mg.m.name, "mode", res + "@" + hz);
+                                dp.openModes = "";
+                            }
+                        }
+                    }
+
+                    SegRow {
+                        enabled: !mg.d.disabled
+                        label: "Tần số quét"
+                        note: "Càng cao chuyển động càng mượt, tốn pin hơn một chút"
+                        options: dp.ratesFor(mg.m, dp.resOf(mg.d.mode)).slice(0, 5).map(r => [r, r + " Hz"])
+                        current: dp.hzOf(mg.d.mode)
+                        onPicked: v => dp.setDraft(mg.m.name, "mode", dp.resOf(mg.d.mode) + "@" + v)
+                    }
+
+                    SegRow {
+                        enabled: !mg.d.disabled
+                        label: "Tỉ lệ (chữ và biểu tượng to hơn)"
+                        note: "Màn hình laptop độ phân giải cao thường hợp 125–150%"
+                        options: [[1, "100%"], [1.25, "125%"], [1.5, "150%"], [1.75, "175%"], [2, "200%"]]
+                        current: Math.round(+mg.d.scale * 100) / 100
+                        onPicked: v => dp.setDraft(mg.m.name, "scale", v)
+                        last: mg.index === 0 || dp.mons.length < 2
+                    }
+
+                    SegRow {
+                        visible: mg.index > 0
+                        enabled: !mg.d.disabled
+                        label: "Đặt so với màn hình chính"
+                        options: [["left", "Bên trái"], ["right", "Bên phải"], ["above", "Phía trên"], ["below", "Phía dưới"]]
+                        current: dp.placeOf(mg.m.name)
+                        onPicked: v => dp.setPlace(mg.m.name, v)
+                        last: true
+                    }
+                }
+            }
+
+            Group {
+                visible: dp.loaded
+                title: ""
+                ButtonsRow {
+                    buttons: [["Đặt lại tự động", () => { Settings.display.monitors = ({}); dp.draft = ({}); revertRead.restart(); }],
+                              ["Áp dụng", () => dp.apply()]]
+                    note: dp.dirty ? "Có thay đổi chưa áp dụng." : "Cắm thêm màn hình thì mở lại trang này để chỉnh."
                     last: true
                 }
             }
@@ -1241,6 +1495,271 @@ FloatingWindow {
     }
 
     Component {
+        id: powerPage
+        Column {
+            spacing: 26
+            PageTitle { text: "Nguồn điện" }
+
+            Group {
+                title: "Chế độ"
+                SegRow {
+                    label: "Hiệu năng"
+                    note: "Tiết kiệm pin: máy mát và lâu hết pin hơn. Hiệu năng: nhanh nhất, tốn pin."
+                    options: [[PowerProfile.PowerSaver, "Tiết kiệm pin"], [PowerProfile.Balanced, "Cân bằng"], [PowerProfile.Performance, "Hiệu năng"]]
+                    current: PowerProfiles.profile
+                    onPicked: v => PowerProfiles.profile = v
+                }
+                InfoRow {
+                    visible: !!UPower.displayDevice && UPower.displayDevice.isLaptopBattery
+                    label: "Pin"
+                    value: UPower.displayDevice ? Math.round(UPower.displayDevice.percentage * 100) + "%" + (UPower.onBattery ? " · đang dùng pin" : " · đang sạc") : ""
+                    last: true
+                }
+            }
+
+            Group {
+                title: "Khi không dùng máy"
+                SegRow {
+                    label: "Tắt màn hình sau"
+                    options: [[60, "1 phút"], [180, "3 phút"], [330, "5 phút"], [600, "10 phút"], [1800, "30 phút"], [0, "Không"]]
+                    current: Settings.power.screenOffAfter
+                    onPicked: v => Settings.power.screenOffAfter = v
+                }
+                SegRow {
+                    label: "Khóa màn hình sau"
+                    options: [[120, "2 phút"], [300, "5 phút"], [600, "10 phút"], [1800, "30 phút"], [0, "Không"]]
+                    current: Settings.power.lockAfter
+                    onPicked: v => Settings.power.lockAfter = v
+                }
+                SegRow {
+                    label: "Cho máy ngủ sau"
+                    note: "Máy luôn khóa trước khi ngủ, kể cả khi gập màn hình laptop. Đang xem phim hay họp video thì không tự khóa."
+                    options: [[900, "15 phút"], [1800, "30 phút"], [3600, "1 giờ"], [0, "Không"]]
+                    current: Settings.power.sleepAfter
+                    onPicked: v => Settings.power.sleepAfter = v
+                    last: true
+                }
+            }
+        }
+    }
+
+    Component {
+        id: dtPage
+        Column {
+            id: dt
+            spacing: 26
+            property string tz: ""
+            property bool ntp: true
+            property var zones: []
+            property string q: ""
+
+            function read() { infoProc.running = false; infoProc.running = true; }
+            Component.onCompleted: { read(); zoneProc.running = true; }
+            Process {
+                id: infoProc
+                command: ["timedatectl", "show", "-p", "Timezone", "-p", "NTP", "--value"]
+                stdout: StdioCollector {
+                    onStreamFinished: { const l = text.trim().split("\n"); dt.tz = l[0] || ""; dt.ntp = l[1] === "yes"; }
+                }
+            }
+            Process {
+                id: zoneProc
+                command: ["timedatectl", "list-timezones"]
+                stdout: StdioCollector { onStreamFinished: dt.zones = text.trim().split("\n") }
+            }
+            // timedatectl hỏi mật khẩu bằng hộp thoại của hệ thống (hyprpolkitagent)
+            Process {
+                id: setProc
+                onExited: dt.read()
+            }
+            function run(cmd) { setProc.command = cmd; setProc.running = true; }
+
+            SystemClock { id: dclock; precision: SystemClock.Seconds }
+
+            PageTitle { text: "Ngày giờ" }
+
+            Group {
+                title: ""
+                InfoRow {
+                    label: "Bây giờ"
+                    value: dclock.date.toLocaleString(Qt.locale("vi_VN"), "dddd, dd/MM/yyyy") + "  "
+                           + Qt.formatDateTime(dclock.date, Settings.misc.clock24 ? "HH:mm:ss" : "h:mm:ss AP")
+                }
+                SwitchRow {
+                    label: "Tự đặt giờ qua mạng"
+                    note: "Nên bật. Đổi cài đặt này cần mật khẩu."
+                    on: dt.ntp
+                    onToggled: dt.run(["timedatectl", "set-ntp", dt.ntp ? "false" : "true"])
+                }
+                SegRow {
+                    label: "Kiểu giờ"
+                    options: [[true, "24 giờ"], [false, "12 giờ (SA/CH)"]]
+                    current: Settings.misc.clock24
+                    onPicked: v => Settings.misc.clock24 = v
+                    last: true
+                }
+            }
+
+            Group {
+                title: "Múi giờ"
+                InfoRow { label: "Đang dùng"; value: dt.tz }
+                Item {
+                    width: parent.width
+                    height: 60
+                    Rectangle {
+                        x: 16; y: 10
+                        width: parent.width - 32 - 150
+                        height: 40
+                        radius: 12
+                        color: Theme.chip
+                        TextInput {
+                            id: zq
+                            x: 14
+                            width: parent.width - 28
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.family: Theme.font
+                            font.pixelSize: 14
+                            color: Theme.fg
+                            clip: true
+                            onTextChanged: dt.q = text.trim().toLowerCase().replace(/ /g, "_")
+                            Text { visible: zq.text.length === 0; text: "Tìm thành phố, ví dụ Tokyo, London"; font: zq.font; color: Theme.dim }
+                        }
+                    }
+                    SmallButton {
+                        anchors.right: parent.right
+                        anchors.rightMargin: 16
+                        y: 13
+                        text: "Giờ Việt Nam"
+                        onClicked: dt.run(["timedatectl", "set-timezone", "Asia/Ho_Chi_Minh"])
+                    }
+                }
+                Repeater {
+                    model: dt.q.length < 2 ? [] : dt.zones.filter(z => z.toLowerCase().includes(dt.q)).slice(0, 8)
+                    delegate: PickRow {
+                        required property string modelData
+                        label: modelData.replace(/_/g, " ")
+                        on: modelData === dt.tz
+                        onPicked: { dt.run(["timedatectl", "set-timezone", modelData]); zq.text = ""; }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: appsPage
+        Column {
+            id: ap
+            spacing: 26
+            // [nhãn, các kiểu tệp]; kiểu đầu tiên dùng để đọc ứng dụng đang chọn
+            readonly property var kinds: [
+                ["Trình duyệt web", ["x-scheme-handler/https", "x-scheme-handler/http", "text/html"]],
+                ["Thư mục", ["inode/directory"]],
+                ["Ảnh", ["image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp", "image/tiff", "image/avif", "image/heic", "image/svg+xml"]],
+                ["Video", ["video/mp4", "video/x-matroska", "video/webm", "video/quicktime", "video/x-msvideo", "video/mpeg"]],
+                ["Nhạc", ["audio/mpeg", "audio/flac", "audio/ogg", "audio/x-wav", "audio/mp4", "audio/aac"]],
+                ["PDF", ["application/pdf"]],
+                ["Văn bản", ["text/plain", "text/markdown"]],
+                ["Tệp nén", ["application/zip", "application/x-7z-compressed", "application/vnd.rar", "application/x-tar", "application/gzip"]]
+            ]
+            property var current: ({})     // nhãn → tệp .desktop đang chọn
+            property var choices: ({})     // nhãn → [tệp .desktop có thể mở]
+            property string open: ""
+
+            function read() { lister.running = false; lister.running = true; }
+            Component.onCompleted: read()
+            Process {
+                id: lister
+                // mỗi loại: dòng "#nhãn", dòng mặc định, rồi các ứng dụng đăng ký (gio mime)
+                command: ["sh", "-c", ap.kinds.map(k =>
+                    "echo '#" + k[0] + "'; xdg-mime query default " + k[1][0] + "; echo '--'; "
+                    + "LC_ALL=C gio mime " + k[1][0] + " 2>/dev/null | sed -n '/Registered applications:/,/Recommended/p' | grep -E '^\\s+' | tr -d '\\t '"
+                ).join("; ")]
+                stdout: StdioCollector {
+                    onStreamFinished: {
+                        const cur = {}, ch = {};
+                        let label = "", phase = 0;
+                        for (const line of text.split("\n")) {
+                            if (line.startsWith("#")) { label = line.slice(1); phase = 1; ch[label] = []; continue; }
+                            if (line === "--") { phase = 2; continue; }
+                            if (!line.trim()) continue;
+                            if (phase === 1) cur[label] = line.trim();
+                            else if (phase === 2 && ch[label].indexOf(line.trim()) < 0) ch[label].push(line.trim());
+                        }
+                        ap.current = cur;
+                        ap.choices = ch;
+                    }
+                }
+            }
+            function entryOf(file) { return DesktopEntries.byId((file || "").replace(/\.desktop$/, "")); }
+            function setDefault(kind, file) {
+                Quickshell.execDetached(["xdg-mime", "default", file].concat(kind[1]));
+                const c = Object.assign({}, ap.current);
+                c[kind[0]] = file;
+                ap.current = c;
+                ap.open = "";
+            }
+
+            PageTitle { text: "Ứng dụng mặc định" }
+
+            Group {
+                title: "Mở bằng"
+                Repeater {
+                    model: ap.kinds
+                    delegate: Column {
+                        id: kd
+                        required property var modelData
+                        required property int index
+                        width: parent.width
+                        readonly property string cur: ap.current[modelData[0]] || ""
+                        readonly property var e: ap.entryOf(cur)
+                        RowBase {
+                            label: kd.modelData[0]
+                            last: kd.index === ap.kinds.length - 1 && ap.open !== kd.modelData[0]
+                            Row {
+                                anchors.right: parent.right
+                                anchors.rightMargin: 18
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 10
+                                Image {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 22
+                                    height: 22
+                                    sourceSize: Qt.size(44, 44)
+                                    source: kd.e ? Quickshell.iconPath(kd.e.icon, "application-x-executable") : ""
+                                }
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: (kd.e ? kd.e.name : kd.cur || "Chưa chọn") + (ap.open === kd.modelData[0] ? "  ▴" : "  ▾")
+                                    font.family: Theme.font
+                                    font.pixelSize: 14
+                                    font.weight: Font.Medium
+                                    color: Theme.fg
+                                }
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: ap.open = ap.open === kd.modelData[0] ? "" : kd.modelData[0]
+                            }
+                        }
+                        Repeater {
+                            model: ap.open === kd.modelData[0] ? (ap.choices[kd.modelData[0]] || []) : []
+                            delegate: PickRow {
+                                required property string modelData
+                                readonly property var en: ap.entryOf(modelData)
+                                label: "      " + (en ? en.name : modelData)
+                                on: modelData === kd.cur
+                                onPicked: ap.setDefault(kd.modelData, modelData)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
         id: weatherPage
         Column {
             id: wp2
@@ -1397,6 +1916,23 @@ FloatingWindow {
                 InfoRow { label: "Kernel"; value: ab.info[1] || "" }
                 InfoRow { label: "Hyprland"; value: ab.info[2] || "" }
                 InfoRow { label: "Quickshell"; value: ab.info[3] || ""; last: true }
+            }
+
+            Group {
+                title: "Cập nhật phần mềm"
+                InfoRow {
+                    label: Updates.checking ? "Đang kiểm tra…"
+                        : Updates.count > 0 ? "Có " + Updates.count + " bản cập nhật" : "Máy đang ở bản mới nhất"
+                    value: Updates.lastCheck && !isNaN(Updates.lastCheck.getTime())
+                           ? "kiểm tra lúc " + Qt.formatDateTime(Updates.lastCheck, "HH:mm") : ""
+                }
+                ButtonsRow {
+                    buttons: [["Kiểm tra ngay", () => Updates.check()],
+                              ["Cập nhật", () => Updates.run()],
+                              ["Kho ứng dụng", () => Quickshell.execDetached(["gnome-software"])]]
+                    note: "Tự kiểm tra mỗi 3 giờ. Kho ứng dụng lấy phần mềm từ Flathub."
+                    last: true
+                }
             }
 
             Group {

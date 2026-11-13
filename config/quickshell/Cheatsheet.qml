@@ -39,6 +39,9 @@ PanelWindow {
         ] },
         { title: "Cửa sổ", items: [
             [["Super", "Q"], "Đóng"],
+            [["Alt", "F4"], "Đóng (như Windows)"],
+            [["Super", "H"], "Thu nhỏ xuống dock"],
+            [["Alt", "Tab"], "Chuyển cửa sổ"],
             [["Super", "V"], "Nổi / xếp ô"],
             [["Super", "F"], "Toàn màn hình"],
             [["Super", "P"], "Ghim nổi trên mọi workspace"],
@@ -79,6 +82,7 @@ PanelWindow {
         ] },
         { title: "Khác", items: [
             [["Super", "Shift", "W"], "Hình nền ngẫu nhiên"],
+            [["Ctrl", "Shift", "Esc"], "Trình quản lý tác vụ"],
             [["Super", "Shift", "Esc"], "Thoát Hyprland ngay"]
         ] }
     ]

@@ -33,7 +33,7 @@ cd liquid-glass
 
 Script hỏi trước mỗi bước cần `sudo`:
 
-1. Cài khoảng 54 gói từ kho chính thức (gói có rồi thì bỏ qua).
+1. Cài khoảng 75 gói từ kho chính thức (gói có rồi thì bỏ qua).
 2. Tuỳ chọn: cài `yay` và `mpvpaper` từ AUR để dùng hình nền video.
 3. Sao lưu cấu hình cũ trong `~/.config/hypr`, `quickshell`, `kitty` sang `~/.config/liquid-glass-backup-<thời gian>/`, rồi chép cấu hình mới vào.
 4. Đặt chế độ tối cho ứng dụng GTK, biểu tượng Papirus, phông Inter.
@@ -57,7 +57,10 @@ Sau đó đăng xuất, chọn phiên **Hyprland** ở màn hình đăng nhập.
 | `Super + E` / `Super + B` | Tệp / trình duyệt |
 | `Super + W` | Bảng widget (lịch, thời tiết, ghi chú, tài nguyên) |
 | `Super + N` | Trung tâm điều khiển và thông báo |
-| `Super + Q` | Đóng cửa sổ |
+| `Super + Q` hoặc `Alt + F4` | Đóng cửa sổ |
+| `Alt + Tab` | Chuyển cửa sổ (giữ Alt, bấm Tab để chọn, thả Alt để chuyển) |
+| `Super + H` | Thu nhỏ cửa sổ xuống dock |
+| `Ctrl + Shift + Esc` | Trình quản lý tác vụ |
 | `Super + V` | Bật/tắt cửa sổ nổi |
 | `Super + F` | Toàn màn hình |
 | `Super + P` | Ghim cửa sổ (chuyển sang nổi rồi hiện trên mọi workspace) |
@@ -144,8 +147,12 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - *Wi-Fi:* bật/tắt, danh sách mạng xung quanh, bấm để kết nối (mạng có khoá thì hiện ô mật khẩu ngay bên dưới), quên mạng, ngắt kết nối.
 - *Bluetooth:* bật/tắt, thiết bị đã ghép (kết nối, ngắt, quên, % pin), tìm và ghép thiết bị mới; ghép xong tự kết nối.
 - *Âm thanh:* chọn loa / tai nghe / HDMI, chọn micro, âm lượng và tắt tiếng từng cái, âm lượng riêng của từng ứng dụng đang phát.
+- *Màn hình:* độ phân giải, tần số quét, tỉ lệ 100–200%, bật/tắt và vị trí màn hình phụ (trái/phải/trên/dưới). Bấm *Áp dụng* xong, nếu không bấm *Giữ thay đổi* trong 15 giây thì tự quay lại như cũ (phòng khi màn hình đen).
+- *Nguồn điện:* tiết kiệm pin / cân bằng / hiệu năng; sau bao lâu thì tắt màn hình, khóa, cho máy ngủ.
+- *Ngày giờ:* tự đặt giờ qua mạng, kiểu 24 giờ hay 12 giờ, đổi múi giờ (tìm theo tên thành phố).
+- *Ứng dụng mặc định:* mở web, thư mục, ảnh, video, nhạc, PDF, văn bản, tệp nén bằng ứng dụng nào.
 - *Thời tiết:* gõ tên thành phố rồi chọn trong danh sách. Không cần tự tìm toạ độ nữa.
-- *Giới thiệu:* tên máy, phiên bản Hyprland, Quickshell, kernel.
+- *Giới thiệu:* tên máy, phiên bản Hyprland, Quickshell, kernel; kiểm tra cập nhật, mở kho ứng dụng.
 
 Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprland được ghi ra `~/.config/hypr/lg_settings.lua` (đừng sửa tay file này, nó sẽ bị ghi đè; muốn chỉnh thêm thì dùng `user.lua`).
 
@@ -153,18 +160,22 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 
 ---
 
+## Cho người quen Windows
+
+- **Alt + Tab**, **Alt + F4**, **Ctrl + Shift + Esc** (Mission Center: xem CPU, RAM, ứng dụng nào đang chạy, tắt ứng dụng bị treo) dùng như trên Windows. `Super + Shift + S` cũng là chụp màn hình như Windows.
+- **Thu nhỏ** (`Super + H`): cửa sổ biến khỏi màn hình nhưng vẫn chạy; biểu tượng trên dock vẫn có chấm. Bấm biểu tượng đó, hoặc chọn trong Alt + Tab, để hiện lại.
+- **Ứng dụng có sẵn:** Firefox, Tệp (Nautilus), xem ảnh (Loupe), xem video và nghe nhạc (Celluloid), đọc PDF (Papers), soạn văn bản (Text Editor), máy tính bỏ túi, giải nén zip/rar/7z (File Roller), Mission Center.
+- **USB, điện thoại, máy ảnh** cắm vào là hiện trong Tệp (điện thoại Android: chọn chế độ "Truyền tệp" trên điện thoại).
+- **Tài liệu Word/Excel** từ máy Windows hiển thị đúng phông nhờ bộ phông Liberation (thay cho Arial, Times New Roman).
+- **Cài phần mềm:** mở *Phần mềm* trong launcher (GNOME Software, lấy ứng dụng từ Flathub, như Microsoft Store).
+- **Cập nhật:** máy tự kiểm tra mỗi 3 giờ. Có bản mới thì hiện thông báo và một ô trong trung tâm điều khiển; bấm *Cập nhật* để mở cửa sổ cập nhật (nhập mật khẩu khi được hỏi).
+- **Lịch có âm lịch:** bảng widget hiện ngày âm dưới mỗi ngày, ngày nghỉ lễ màu đỏ, ngày lễ khác có chấm vàng. Bấm vào một ngày để xem âm lịch đầy đủ (ví dụ "mùng 5 tháng 10 năm Bính Ngọ") và tên ngày lễ. Âm lịch tính ngay trên máy, không cần mạng.
+
 ## Khóa màn hình, tự khóa, menu nguồn, đăng nhập
 
 **Màn hình khóa** (`Super + L`) dùng hyprlock: nền là ảnh chụp màn hình lúc khóa được làm mờ, giờ lớn ở giữa, ảnh đại diện và ô mật khẩu ở dưới, pin và bố cục bàn phím ở hai góc. Gõ sai mật khẩu thì ô đổi màu và đếm số lần sai. Máy có cảm biến vân tay: bỏ dấu `#` ở phần `auth` trong `~/.config/hypr/hyprlock.conf` và cài `fprintd`.
 
-**Tự khóa** (hypridle, cấu hình ở `~/.config/hypr/hypridle.conf`):
-
-| Không dùng máy | Việc |
-|---|---|
-| 2,5 phút | Làm tối màn hình |
-| 5 phút | Khóa |
-| 5,5 phút | Tắt màn hình |
-| 30 phút | Cho máy ngủ |
+**Tự khóa** (hypridle): mặc định làm tối màn hình lúc 4,5 phút, khóa lúc 5 phút, tắt màn hình lúc 5,5 phút, cho máy ngủ lúc 30 phút. Đổi trong Cài đặt → Nguồn điện; file `~/.config/hypr/hypridle.conf` do ứng dụng Cài đặt ghi lại.
 
 Đang xem phim hoặc họp video thì không tự khóa (nếu ứng dụng báo cho hệ thống). Máy luôn khóa trước khi ngủ, kể cả khi gập màn hình laptop.
 
@@ -284,6 +295,10 @@ config/
     Weather.qml       thời tiết
     Tile.qml, GlassSlider.qml, MediaCard.qml, NotifCard.qml
     Launcher.qml      trình chạy nhanh
+    Switcher.qml      Alt + Tab
+    Updates.qml       kiểm tra cập nhật
+    lunar.js          âm lịch và ngày lễ
+    WinOps.qml        thu nhỏ / hiện lại cửa sổ
     Dock.qml          dock ở cạnh dưới
     PowerMenu.qml     menu nguồn
     Overview.qml      toàn cảnh workspace

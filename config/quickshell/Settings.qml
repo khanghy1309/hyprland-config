@@ -25,6 +25,8 @@ Singleton {
     property alias weather: adapter.weather
     property alias misc: adapter.misc
     property alias dock: adapter.dock
+    property alias display: adapter.display
+    property alias power: adapter.power
 
     property bool ready: false
 
@@ -33,7 +35,7 @@ Singleton {
         path: root.dir + "/settings.json"
         watchChanges: true
         onFileChanged: reload()
-        onLoaded: { root.ready = true; root.writeLua(); }
+        onLoaded: { root.ready = true; root.writeLua(); root.writeIdle(); }
         onLoadFailed: {
             // chưa có file: tạo với giá trị mặc định
             mkdir.running = true;
@@ -86,6 +88,18 @@ Singleton {
             property JsonObject misc: JsonObject {
                 property int nightLightTemp: 4500
                 property int notifTimeout: 5000
+                property bool clock24: true
+            }
+            property JsonObject display: JsonObject {
+                // { "eDP-1": { mode: "1920x1080@60", scale: 1.25, position: "0x0", disabled: false }, ... }
+                property var monitors: ({})
+            }
+            property JsonObject power: JsonObject {
+                // giây không dùng máy; 0 = không bao giờ
+                property int dimAfter: 150
+                property int lockAfter: 300
+                property int screenOffAfter: 330
+                property int sleepAfter: 1800
             }
             property JsonObject dock: JsonObject {
                 property bool enabled: true
@@ -101,23 +115,29 @@ Singleton {
     Process {
         id: mkdir
         command: ["mkdir", "-p", root.dir]
-        onExited: { file.writeAdapter(); root.writeLua(); }
+        onExited: { file.writeAdapter(); root.writeLua(); root.writeIdle(); }
     }
 
     // gom các thay đổi liên tiếp (kéo thanh trượt) thành một lần ghi
     Timer {
         id: saveTimer
         interval: 350
-        onTriggered: { file.writeAdapter(); root.writeLua(); }
+        onTriggered: { file.writeAdapter(); root.writeLua(); root.writeIdle(); }
     }
 
     // ── Lua cho Hyprland ──
-    function lua(v) {
+    function lua(v, depth) {
+        const d = depth || 1;
         if (typeof v === "boolean") return v ? "true" : "false";
         if (typeof v === "number") return isFinite(v) ? String(Math.round(v * 1000) / 1000) : "nil";
         if (typeof v === "string") return JSON.stringify(v);
+        if (v === null || v === undefined) return "nil";
+        const pad = "    ".repeat(d + 1), end = "    ".repeat(d);
+        // tên như "eDP-1" không phải tên biến Lua hợp lệ: viết dạng ["eDP-1"]
+        const key = k => /^[A-Za-z_][A-Za-z0-9_]*$/.test(k) ? k : "[" + JSON.stringify(k) + "]";
         const keys = Object.keys(v);
-        return "{\n" + keys.map(k => "        " + k + " = " + lua(v[k]) + ",").join("\n") + "\n    }";
+        if (keys.length === 0) return "{}";
+        return "{\n" + keys.map(k => pad + key(k) + " = " + lua(v[k], d + 1) + ",").join("\n") + "\n" + end + "}";
     }
     readonly property string luaText: {
         const L = look, I = input, G = gestures;
@@ -128,7 +148,9 @@ Singleton {
             input: { naturalScroll: I.naturalScroll, tapToClick: I.tapToClick,
                      disableWhileTyping: I.disableWhileTyping, scrollFactor: I.scrollFactor,
                      sensitivity: I.sensitivity, repeatRate: I.repeatRate, repeatDelay: I.repeatDelay },
-            gestures: { workspace: G.workspace, overview: G.overview, dropdown: G.dropdown, panels: G.panels }
+            gestures: { workspace: G.workspace, overview: G.overview, dropdown: G.dropdown, panels: G.panels },
+            // từng màn hình: { mode, scale, position, disabled }; xem lg_monitors.lua
+            monitors: display.monitors || {}
         };
         return "-- Do ứng dụng Cài đặt (Super + ,) tự ghi. Sửa tay sẽ bị ghi đè;\n"
              + "-- chỉnh riêng thì dùng user.lua.\nreturn {\n"
@@ -147,6 +169,42 @@ Singleton {
         id: reloadTimer
         interval: 300
         onTriggered: Quickshell.execDetached(["hyprctl", "reload"])
+    }
+
+    // ── tự khóa / tắt màn hình / ngủ (Cài đặt → Nguồn điện) → ~/.config/hypr/hypridle.conf ──
+    readonly property string idlePath: (Quickshell.env("XDG_CONFIG_HOME") || home + "/.config") + "/hypr/hypridle.conf"
+    readonly property string idleText: {
+        const P = power;
+        const dpmsOff = "hyprctl dispatch 'hl.dsp.dpms({action = \"off\"})'";
+        const dpmsOn = "hyprctl dispatch 'hl.dsp.dpms({action = \"on\"})'";
+        const firstOff = [P.lockAfter, P.screenOffAfter].filter(x => x > 0);
+        const dim = firstOff.length ? Math.max(20, Math.min(...firstOff) - 30) : 0;
+        const L = ["# Do ứng dụng Cài đặt (Super + ,) → Nguồn điện tự ghi. Sửa tay sẽ bị ghi đè.",
+                   "# hypridle 0.1 vẫn dùng cú pháp hyprlang.", "",
+                   "general {",
+                   "    lock_cmd = pidof hyprlock || hyprlock",
+                   "    before_sleep_cmd = loginctl lock-session",
+                   "    after_sleep_cmd = " + dpmsOn,
+                   "    ignore_dbus_inhibit = false",
+                   "}", ""];
+        const add = (t, on, off, note) => {
+            if (t <= 0) return;
+            L.push("# " + note, "listener {", "    timeout = " + t, "    on-timeout = " + on);
+            if (off) L.push("    on-resume = " + off);
+            L.push("}", "");
+        };
+        add(dim, "brightnessctl -s set 10", "brightnessctl -r", "làm tối màn hình trước khi tắt/khóa");
+        add(P.lockAfter, "loginctl lock-session", "", "khóa màn hình");
+        add(P.screenOffAfter, dpmsOff, dpmsOn, "tắt màn hình");
+        add(P.sleepAfter, "systemctl suspend", "", "cho máy ngủ");
+        return L.join("\n");
+    }
+    FileView { id: idleFile; path: root.idlePath; printErrors: false }
+    function writeIdle() {
+        if (idleFile.text() === idleText) return;
+        idleFile.setText(idleText);
+        // hypridle không tự đọc lại file: khởi động lại nó
+        Quickshell.execDetached(["sh", "-c", "pkill -x hypridle; sleep 0.3; setsid -f hypridle >/dev/null 2>&1"]);
     }
 
     // ── phông chữ cho ứng dụng GTK (Tệp, Firefox...) đổi theo ──

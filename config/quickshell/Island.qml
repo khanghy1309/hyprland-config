@@ -122,7 +122,7 @@ PanelWindow {
                 id: clockText
                 anchors.centerIn: parent
                 text: clock.date.toLocaleString(Qt.locale("vi_VN"), "ddd, dd/MM") + "  ·  "
-                      + Qt.formatDateTime(clock.date, "HH:mm")
+                      + Qt.formatDateTime(clock.date, Settings.misc.clock24 ? "HH:mm" : "h:mm AP")
                 font.family: Theme.font
                 font.pixelSize: 14
                 font.weight: Font.DemiBold

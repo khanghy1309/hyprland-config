@@ -54,9 +54,8 @@ PanelWindow {
     readonly property var monitor: Hyprland.monitorFor(screen)
     readonly property int activeWs: monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : 1
 
-    // cửa sổ thường (bỏ qua workspace đặc biệt như terminal thả xuống)
-    readonly property var wins: Hyprland.toplevels.values.filter(t =>
-        t.workspace && t.workspace.id > 0 && t.lastIpcObject && t.lastIpcObject["class"])
+    // cửa sổ thường và cửa sổ đã thu nhỏ (bỏ qua terminal thả xuống)
+    readonly property var wins: Hyprland.toplevels.values.filter(t => WinOps.usable(t))
 
     function idFor(t) {
         const c = t.lastIpcObject["class"];
@@ -90,9 +89,7 @@ PanelWindow {
     readonly property bool hasUnpinned: apps.length > pinnedCount
 
     function lua(expr, legacy) { Hyprland.dispatch(Hyprland.usingLua ? expr : legacy); }
-    function focusWin(w) {
-        lua(`hl.dsp.focus({ window = "address:0x${w.address}" })`, `focuswindow address:0x${w.address}`);
-    }
+    function focusWin(w) { WinOps.focus(w); }    // cửa sổ đã thu nhỏ thì hiện lại
     function closeWin(w) {
         lua(`hl.dsp.window.close({ window = "address:0x${w.address}" })`, `closewindow address:0x${w.address}`);
     }
@@ -113,6 +110,9 @@ PanelWindow {
 
     function activate(app) {
         if (app.wins.length === 0) { launch(app); return; }
+        // chỉ còn cửa sổ đã thu nhỏ: hiện lại cái dùng gần nhất
+        const shown = app.wins.filter(w => !WinOps.isMinimized(w));
+        if (shown.length === 0) { WinOps.restore(recent(app.wins)[0]); return; }
         const active = Hyprland.activeToplevel;
         const i = app.wins.indexOf(active);
         if (i >= 0) {
@@ -470,7 +470,8 @@ PanelWindow {
             forTrash = false;
             const list = [];
             for (const w of a.wins)
-                list.push({ label: w.title || a.cls || "Cửa sổ", run: () => dock.focusWin(w), win: true });
+                list.push({ label: (WinOps.isMinimized(w) ? "(thu nhỏ) " : "") + (w.title || a.cls || "Cửa sổ"),
+                            run: () => dock.focusWin(w), win: true });
             if (a.entry) list.push({ label: "Mở cửa sổ mới", run: () => dock.launch(a) });
             if (a.entry) list.push({ label: a.pinned ? "Bỏ ghim khỏi Dock" : "Ghim vào Dock", run: () => dock.setPinned(a.id, !a.pinned) });
             if (a.wins.length > 0)

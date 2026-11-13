@@ -17,6 +17,12 @@ hl.bind(S .. " + B",      sh(LG.browser))
 hl.bind(S .. " + W",      sh("qs ipc call panels widgets"))
 hl.bind(S .. " + N",      sh("qs ipc call panels control"))
 hl.bind(S .. " + Tab",    sh("qs ipc call overview toggle"))
+-- Alt + Tab như Windows: giữ Alt, bấm Tab để chọn, thả Alt để chuyển
+hl.bind("ALT + Tab",         sh("qs ipc call switcher next"))
+hl.bind("ALT + SHIFT + Tab", sh("qs ipc call switcher prev"))
+hl.bind("ALT + Alt_L",       sh("qs ipc call switcher commit"), { release = true, transparent = true })
+-- trình quản lý tác vụ
+hl.bind("CTRL + SHIFT + Escape", sh(LG.taskManager))
 hl.bind(S .. " + slash",  sh("qs ipc call cheatsheet toggle"))
 hl.bind(S .. " + comma",  sh("qs ipc call settings toggle"))
 hl.bind(S .. " + D",      sh("qs ipc call dock toggle"))
@@ -26,6 +32,9 @@ hl.bind(S .. " + SHIFT + V", sh("qs ipc call launcher clipboard"))
 -- Cửa sổ
 -------------------------------------------------------------------
 hl.bind(S .. " + Q", hl.dsp.window.close())
+hl.bind("ALT + F4", hl.dsp.window.close())                       -- như Windows
+-- thu nhỏ: cất cửa sổ vào workspace ẩn; bấm biểu tượng trên dock hoặc Alt + Tab để hiện lại
+hl.bind(S .. " + H", hl.dsp.window.move({ workspace = "special:minimized", follow = false }))
 hl.bind(S .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(S .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind(S .. " + J", hl.dsp.layout("togglesplit"))

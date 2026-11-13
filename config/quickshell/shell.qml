@@ -6,7 +6,7 @@ import Quickshell
 
 ShellRoot {
     // Khởi động sẵn các dịch vụ chạy nền (nhận thông báo, theo dõi âm lượng, nhạc...)
-    readonly property var services: [Settings, Notifs, Osd, Media, Controls, Weather, Recorder]
+    readonly property var services: [Settings, Notifs, Osd, Media, Controls, Weather, Recorder, Updates]
 
     // Mỗi màn hình một thanh trên
     Variants {
@@ -28,6 +28,9 @@ ShellRoot {
 
     // Menu nguồn, mở bằng Super + Esc
     PowerMenu {}
+
+    // Alt + Tab
+    Switcher {}
 
     // Toàn cảnh workspace (Super + Tab, vuốt 3 ngón lên)
     Overview {}

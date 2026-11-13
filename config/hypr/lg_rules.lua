@@ -85,3 +85,19 @@ hl.window_rule({
     size   = "1000 680",
     center = true,
 })
+
+-- Máy tính bỏ túi: nổi, nhỏ gọn
+hl.window_rule({
+    name  = "float-calculator",
+    match = { class = "^org.gnome.Calculator$" },
+    float = true,
+})
+
+-- Cửa sổ cập nhật phần mềm (terminal): nổi, ở giữa
+hl.window_rule({
+    name  = "float-lg-update",
+    match = { class = "^lg-update$" },
+    float  = true,
+    size   = "900 560",
+    center = true,
+})

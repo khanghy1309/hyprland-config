@@ -120,6 +120,63 @@ GlassPill {
             }
         }
 
+        // ── có bản cập nhật ──
+        Rectangle {
+            visible: Updates.count > 0 || Updates.updating
+            width: parent.width
+            height: 64
+            radius: 22
+            color: Theme.chip
+            Row {
+                x: 16
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 12
+                Icon { anchors.verticalCenter: parent.verticalCenter; path: "M12 4v11M7 10l5 5 5-5M5 20h14"; size: 18 }
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    Text {
+                        text: Updates.updating ? "Đang cập nhật…" : "Có " + Updates.count + " bản cập nhật"
+                        font.family: Theme.font
+                        font.pixelSize: 14
+                        font.weight: Font.DemiBold
+                        color: Theme.fg
+                    }
+                    Text {
+                        visible: !Updates.updating
+                        text: [Updates.pacman ? Updates.pacman + " gói hệ thống" : "", Updates.aur ? Updates.aur + " gói AUR" : "",
+                               Updates.flatpak ? Updates.flatpak + " ứng dụng" : ""].filter(x => x).join(" · ")
+                        font.family: Theme.font
+                        font.pixelSize: 12
+                        color: Theme.dim
+                    }
+                }
+            }
+            Rectangle {
+                visible: !Updates.updating
+                anchors.right: parent.right
+                anchors.rightMargin: 14
+                anchors.verticalCenter: parent.verticalCenter
+                width: upText.implicitWidth + 26
+                height: 34
+                radius: 12
+                color: Theme.accent
+                Text {
+                    id: upText
+                    anchors.centerIn: parent
+                    text: "Cập nhật"
+                    font.family: Theme.font
+                    font.pixelSize: 13
+                    font.weight: Font.DemiBold
+                    color: Theme.ink
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: { PanelState.close(); Updates.run(); }
+                }
+            }
+        }
+
         // ── nhạc ──
         Rectangle {
             visible: Media.hasTrack

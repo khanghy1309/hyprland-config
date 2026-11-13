@@ -60,6 +60,14 @@ PKGS=(
     satty wf-recorder libpulse tesseract tesseract-data-vie tesseract-data-eng
     # ảnh thu nhỏ của hình nền video (Cài đặt → Hình nền)
     ffmpeg
+    # ứng dụng cơ bản: xem ảnh, xem video, đọc PDF, soạn văn bản, máy tính, giải nén, quản lý tác vụ
+    loupe celluloid papers gnome-text-editor gnome-calculator file-roller 7zip unrar unzip mission-center
+    # cắm USB, điện thoại, máy ảnh là hiện trong Tệp
+    gvfs gvfs-mtp gvfs-gphoto2 udisks2
+    # phông tương thích Arial / Times New Roman cho tài liệu từ Windows
+    ttf-liberation
+    # kiểm tra cập nhật, kho ứng dụng (Flathub)
+    pacman-contrib gnome-software flatpak
     # tiện ích
     fd jq libnotify xdg-utils xdg-user-dirs
     # bộ gõ tiếng Việt
@@ -181,6 +189,32 @@ sudo mkdir -p "$FONT_DIR"
 sudo cp -r "$HERE/fonts/." "$FONT_DIR/"
 fc-cache -f >/dev/null 2>&1 || true
 info "Đã cài phông Geist, Be Vietnam Pro, Onest (đổi trong Cài đặt → Giao diện)"
+echo
+
+# ───────────────────────── ứng dụng mặc định ─────────────────────────
+# Mở ảnh, video, PDF... bằng ứng dụng nào. Đổi lại trong Cài đặt → Ứng dụng mặc định.
+if command -v xdg-mime >/dev/null 2>&1; then
+    setdef() { local app="$1"; shift; xdg-mime default "$app" "$@" 2>/dev/null || true; }
+    setdef firefox.desktop text/html x-scheme-handler/http x-scheme-handler/https
+    setdef org.gnome.Nautilus.desktop inode/directory
+    setdef org.gnome.Loupe.desktop image/png image/jpeg image/webp image/gif image/bmp image/tiff image/avif image/heic image/svg+xml
+    setdef io.github.celluloid_player.Celluloid.desktop video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg \
+        audio/mpeg audio/flac audio/ogg audio/x-wav audio/mp4 audio/aac
+    setdef org.gnome.Papers.desktop application/pdf
+    setdef org.gnome.TextEditor.desktop text/plain text/markdown
+    setdef org.gnome.FileRoller.desktop application/zip application/x-7z-compressed application/vnd.rar \
+        application/x-tar application/gzip application/x-compressed-tar application/x-xz-compressed-tar
+    info "Đã chọn ứng dụng mặc định cho ảnh, video, PDF, văn bản, tệp nén"
+fi
+
+# Kho ứng dụng: GNOME Software lấy ứng dụng từ Flathub (cài cho riêng bạn, không cần sudo)
+if command -v flatpak >/dev/null 2>&1; then
+    if flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null; then
+        info "Đã thêm Flathub cho kho ứng dụng (mở \"Phần mềm\" trong launcher)"
+    else
+        warn "Chưa thêm được Flathub (kiểm tra mạng), chạy lại script sau."
+    fi
+fi
 echo
 
 # ───────────────────────── giao diện tối cho ứng dụng ─────────────────────────

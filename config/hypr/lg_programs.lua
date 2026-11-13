@@ -5,6 +5,7 @@ LG = {
     terminal    = "kitty",
     fileManager = "nautilus",
     browser     = "firefox",
+    taskManager = "missioncenter",   -- Ctrl + Shift + Esc
     -- Launcher là một phần của Quickshell (~/.config/quickshell)
     launcher    = "qs ipc call launcher toggle",
     wallpaper   = os.getenv("HOME") .. "/.config/hypr/scripts/wallpaper.sh",
