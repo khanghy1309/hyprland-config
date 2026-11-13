@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Cài đặt
+GenericName=Cài đặt Liquid Glass
+Comment=Giao diện, hình nền, touchpad, Wi-Fi, thời tiết
+Keywords=settings;cai dat;cài đặt;wallpaper;hình nền;wifi;touchpad;
+Icon=preferences-system
+Exec=qs ipc call settings open
+Terminal=false
+Categories=Settings;
