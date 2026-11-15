@@ -46,9 +46,16 @@ is_video() {
     esac
 }
 
+# tắt mpvpaper. Lúc bật chế độ chơi game nó đang bị đóng băng (SIGSTOP) và sẽ không nhận lệnh tắt
+# cho tới khi được chạy tiếp, nên cho chạy tiếp trước rồi mới tắt.
+stop_mpvpaper() {
+    pkill -CONT -x mpvpaper 2>/dev/null
+    pkill -x mpvpaper 2>/dev/null
+}
+
 start_awww() {
     if ! pgrep -x awww-daemon >/dev/null; then
-        awww-daemon --quiet >/dev/null 2>&1 &
+        awww-daemon --quiet >/dev/null 2>&1 9>&- &
         disown
         # chờ daemon sẵn sàng (tối đa ~3 giây)
         for _ in $(seq 1 30); do
@@ -59,7 +66,7 @@ start_awww() {
 }
 
 set_image() {
-    pkill -x mpvpaper 2>/dev/null
+    stop_mpvpaper
     start_awww
     local kind
     kind="$(opt .wallpaper.transition fade)"    # fade | grow | wipe | none
@@ -77,7 +84,7 @@ set_video() {
     fi
     # awww và mpvpaper cùng vẽ ở lớp nền: tắt awww để video không bị che
     pkill -x awww-daemon 2>/dev/null
-    pkill -x mpvpaper 2>/dev/null
+    stop_mpvpaper
     # -p: tạm dừng khi hình nền bị che hẳn. Thêm -a để tạm dừng sớm hơn:
     #   full   khi có cửa sổ toàn màn hình
     #   max    khi có cửa sổ toàn màn hình hoặc phóng to
@@ -94,7 +101,7 @@ set_video() {
     esac
     mpvpaper -f "${args[@]}" \
         -o "no-audio loop hwdec=auto panscan=1.0" \
-        ALL "$1"
+        ALL "$1" 9>&-
 }
 
 # ảnh thu nhỏ của video (dùng cho Cài đặt và cho chế độ dùng pin)
@@ -103,8 +110,14 @@ thumb() {
     mkdir -p "$THUMBS"
     out="$THUMBS/$(printf '%s' "$src" | md5sum | cut -c1-16)-$size.jpg"
     if [ ! -s "$out" ] || [ "$src" -nt "$out" ]; then
+        # lấy khung ở giây thứ 1; video ngắn hơn 1 giây thì lấy khung đầu
         ffmpeg -loglevel error -y -ss 1 -i "$src" -frames:v 1 \
-            -vf "scale=$size:-2" -q:v 3 "$out" </dev/null || return 1
+            -vf "scale=$size:-2" -q:v 3 "$out" </dev/null 2>/dev/null
+        if [ ! -s "$out" ]; then
+            ffmpeg -loglevel error -y -i "$src" -frames:v 1 \
+                -vf "scale=$size:-2" -q:v 3 "$out" </dev/null || return 1
+        fi
+        [ -s "$out" ] || return 1
     fi
     printf '%s\n' "$out"
 }
@@ -122,6 +135,14 @@ apply() {
     fi
     printf '%s\n' "$file" > "$STATE_FILE"
 }
+
+# Lúc đăng nhập có hai lệnh chạy gần như cùng lúc ("restore" của Hyprland và "power" của Quickshell).
+# Xếp hàng bằng khoá để chúng không cùng tắt/bật trình hình nền và để lại hai cái chạy song song.
+# ("thumb" chỉ đọc nên không cần chờ. Các trình chạy nền được mở với 9>&- để không giữ khoá mãi.)
+if [ "${1:-}" != "thumb" ] && command -v flock >/dev/null 2>&1; then
+    exec 9>"${XDG_RUNTIME_DIR:-/tmp}/liquid-glass-wallpaper.lock"
+    flock -w 20 9 || true
+fi
 
 case "${1:-}" in
     power)

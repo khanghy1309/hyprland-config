@@ -45,13 +45,25 @@ geometry() {
     esac
 }
 
+# Bộ mã hoá H.264 chỉ nhận khung có chiều rộng và chiều cao chẵn: bớt 1 px nếu lẻ.
+even_geom() {
+    local pos size w h
+    read -r pos size <<< "$1"
+    w="${size%x*}"; h="${size#*x}"
+    if [[ "$w" =~ ^[0-9]+$ && "$h" =~ ^[0-9]+$ ]]; then
+        printf '%s %dx%d\n' "$pos" $((w - w % 2)) $((h - h % 2))
+    else
+        printf '%s\n' "$1"
+    fi
+}
+
 shot() {
     local mode="$1"; shift
     local edit=0 delay=0
     while (($#)); do
         case "$1" in
             --edit) edit=1 ;;
-            --delay) delay="${2:-0}"; shift ;;
+            --delay) delay="${2:-0}"; [[ "$delay" =~ ^[0-9]+$ ]] || delay=0; shift ;;
         esac
         shift
     done
@@ -106,6 +118,7 @@ record() {
     local geom
     geom="$(geometry "$mode")" || exit 0
     [[ -n "$geom" ]] || exit 0
+    geom="$(even_geom "$geom")"
 
     local args=()
     case "$audio" in
@@ -158,7 +171,8 @@ ocr() {
         exit 0
     fi
     printf '%s' "$text" | wl-copy
-    notify "Đã chép chữ vào bộ nhớ tạm" "$(printf '%s' "$text" | head -c 200)"
+    # cắt theo ký tự (không theo byte) để không cắt đôi một chữ có dấu
+    notify "Đã chép chữ vào bộ nhớ tạm" "${text:0:200}"
 }
 
 cmd="${1:-}"; shift || true

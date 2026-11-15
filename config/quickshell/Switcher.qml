@@ -49,7 +49,8 @@ PanelWindow {
     }
     function commit() {
         if (!visible) return;
-        const w = wins[index];
+        // danh sách có thể ngắn lại lúc bảng đang mở (một cửa sổ vừa đóng)
+        const w = wins.length > 0 ? wins[Math.min(index, wins.length - 1)] : null;
         visible = false;
         if (w) WinOps.focus(w);
     }

@@ -31,6 +31,9 @@ add_params() {
     printf '%s' "${line# }"
 }
 
+# chuỗi dùng làm phần thay thế trong sed: thoát các ký tự sed hiểu theo nghĩa riêng
+sed_escape() { printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'; }
+
 bold "Màn hình khởi động (Plymouth)"
 
 # ── 1. gói và theme ──
@@ -57,7 +60,11 @@ if [[ -f $MK ]]; then
             sudo sed -i -E '/^HOOKS=/ s/([( ])udev([ )])/\1udev plymouth\2/' "$MK"
         fi
         grep -E '^HOOKS=' "$MK" | sed 's/^/    /'
-        rebuild=1
+        if grep -E '^HOOKS=' "$MK" | grep -q plymouth; then
+            rebuild=1
+        else
+            warn "Không thấy hook udev hay systemd trong HOOKS nên chưa thêm được. Tự thêm \"plymouth\" vào HOOKS trong $MK (sau udev/systemd)."
+        fi
     fi
 else
     warn "Không thấy $MK (máy không dùng mkinitcpio?). Tự thêm plymouth vào initramfs theo công cụ của bạn."
@@ -66,26 +73,37 @@ fi
 # ── 3. dòng lệnh kernel ──
 cmdline_done=0
 if [[ -f /etc/default/grub ]] && command -v grub-mkconfig >/dev/null 2>&1; then
-    cur="$(sed -nE 's/^GRUB_CMDLINE_LINUX_DEFAULT="(.*)"/\1/p' /etc/default/grub | head -n1)"
-    new="$(add_params "$cur")"
-    if [[ $cur == "$new" ]]; then
-        info "GRUB đã có quiet splash"; cmdline_done=1
-    elif ask "Sửa dòng lệnh kernel của GRUB thành: \"$new\"?"; then
+    # dòng có thể dùng nháy kép hoặc nháy đơn
+    if grep -qE "^GRUB_CMDLINE_LINUX_DEFAULT=[\"'].*[\"']" /etc/default/grub; then
+        cur="$(sed -nE "s/^GRUB_CMDLINE_LINUX_DEFAULT=[\"'](.*)[\"'].*/\1/p" /etc/default/grub | head -n1)"
+        new="$(add_params "$cur")"
+        if [[ $cur == "$new" ]]; then
+            info "GRUB đã có quiet splash"; cmdline_done=1
+        elif ask "Sửa dòng lệnh kernel của GRUB thành: \"$new\"?"; then
+            backup /etc/default/grub
+            sudo sed -i -E "s|^GRUB_CMDLINE_LINUX_DEFAULT=[\"'].*[\"'].*|GRUB_CMDLINE_LINUX_DEFAULT=\"$(sed_escape "$new")\"|" /etc/default/grub
+            sudo grub-mkconfig -o /boot/grub/grub.cfg
+            cmdline_done=1
+        fi
+    elif ask "Trong /etc/default/grub chưa có dòng GRUB_CMDLINE_LINUX_DEFAULT. Thêm dòng đó với quiet splash?"; then
         backup /etc/default/grub
-        sudo sed -i -E "s|^GRUB_CMDLINE_LINUX_DEFAULT=\".*\"|GRUB_CMDLINE_LINUX_DEFAULT=\"$new\"|" /etc/default/grub
+        printf 'GRUB_CMDLINE_LINUX_DEFAULT="%s"\n' "$(add_params "")" | sudo tee -a /etc/default/grub >/dev/null
         sudo grub-mkconfig -o /boot/grub/grub.cfg
         cmdline_done=1
     fi
 fi
-if [[ $cmdline_done -eq 0 ]] && compgen -G "/boot/loader/entries/*.conf" >/dev/null 2>&1; then
+# /boot thường chỉ root đọc được, nên liệt kê và đọc bằng sudo
+mapfile -t ENTRIES < <(sudo sh -c 'ls /boot/loader/entries/*.conf 2>/dev/null' || true)
+if [[ $cmdline_done -eq 0 && ${#ENTRIES[@]} -gt 0 ]]; then
     if ask "Máy dùng systemd-boot. Thêm quiet splash vào các mục khởi động trong /boot/loader/entries?"; then
-        for f in /boot/loader/entries/*.conf; do
-            cur="$(sed -nE 's/^options[[:space:]]+(.*)/\1/p' "$f" | head -n1)"
+        for f in "${ENTRIES[@]}"; do
+            cur="$(sudo sed -nE 's/^options[[:space:]]+(.*)/\1/p' "$f" | head -n1)"
             [[ -z $cur ]] && continue
             new="$(add_params "$cur")"
             [[ $cur == "$new" ]] && continue
             backup "$f"
-            sudo sed -i -E "s|^options[[:space:]]+.*|options $new|" "$f"
+            # chỉ sửa dòng options đầu tiên (một mục có thể có nhiều dòng options, chúng được nối lại)
+            sudo sed -i -E "0,/^options[[:space:]]+.*/ s|^options[[:space:]]+.*|options $(sed_escape "$new")|" "$f"
             info "$(basename "$f"): options $new"
         done
         cmdline_done=1

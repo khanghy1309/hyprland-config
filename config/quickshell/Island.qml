@@ -47,7 +47,11 @@ PanelWindow {
         : (Media.playing && Media.hasTrack) ? "media"
         : "clock"
 
-    onModeChanged: if (mode !== "player" && mode !== "media") expanded = false
+    onModeChanged: {
+        if (mode !== "player" && mode !== "media") expanded = false;
+        // chuột đang nằm trên đảo lúc thông báo tới hoặc đi: báo lại cho đúng (để thông báo không bị giữ mãi / mất sớm)
+        Notifs.hovering = hover.hovered && mode === "notif";
+    }
 
     readonly property var size: ({
         clock:  Qt.size(clockText.implicitWidth + 40, Theme.barHeight),

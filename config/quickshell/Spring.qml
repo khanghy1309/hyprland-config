@@ -24,13 +24,14 @@ Item {
     property bool animated: Settings.look.animations
     readonly property bool running: fa.running
 
-    Component.onCompleted: { value = target; velocity = 0; }
+    Component.onCompleted: { value = isFinite(target) ? target : 0; velocity = 0; }
 
     // nhảy thẳng tới đích, không chuyển động (dùng khi vật đang ẩn)
-    function snap() { fa.stop(); value = target; velocity = 0; }
+    function snap() { fa.stop(); velocity = 0; if (isFinite(target)) value = target; }
 
     onTargetChanged: {
-        if (!animated) { snap(); return; }
+        if (!isFinite(target)) return;      // đích chưa tính được (cửa sổ chưa có cỡ...): giữ nguyên, không để NaN lan ra
+        if (!animated || !isFinite(value)) { snap(); return; }
         if (Math.abs(target - value) > epsilon || Math.abs(velocity) > epsilon) fa.start();
     }
 
@@ -45,6 +46,7 @@ Item {
             v += (k * (target - x) - c * v) * h;
             x += v * h;
         }
+        if (!isFinite(x) || !isFinite(v)) { snap(); return; }
         velocity = v;
         value = x;
         if (Math.abs(target - x) < epsilon && Math.abs(v) < epsilon * 10) snap();

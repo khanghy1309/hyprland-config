@@ -41,6 +41,10 @@ echo
 PKGS=(
     # nền
     hyprland xdg-desktop-portal-hyprland hyprpolkitagent quickshell qt6-5compat qt6-shadertools
+    # hộp chọn tệp cho ứng dụng (nút Tải lên / Mở tệp trong ứng dụng Flatpak và vài ứng dụng khác)
+    xdg-desktop-portal-gtk
+    # kho mật khẩu: trình duyệt, VS Code, Git, Wi-Fi lưu được mật khẩu; tự mở khoá khi đăng nhập qua SDDM
+    gnome-keyring
     # hình nền
     awww
     # terminal, tệp, trình duyệt
@@ -80,8 +84,24 @@ PKGS=(
 
 bold "1. Cài gói từ kho chính thức"
 info "${#PKGS[@]} gói, gói nào có rồi sẽ được bỏ qua"
+# Một tên gói không còn trong kho (bị đổi tên, bị gỡ) sẽ làm pacman từ chối cài TẤT CẢ.
+# Lọc trước: gói nào kho không có thì báo ra và bỏ qua, phần còn lại vẫn cài.
+mapfile -t AVAILABLE < <(pacman -Slq 2>/dev/null | sort -u)
+if ((${#AVAILABLE[@]} > 0)); then
+    WANT=() MISSING=()
+    for p in "${PKGS[@]}"; do
+        if printf '%s\n' "${AVAILABLE[@]}" | grep -qxF -- "$p"; then WANT+=("$p"); else MISSING+=("$p"); fi
+    done
+    if ((${#MISSING[@]} > 0)); then
+        warn "Kho không có các gói này (có thể đã đổi tên), bỏ qua: ${MISSING[*]}"
+        warn "Phần dùng tới chúng sẽ không chạy cho tới khi bạn cài gói thay thế."
+    fi
+else
+    # chưa tải danh sách gói về máy (máy mới cài): cứ đưa hết cho pacman
+    WANT=("${PKGS[@]}")
+fi
 if ask "Cài bằng sudo pacman?"; then
-    sudo pacman -S --needed "${PKGS[@]}"
+    sudo pacman -S --needed "${WANT[@]}" || warn "pacman báo lỗi, một số gói chưa được cài. Xem thông báo phía trên rồi chạy lại script."
 else
     warn "Bỏ qua. Các phần cần gói còn thiếu sẽ không chạy."
 fi
@@ -97,14 +117,16 @@ if [[ -z "$AUR" ]]; then
     if ask "Cài yay để dùng được gói AUR?"; then
         sudo pacman -S --needed git base-devel
         tmp="$(mktemp -d)"
-        git clone https://aur.archlinux.org/yay-bin.git "$tmp/yay-bin"
-        (cd "$tmp/yay-bin" && makepkg -si)
+        if git clone https://aur.archlinux.org/yay-bin.git "$tmp/yay-bin" && (cd "$tmp/yay-bin" && makepkg -si); then
+            AUR=yay
+        else
+            warn "Không cài được yay (kiểm tra mạng). Bỏ qua phần AUR."
+        fi
         rm -rf "$tmp"
-        AUR=yay
     fi
 fi
 if [[ -n "$AUR" ]] && ask "Cài mpvpaper bằng $AUR?"; then
-    "$AUR" -S --needed mpvpaper
+    "$AUR" -S --needed mpvpaper || warn "Không cài được mpvpaper; hình nền video sẽ chưa dùng được."
 else
     info "Bỏ qua. Ảnh tĩnh và ảnh GIF vẫn dùng được; video cần mpvpaper."
 fi
@@ -155,7 +177,8 @@ cp "$HERE/config/applications/"*.desktop "$HOME/.local/share/applications/"
 
 # hình nền mặc định
 mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Screenshots"
-cp -n "$HERE/wallpapers/"* "$HOME/Pictures/Wallpapers/" 2>/dev/null || true
+# chỉ chép tệp (bỏ thư mục src/ chứa mã dựng hình nền), không ghi đè tệp bạn đã có
+find "$HERE/wallpapers" -maxdepth 1 -type f -exec cp -n -t "$HOME/Pictures/Wallpapers/" {} + 2>/dev/null || true
 info "Hình nền: ~/Pictures/Wallpapers"
 
 # bộ gõ: thêm Unikey nếu chưa có cấu hình fcitx5
@@ -187,10 +210,12 @@ echo
 # Geist, Geist Mono, Be Vietnam Pro, Onest (giấy phép SIL OFL, đủ dấu tiếng Việt).
 # Cài cho cả máy để màn hình đăng nhập (chạy bằng tài khoản sddm) cũng dùng được.
 FONT_DIR=/usr/local/share/fonts/liquid-glass
-sudo mkdir -p "$FONT_DIR"
-sudo cp -r "$HERE/fonts/." "$FONT_DIR/"
-fc-cache -f >/dev/null 2>&1 || true
-info "Đã cài phông Geist, Be Vietnam Pro, Onest (đổi trong Cài đặt → Giao diện)"
+if sudo mkdir -p "$FONT_DIR" && sudo cp -r "$HERE/fonts/." "$FONT_DIR/"; then
+    fc-cache -f >/dev/null 2>&1 || true
+    info "Đã cài phông Geist, Be Vietnam Pro, Onest (đổi trong Cài đặt → Giao diện)"
+else
+    warn "Chưa cài được phông chữ (cần sudo). Giao diện sẽ dùng phông dự phòng; chạy lại script để cài."
+fi
 echo
 
 # ───────────────────────── ứng dụng mặc định ─────────────────────────
@@ -305,7 +330,7 @@ echo
 bold "7. Màn hình khởi động (Plymouth)"
 info "Chữ hello tự viết rồi chuyển thành chữ ký, hiện lúc bật máy, nhập mật khẩu ổ đĩa và tắt máy."
 if ask "Cài màn hình khởi động? (sẽ hỏi trước khi sửa mkinitcpio và dòng lệnh kernel)"; then
-    "$HERE/plymouth/install-plymouth.sh"
+    bash "$HERE/plymouth/install-plymouth.sh" || warn "Phần màn hình khởi động chưa xong; chạy lại: ./plymouth/install-plymouth.sh"
 fi
 echo
 

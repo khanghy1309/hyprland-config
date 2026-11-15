@@ -21,7 +21,10 @@ Singleton {
 
     readonly property string stateFile: (Quickshell.env("XDG_STATE_HOME") || Settings.home + "/.local/state") + "/liquid-glass/wallpaper"
     property string wall: ""
-    readonly property bool isVideo: /\.(mp4|webm|mkv|mov|m4v)$/i.test(wall)
+    // hình nền động: video, và cả GIF (Image chỉ lấy được khung đầu)
+    readonly property bool isVideo: /\.(mp4|webm|mkv|mov|m4v|gif)$/i.test(wall)
+    // đường dẫn tệp → URL (tên tệp có dấu cách, #, % ... vẫn mở được)
+    function fileUrl(p) { return p ? "file://" + p.split("/").map(encodeURIComponent).join("/") : ""; }
     property string still: ""
     // dải hình nền sau thanh trên có sáng không (Bar.qml đo); sáng thì kính ở đó tối hơn cho chữ dễ đọc
     property bool topBright: false
@@ -30,21 +33,32 @@ Singleton {
     readonly property bool canRefract: mode === "liquid" && still !== "" && (!isVideo || Settings.look.refractVideo)
 
     FileView {
+        id: stateView
         path: root.stateFile
         watchChanges: true
         onFileChanged: reload()
         onLoaded: root.wall = text().trim()
         onLoadFailed: root.wall = ""
     }
+    // lần chạy đầu tiên tệp trạng thái có thể chưa có (wallpaper.sh chưa kịp ghi): thử lại cho tới khi đọc được
+    Timer { interval: 4000; repeat: true; running: root.wall === ""; onTriggered: stateView.reload() }
     onWallChanged: {
         if (!wall) { still = ""; return; }
         if (!isVideo) { still = wall; return; }
+        still = "";                       // chưa có khung hình của video mới: tạm không khúc xạ
+        makeThumb();
+    }
+    function makeThumb() {
+        if (thumb.running) return;        // đang làm cho video trước: xong sẽ tự làm lại (onExited)
+        thumb.forWall = wall;
         thumb.command = [Settings.wallScript, "thumb", wall, "1920"];
         thumb.running = true;
     }
     Process {
         id: thumb
-        stdout: StdioCollector { onStreamFinished: root.still = text.trim() }
+        property string forWall: ""
+        stdout: StdioCollector { onStreamFinished: if (thumb.forWall === root.wall) root.still = text.trim() }
+        onExited: if (forWall !== root.wall && root.isVideo) root.makeThumb()
     }
 
     // ── cửa sổ nằm sau kính ──
@@ -69,7 +83,8 @@ Singleton {
     property int epoch: 0
     Connections {
         target: Hyprland
-        function onRawEvent(event) { refresh.restart(); }
+        // start() chứ không restart(): sự kiện tới dồn dập cũng không làm việc hỏi lại bị hoãn mãi
+        function onRawEvent(event) { if (!refresh.running) refresh.start(); }
     }
     Timer { id: refresh; interval: 150; onTriggered: { Hyprland.refreshToplevels(); Hyprland.refreshMonitors(); settle.restart(); } }
     // dữ liệu mới về không báo riêng: chờ thêm một nhịp rồi cho các viên kính tính lại

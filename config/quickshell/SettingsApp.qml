@@ -791,7 +791,7 @@ FloatingWindow {
                                     Image {
                                         anchors.fill: parent
                                         anchors.margins: 1
-                                        source: cell.modelData.thumb ? "file://" + cell.modelData.thumb : ""
+                                        source: Glass.fileUrl(cell.modelData.thumb)
                                         sourceSize: Qt.size(480, 270)
                                         fillMode: Image.PreserveAspectCrop
                                         asynchronous: true

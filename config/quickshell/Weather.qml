@@ -58,8 +58,18 @@ Singleton {
                 root.error = "Dữ liệu không đọc được";
             }
         };
+        xhr.timeout = 15000;
+        xhr.ontimeout = () => { root.loading = false; root.error = "Không lấy được dữ liệu"; };
         xhr.open("GET", url);
         xhr.send();
+    }
+
+    // lúc mới đăng nhập mạng thường chưa lên: thử lại mỗi phút cho tới khi được, không chờ tới 30 phút sau
+    Timer {
+        interval: 60 * 1000
+        repeat: true
+        running: root.configured && root.error !== "" && !root.loading
+        onTriggered: root.refresh()
     }
 
     Timer {

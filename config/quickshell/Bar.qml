@@ -44,7 +44,7 @@ PanelWindow {
         // phải "hiện" thì Canvas mới vẽ: đặt ra ngoài cửa sổ cho khỏi thấy
         x: -1000
         renderStrategy: Canvas.Immediate
-        readonly property string src: Glass.still ? "file://" + Glass.still : ""
+        readonly property string src: Glass.fileUrl(Glass.still)
         onSrcChanged: if (src) loadImage(src)
         Component.onCompleted: if (src) loadImage(src)
         onImageLoaded: requestPaint()

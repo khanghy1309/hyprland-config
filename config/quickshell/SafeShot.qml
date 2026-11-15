@@ -30,9 +30,17 @@ ScreencopyView {
         tries = 0;
         if (want) {
             release.stop();
-            if (held !== want) attach();
+            if (held && held !== want) {
+                // đang giữ cửa sổ khác: tháo ra trước (ảnh cũ mất đi), một nhịp sau mới gắn cửa sổ mới
+                attachT.stop();
+                held = null;
+                swap.restart();
+            } else if (!held) {
+                attach();
+            }
         } else {
             attachT.stop();
+            swap.stop();
             retry.stop();
             if (held) release.restart();
         }
@@ -44,6 +52,7 @@ ScreencopyView {
         attachT.restart();
     }
     Timer { id: attachT; onTriggered: if (sc.want) { sc.held = sc.want; watchdog.restart(); } }
+    Timer { id: swap; interval: 80; onTriggered: if (sc.want && !sc.held) sc.attach() }
     Timer { id: release; interval: sc.graceMs; onTriggered: if (!sc.want) sc.held = null }
 
     // không có ảnh: tháo nguồn, chờ cho chắc không còn khung hình nào đang về, rồi gắn lại

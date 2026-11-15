@@ -18,7 +18,10 @@ Singleton {
     readonly property var current: popups.length > 0 ? popups[0] : null
 
     function next() {
+        const done = root.popups.length > 0 ? root.popups[0] : null;
         root.popups = root.popups.slice(1).filter(n => n && n.tracked);
+        // thông báo "thoáng qua" (ứng dụng đánh dấu transient): hiện xong là bỏ, không giữ trong danh sách
+        if (done && done.tracked && done.transient) done.dismiss();
     }
 
     function dismiss(n) {
@@ -38,7 +41,7 @@ Singleton {
         if (!n) return "";
         if (n.image) return n.image;
         if (n.appIcon && (n.appIcon.startsWith("/") || n.appIcon.startsWith("file:")))
-            return n.appIcon.startsWith("/") ? "file://" + n.appIcon : n.appIcon;
+            return n.appIcon.startsWith("/") ? Glass.fileUrl(n.appIcon) : n.appIcon;
         return n.appIcon ? Quickshell.iconPath(n.appIcon, true) : "";
     }
 
@@ -53,6 +56,9 @@ Singleton {
 
         onNotification: n => {
             n.tracked = true;
+            // ứng dụng tự rút thông báo (hoặc nó bị thay thế): gỡ khỏi hàng chờ ngay,
+            // nếu không đảo động sẽ giữ một thông báo đã mất cho tới khi hết giờ
+            n.closed.connect(() => { root.popups = root.popups.filter(x => x && x !== n && x.tracked); });
             if (root.dnd && n.urgency !== NotificationUrgency.Critical) return;
             root.popups = root.popups.concat([n]);
         }

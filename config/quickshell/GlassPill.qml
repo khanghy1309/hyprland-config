@@ -82,7 +82,7 @@ Item {
     Image {
         id: wallTex
         visible: false
-        source: pill._wantRefract ? "file://" + Glass.still : ""
+        source: pill._wantRefract ? Glass.fileUrl(Glass.still) : ""
         sourceSize.width: 1600
         asynchronous: true
         mipmap: true

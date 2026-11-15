@@ -98,17 +98,8 @@ PanelWindow {
         function close(): void { root.close(); }
     }
 
-    // hình nền đang dùng (chỉ ảnh tĩnh; video thì dùng nền tối)
-    FileView {
-        id: wallState
-        path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/liquid-glass/wallpaper"
-        watchChanges: true
-        onFileChanged: reload()
-    }
-    readonly property string wallpaper: {
-        const p = wallState.text().trim();
-        return /\.(png|jpe?g|webp)$/i.test(p) ? "file://" + p : "";
-    }
+    // hình nền đang dùng (video và GIF thì một khung hình tĩnh, xem Glass.qml)
+    readonly property string wallpaper: Glass.fileUrl(Glass.still)
 
     Rectangle {
         anchors.fill: parent

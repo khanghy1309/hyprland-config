@@ -39,7 +39,15 @@ Scope {
 
     // ── gọi từ WinOps ──
     function play(j) {
-        if (job) finish();
+        // còn việc cũ (đang chờ ảnh, đang chạy, hoặc đang bàn giao): làm cho xong ngay rồi mới nhận việc mới
+        handoverAnim.stop();
+        if (job) {
+            anim.stop();
+            captureWait.stop();
+            const old = job;
+            job = null;
+            settle(old);
+        }
         if (effect === "off" || !j.tl || !j.screen) { run(j.before); run(j.after); return; }
         progress = j.reverse ? 1 : 0;
         captured = false;
@@ -48,6 +56,14 @@ Scope {
         captureWait.restart();
     }
     function run(f) { if (f) f(); }
+    // chạy nốt phần việc thật của một việc, mỗi phần đúng một lần
+    function settle(j) {
+        const b = j.before, a = j.after;
+        j.before = null;
+        j.after = null;
+        run(b);
+        run(a);
+    }
 
     function start() {
         if (!job) return;
@@ -63,8 +79,7 @@ Scope {
         captureWait.stop();
         const j = job;
         if (!j) return;
-        run(j.before);
-        run(j.after);
+        settle(j);
         if (j.reverse) { handoverAnim.restart(); return; }   // cửa sổ thật đã về: ảnh chụp mờ đi trên nó
         job = null;
     }
@@ -72,7 +87,7 @@ Scope {
         console.log("[thu nhỏ] không chụp được cửa sổ kịp, làm luôn không hiệu ứng");
         const j = job;
         job = null;
-        if (j) { run(j.before); run(j.after); }
+        if (j) settle(j);
     }
 
     Timer { id: captureWait; interval: 900; onTriggered: if (!fx.captured) fx.giveUp() }
@@ -122,13 +137,19 @@ Scope {
                 height: Math.max(1, ow.w.height)
                 want: ow.mine ? fx.job.tl : null
                 // không đặt visible: false (ảnh sẽ rỗng); hideSource của capTex đã giấu nó khỏi màn hình
-                onHasContentChanged: {
-                    if (hasContent && ow.mine && fx.job && !fx.captured) {
-                        fx.captured = true;
-                        captureWait.stop();
-                        fx.start();
-                    }
-                }
+                onHasContentChanged: ow.tryStart()
+            }
+            // ảnh đã có sẵn từ lần trước (thu nhỏ rồi hiện lại ngay): không có tín hiệu mới, phải tự kiểm tra
+            Connections {
+                target: fx
+                function onJobChanged() { ow.tryStart(); }
+            }
+            function tryStart() {
+                if (!mine || !fx.job || fx.captured) return;
+                if (!cap.hasContent || cap.held !== fx.job.tl) return;
+                fx.captured = true;
+                captureWait.stop();
+                fx.start();
             }
             ShaderEffectSource { id: capTex; sourceItem: cap; hideSource: true; visible: false; live: true; smooth: true }
 

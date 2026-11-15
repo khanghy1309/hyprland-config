@@ -35,7 +35,7 @@ Item {
     // ảnh của tấm thẻ kèm khoảng trống cho bụi bay
     ShaderEffectSource {
         id: src
-        sourceItem: holder
+        sourceItem: root.progress > 0 ? holder : null     // chỉ chụp khi bắt đầu tan, đỡ tốn bộ nhớ cho mỗi thẻ
         sourceRect: Qt.rect(0, -root.padY, root.width + root.padX, root.height + root.padY)
         live: false
         hideSource: fx.visible
