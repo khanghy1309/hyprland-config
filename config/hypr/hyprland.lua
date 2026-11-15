@@ -20,6 +20,7 @@ end
 
 require("lg_monitors")   -- màn hình
 require("lg_env")        -- biến môi trường (bộ gõ tiếng Việt, con trỏ...)
+pcall(require, "lg_gpu") -- biến riêng cho card NVIDIA (nvidia/setup-nvidia.sh ghi; máy khác không có file này)
 require("lg_look")       -- kính, bo góc, bóng, chuyển động
 require("lg_input")      -- bàn phím, touchpad, cử chỉ
 require("lg_rules")      -- quy tắc cho cửa sổ và lớp (thanh trên, launcher)

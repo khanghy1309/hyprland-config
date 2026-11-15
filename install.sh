@@ -72,8 +72,8 @@ PKGS=(
     ttf-liberation
     # kiểm tra cập nhật, kho ứng dụng (Flathub)
     pacman-contrib gnome-software flatpak
-    # tiện ích
-    fd jq libnotify xdg-utils xdg-user-dirs
+    # tiện ích (pciutils: nhận card đồ hoạ)
+    fd jq libnotify xdg-utils xdg-user-dirs pciutils
     # bộ gõ tiếng Việt
     fcitx5 fcitx5-gtk fcitx5-qt fcitx5-configtool fcitx5-unikey
     # phông chữ và biểu tượng
@@ -291,8 +291,14 @@ for d in mako dunst swaync; do
 done
 echo
 
+# ───────────────────────── card NVIDIA ─────────────────────────
+# Không có card NVIDIA thì script tự bỏ qua, không hỏi gì.
+bold "6. Card đồ hoạ"
+bash "$HERE/nvidia/setup-nvidia.sh" || warn "Phần NVIDIA chưa xong; chạy lại: ./nvidia/setup-nvidia.sh"
+echo
+
 # ───────────────────────── màn hình đăng nhập ─────────────────────────
-bold "6. Màn hình đăng nhập (SDDM)"
+bold "7. Màn hình đăng nhập (SDDM)"
 THEME_DIR=/usr/share/sddm/themes/liquid-glass
 if ask "Cài theme đăng nhập Liquid Glass vào $THEME_DIR (cần sudo)?"; then
     sudo mkdir -p "$THEME_DIR"
@@ -327,7 +333,7 @@ fi
 echo
 
 # ───────────────────────── màn hình khởi động ─────────────────────────
-bold "7. Màn hình khởi động (Plymouth)"
+bold "8. Màn hình khởi động (Plymouth)"
 info "Chữ hello tự viết rồi chuyển thành chữ ký, hiện lúc bật máy, nhập mật khẩu ổ đĩa và tắt máy."
 if ask "Cài màn hình khởi động? (sẽ hỏi trước khi sửa mkinitcpio và dòng lệnh kernel)"; then
     bash "$HERE/plymouth/install-plymouth.sh" || warn "Phần màn hình khởi động chưa xong; chạy lại: ./plymouth/install-plymouth.sh"

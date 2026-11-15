@@ -24,7 +24,7 @@ Viết cho **Hyprland 0.57.2** (cấu hình bằng Lua) và **Quickshell 0.3.2**
 
 - Arch Linux đã cài xong, đăng nhập được, có mạng.
 - Tài khoản thường có quyền `sudo`.
-- Card đồ hoạ Intel hoặc AMD chạy tốt nhất. Card NVIDIA cần cài driver theo hướng dẫn trên wiki Hyprland trước.
+- Card đồ hoạ Intel, AMD hoặc NVIDIA. Với NVIDIA, script cài đặt tự nhận card và cài đúng driver (xem *Card NVIDIA* bên dưới).
 
 ## Cài đặt
 
@@ -40,7 +40,28 @@ Script hỏi trước mỗi bước cần `sudo`:
 3. Sao lưu cấu hình cũ trong `~/.config/hypr`, `quickshell`, `kitty` sang `~/.config/liquid-glass-backup-<thời gian>/`, rồi chép cấu hình mới vào.
 4. Đặt chế độ tối cho ứng dụng GTK, biểu tượng Papirus, phông Inter.
 5. Bật NetworkManager, bluetooth và power-profiles-daemon (cho công tắc tiết kiệm pin).
-6. Cài theme đăng nhập vào `/usr/share/sddm/themes/liquid-glass` và bật SDDM nếu máy chưa dùng trình đăng nhập nào khác.
+6. Máy có card NVIDIA: tự nhận đời card và cài driver hợp (không có card NVIDIA thì bỏ qua, không hỏi gì).
+7. Cài theme đăng nhập vào `/usr/share/sddm/themes/liquid-glass` và bật SDDM nếu máy chưa dùng trình đăng nhập nào khác.
+8. Tuỳ chọn: màn hình khởi động Plymouth.
+
+### Card NVIDIA
+
+`nvidia/setup-nvidia.sh` (install.sh tự gọi; chạy riêng được) đọc tên card rồi chọn driver theo đời card, đúng như Arch đang khuyên từ driver 590:
+
+| Card | Driver |
+|---|---|
+| RTX 20 / GTX 16 trở lên (RTX 30, 40, 50…) | `nvidia-open` từ kho chính thức |
+| GTX 750 tới GTX 10 (GTX 1060, 1050 Ti…), Titan V | `nvidia-580xx-dkms` từ AUR (driver mới không còn hỗ trợ các card này) |
+| GTX 600/700 đời cũ hơn | giữ driver mở có sẵn; driver NVIDIA cho các card này không chạy được Hyprland |
+
+Script còn:
+- chọn bản driver hợp với kernel bạn dùng (`linux`, `linux-lts`, hay kernel khác thì bản dkms kèm header);
+- cài bản 32-bit nếu bạn đã bật kho multilib (cho Steam);
+- nạp driver ngay từ lúc khởi động, để màn hình khởi động và đăng nhập không bị đen (sửa `/etc/mkinitcpio.conf`, có sao lưu);
+- máy bàn chỉ có card NVIDIA: bật giải mã video bằng card cho trình duyệt, trình xem video và hình nền video;
+- laptop có cả card tích hợp: màn hình chạy bằng card tích hợp cho mát và đỡ tốn pin; chạy game bằng card rời với `prime-run <lệnh>` (Steam: thêm `prime-run %command%` vào Launch Options của game).
+
+Xem trước script sẽ làm gì mà không đổi gì: `./nvidia/setup-nvidia.sh --dry-run`.
 
 Đã cài bản trước rồi? Giải nén bản này đè lên thư mục cũ và chạy lại `./install.sh`. Script chỉ cài thêm gói còn thiếu, sao lưu cấu hình hiện tại rồi chép bản mới; `user.lua` của bạn được giữ nguyên.
 
@@ -199,7 +220,7 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 
 Lúc bật máy, trên nền đen: chữ **hello** tự viết ra bằng nét sáng tím hồng, rồi từng đoạn nét trôi như chất lỏng từ trái sang phải và **biến thành chữ ký**; xong chữ ký sáng nhịp nhàng, có ba chấm chờ bên dưới. Máy có ổ đĩa mã hoá thì ô nhập mật khẩu hiện ngay dưới chữ ký. Lúc tắt máy hoặc khởi động lại: chữ ký hiện dần kèm dòng "Đang tắt máy…" / "Đang khởi động lại…".
 
-Cài bằng `./install.sh` (bước 7) hoặc riêng: `./plymouth/install-plymouth.sh`. Script hỏi trước khi sửa `/etc/mkinitcpio.conf` và dòng lệnh kernel (GRUB, systemd-boot hoặc `/etc/kernel/cmdline`), và sao lưu từng file trước khi sửa.
+Cài bằng `./install.sh` (bước 8) hoặc riêng: `./plymouth/install-plymouth.sh`. Script hỏi trước khi sửa `/etc/mkinitcpio.conf` và dòng lệnh kernel (GRUB, systemd-boot hoặc `/etc/kernel/cmdline`), và sao lưu từng file trước khi sửa.
 
 - Xem thử không cần khởi động lại: `sudo plymouthd; sudo plymouth --show-splash; sleep 8; sudo plymouth --quit`
 - Đổi chữ ký hoặc chữ hello: sửa danh sách điểm trong `plymouth/src/anim.html`, rồi chạy `node plymouth/src/render.js /tmp/khung` và `python3 plymouth/src/pack.py /tmp/khung plymouth/liquid-glass`, cập nhật số khung trong `liquid-glass.script` theo `layout.txt`, rồi cài lại.
@@ -252,6 +273,10 @@ Sửa file nào thì Hyprland và Quickshell tự tải lại, không cần đă
 
 **Thông báo không hiện lên đảo động.** Một trình thông báo khác (mako, dunst, swaync) đang giữ chỗ. Gỡ nó rồi chạy lại `qs`.
 
+**Máy NVIDIA: màn hình đen sau khi đăng nhập hoặc sau khi cập nhật.** Bấm `Ctrl + Alt + F3` để sang màn hình chữ, đăng nhập, rồi chạy `nvidia-smi`. Báo lỗi hoặc không thấy tên card nghĩa là driver chưa chạy: chạy lại `./nvidia/setup-nvidia.sh` rồi khởi động lại. Card GTX 10 trở về trước mà đang cài `nvidia-open` thì đó là lý do: script sẽ đổi sang nhánh 580.
+
+**Máy NVIDIA: video trong trình duyệt giật, quạt kêu to.** Chạy `vainfo` (gói `libva-utils`); thấy dòng `NVDEC` là giải mã video bằng card đã chạy. Laptop lai thì video dùng card tích hợp, như vậy là đúng.
+
 **Công tắc Tiết kiệm pin không bấm được.** Kiểm tra dịch vụ: `systemctl status power-profiles-daemon`.
 
 **Không có sóng âm.** Cần gói `cava`; sóng âm chỉ chạy khi đang phát nhạc.
@@ -295,6 +320,7 @@ config/
     lg_programs.lua   ứng dụng mặc định
     lg_monitors.lua   màn hình
     lg_env.lua        biến môi trường, bộ gõ
+    lg_gpu.lua        biến riêng cho card NVIDIA (do nvidia/setup-nvidia.sh ghi, chỉ có trên máy NVIDIA)
     lg_look.lua       kính, bo góc, bóng, chuyển động
     lg_input.lua      bàn phím, touchpad, cử chỉ
     lg_rules.lua      quy tắc cửa sổ và lớp
@@ -349,6 +375,7 @@ config/
   kitty/
     kitty.conf, glass-theme.conf
 sddm/liquid-glass/   theme màn hình đăng nhập (Main.qml, GlassBox.qml...)
+nvidia/setup-nvidia.sh   nhận card NVIDIA và cài đúng driver
 fonts/               Geist, Geist Mono, Be Vietnam Pro, Onest (giấy phép SIL OFL)
 wallpapers/ridge.png  hình nền mặc định (4K)
 install.sh
