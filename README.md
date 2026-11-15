@@ -38,7 +38,7 @@ Script hỏi trước mỗi bước cần `sudo`:
 1. Cài khoảng 75 gói từ kho chính thức (gói có rồi thì bỏ qua).
 2. Tuỳ chọn: cài `yay` và `mpvpaper` từ AUR để dùng hình nền video.
 3. Sao lưu cấu hình cũ trong `~/.config/hypr`, `quickshell`, `kitty` sang `~/.config/liquid-glass-backup-<thời gian>/`, rồi chép cấu hình mới vào.
-4. Đặt chế độ tối cho ứng dụng GTK, biểu tượng Papirus, phông Inter.
+4. Cho ứng dụng GTK, Qt và Flatpak cùng bảng màu với Liquid Glass, đặt màu thư mục, thêm lối tắt ở thanh bên trình quản lý tệp (xem *Ứng dụng và thư mục* bên dưới).
 5. Bật NetworkManager, bluetooth và power-profiles-daemon (cho công tắc tiết kiệm pin).
 6. Máy có card NVIDIA: tự nhận đời card và cài driver hợp (không có card NVIDIA thì bỏ qua, không hỏi gì).
 7. Cài theme đăng nhập vào `/usr/share/sddm/themes/liquid-glass` và bật SDDM nếu máy chưa dùng trình đăng nhập nào khác.
@@ -167,7 +167,7 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - Đổi kích thước, tắt phóng to, tắt tự ẩn: Cài đặt → Dock.
 
 **Cài đặt** (`Super + ,`, hoặc gõ "cài đặt" trong launcher): một cửa sổ kính, đổi gì là áp dụng ngay, không có nút Lưu.
-- *Giao diện:* phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kính của cửa sổ (acrylic / mờ thường / tắt), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
+- *Giao diện:* phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kính của cửa sổ (acrylic / mờ thường / tắt), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, màu thư mục, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
 - *Hình nền:* bấm vào ảnh để đổi. Video và GIF có nhãn ở góc. Chọn lúc nào video tạm dừng (khi có cửa sổ toàn màn hình, khi có bất kỳ cửa sổ nào, hoặc không bao giờ), có dùng ảnh tĩnh khi chạy pin không, và hiệu ứng khi đổi ảnh.
 - *Touchpad và bàn phím:* cuộn tự nhiên, chạm để bấm, tắt touchpad khi gõ, tốc độ cuộn và con trỏ, bật/tắt từng cử chỉ, tốc độ lặp phím (có ô gõ thử).
 - *Wi-Fi:* bật/tắt, danh sách mạng xung quanh, bấm để kết nối (mạng có khoá thì hiện ô mật khẩu ngay bên dưới), quên mạng, ngắt kết nối.
@@ -189,6 +189,21 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 **Bảng phím tắt** (`Super + /`): toàn bộ phím tắt và cử chỉ, gõ để lọc (gõ không dấu cũng được). Nếu bạn đổi phím trong `lg_keybinds.lua`, sửa thêm `Cheatsheet.qml` cho bảng khớp.
 
 ---
+
+## Ứng dụng và thư mục
+
+Ứng dụng mở trong cửa sổ cũng dùng chung bảng màu với thanh trên và dock: nền kính tối, mục được chọn trắng đục chữ tối.
+
+- **Ứng dụng GTK 4 / libadwaita** (Tệp, Lịch, hộp chọn tệp…): đổi màu theo Liquid Glass. Hình dáng nút giữ nguyên vì libadwaita không cho thay.
+- **Trình quản lý tệp (Nautilus):** thanh bên kính mờ, nhìn xuyên thấy hình nền như Finder; phần danh sách tệp vẫn nền đặc. Thanh bên có sẵn lối tắt Tài liệu, Tải về, Ảnh, Ảnh chụp màn hình, Hình nền, Dự án (chỉ thư mục nào có thật; đã có lối tắt riêng thì giữ nguyên).
+- **Ứng dụng GTK 3** (GIMP, Inkscape…): theme adw-gtk3 tối cùng màu.
+- **Ứng dụng Qt** (VLC, OBS, qBittorrent…): bảng màu tối Liquid Glass qua qt6ct.
+- **Ứng dụng Flatpak:** đọc được màu Liquid Glass (chỉ đọc), ứng dụng GTK 3 trong Flatpak có theme adw-gtk3 tối; áp cho cả ứng dụng cài sau này.
+- **Màu thư mục:** Cài đặt → Giao diện → *Màu thư mục*, 12 màu (mặc định tím). Đổi là trình quản lý tệp đổi theo ngay.
+
+CSS riêng của bạn: đặt trong `~/.config/gtk-4.0/gtk.css` (hoặc `gtk-3.0`), dưới dòng `@import`. Không thích thanh bên Nautilus trong suốt: thêm `window.view { background-color: #1b1d21; }` vào đó.
+
+Chạy lại tay (sau khi cài thêm Papirus, Flatpak…): `~/.config/hypr/scripts/theme-apps.sh all`.
 
 ## Cho người quen Windows
 
@@ -273,6 +288,8 @@ Sửa file nào thì Hyprland và Quickshell tự tải lại, không cần đă
 
 **Thông báo không hiện lên đảo động.** Một trình thông báo khác (mako, dunst, swaync) đang giữ chỗ. Gỡ nó rồi chạy lại `qs`.
 
+**Ứng dụng Flatpak vẫn sáng / khác màu.** Chạy `~/.config/hypr/scripts/theme-apps.sh flatpak` (cần mạng để tải theme adw-gtk3 bản Flatpak), rồi mở lại ứng dụng. Ứng dụng Qt/KDE trong Flatpak không đọc qt6ct nên giữ màu riêng của chúng.
+
 **Máy NVIDIA: màn hình đen sau khi đăng nhập hoặc sau khi cập nhật.** Bấm `Ctrl + Alt + F3` để sang màn hình chữ, đăng nhập, rồi chạy `nvidia-smi`. Báo lỗi hoặc không thấy tên card nghĩa là driver chưa chạy: chạy lại `./nvidia/setup-nvidia.sh` rồi khởi động lại. Card GTX 10 trở về trước mà đang cài `nvidia-open` thì đó là lý do: script sẽ đổi sang nhánh 580.
 
 **Máy NVIDIA: video trong trình duyệt giật, quạt kêu to.** Chạy `vainfo` (gói `libva-utils`); thấy dòng `NVDEC` là giải mã video bằng card đã chạy. Laptop lai thì video dùng card tích hợp, như vậy là đúng.
@@ -321,6 +338,7 @@ config/
     lg_monitors.lua   màn hình
     lg_env.lua        biến môi trường, bộ gõ
     lg_gpu.lua        biến riêng cho card NVIDIA (do nvidia/setup-nvidia.sh ghi, chỉ có trên máy NVIDIA)
+    theme/            màu cho ứng dụng: gtk4.css, gtk3.css, qt-colors.conf (theme-apps.sh chép đi)
     lg_look.lua       kính, bo góc, bóng, chuyển động
     lg_input.lua      bàn phím, touchpad, cử chỉ
     lg_rules.lua      quy tắc cửa sổ và lớp
@@ -329,7 +347,7 @@ config/
     lg_settings.lua   do ứng dụng Cài đặt tự ghi (không sửa tay)
     hyprlock.conf     màn hình khóa
     hypridle.conf     tự khóa khi không dùng máy
-    scripts/wallpaper.sh, capture.sh, vndate.sh, battery.sh, gamemode.sh
+    scripts/wallpaper.sh, capture.sh, vndate.sh, battery.sh, gamemode.sh, theme-apps.sh
   quickshell/
     shell.qml         điểm vào
     Theme.qml         màu, phông, kích thước

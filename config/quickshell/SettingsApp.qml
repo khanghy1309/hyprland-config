@@ -174,6 +174,49 @@ FloatingWindow {
                     current: Settings.look.material
                     onPicked: v => Settings.look.material = v
                 }
+                // màu thư mục trong trình quản lý tệp và hộp chọn tệp (bộ biểu tượng Papirus)
+                RowBase {
+                    id: fcRow
+                    label: "Màu thư mục"
+                    // rê chuột lên một chấm màu thì dòng ghi chú hiện tên màu đó
+                    note: fcRow.hoverName !== "" ? fcRow.hoverName : "Trình quản lý tệp, hộp chọn tệp và ứng dụng Flatpak đổi theo"
+                    property string hoverName: ""
+                    reserve: fcSwatches.width + 36
+                    readonly property var colors: [
+                        ["violet", "#7e57c2", "Tím"], ["indigo", "#5c6bc0", "Chàm"], ["blue", "#5294e2", "Xanh dương"],
+                        ["nordic", "#81a1c1", "Xanh Bắc Âu"], ["bluegrey", "#607d8b", "Xám xanh"], ["grey", "#8e8e8e", "Xám"],
+                        ["teal", "#16a085", "Xanh ngọc"], ["green", "#87b158", "Xanh lá"], ["yellow", "#f9bd30", "Vàng"],
+                        ["orange", "#ee923a", "Cam"], ["red", "#e25252", "Đỏ"], ["pink", "#f06292", "Hồng"]
+                    ]
+                    Row {
+                        id: fcSwatches
+                        anchors.right: parent.right
+                        anchors.rightMargin: 18
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 6
+                        Repeater {
+                            model: fcRow.colors
+                            delegate: Rectangle {
+                                required property var modelData
+                                readonly property bool on: Settings.look.folderColor === modelData[0]
+                                width: 22
+                                height: 22
+                                radius: 11
+                                color: modelData[1]
+                                border.width: on ? 2 : 1
+                                border.color: on ? Theme.fg : Qt.rgba(1, 1, 1, 0.18)
+                                scale: swHover.hovered ? 1.15 : 1
+                                Behavior on scale { NumberAnimation { duration: Theme.fast } }
+                                HoverHandler {
+                                    id: swHover
+                                    cursorShape: Qt.PointingHandCursor
+                                    onHoveredChanged: fcRow.hoverName = hovered ? modelData[2] : ""
+                                }
+                                TapHandler { onTapped: Settings.look.folderColor = modelData[0] }
+                            }
+                        }
+                    }
+                }
                 SwitchRow {
                     label: "Khúc xạ cả hình nền video"
                     note: "Kính dùng một khung hình tĩnh của video, nên chỗ mép có thể lệch với video đang chạy"

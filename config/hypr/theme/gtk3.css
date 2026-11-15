@@ -1,0 +1,23 @@
+/* Liquid Glass cho ứng dụng GTK 3 (dùng theme adw-gtk3-dark).
+ * theme-apps.sh chép tệp này thành ~/.config/gtk-3.0/liquid-glass.css và @import trong gtk.css.
+ * Cùng bảng màu với gtk4.css. */
+@define-color accent_bg_color #e9edef;
+@define-color accent_fg_color #14181b;
+@define-color accent_color #dfe5e8;
+@define-color window_bg_color #17191c;
+@define-color window_fg_color #f3f6f6;
+@define-color view_bg_color #1b1d21;
+@define-color view_fg_color #f3f6f6;
+@define-color headerbar_bg_color #1f2125;
+@define-color headerbar_fg_color #f3f6f6;
+@define-color headerbar_backdrop_color #1b1d21;
+@define-color sidebar_bg_color #1f2125;
+@define-color sidebar_fg_color #f3f6f6;
+@define-color sidebar_backdrop_color #1c1e22;
+@define-color card_bg_color rgba(255, 255, 255, 0.06);
+@define-color dialog_bg_color #202226;
+@define-color popover_bg_color #24262b;
+
+switch:checked slider {
+    background-color: #14181b;
+}

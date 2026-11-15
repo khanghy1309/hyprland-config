@@ -61,6 +61,7 @@ Singleton {
                 property string monoFont: "Geist Mono" // Geist Mono | JetBrains Mono
                 property string material: "liquid"   // liquid | rim | flat  (xem Glass.qml)
                 property bool refractVideo: false    // khúc xạ cả khi hình nền là video (dùng một khung hình tĩnh)
+                property string folderColor: "violet" // màu thư mục (Papirus): blue | violet | grey | nordic | pink ...
             }
             property JsonObject input: JsonObject {
                 property bool naturalScroll: true
@@ -212,6 +213,10 @@ Singleton {
 
     // ── phông chữ cho ứng dụng GTK (Tệp, Firefox...) đổi theo ──
     readonly property string uiFont: look.font
+    // màu thư mục: dựng lại bộ biểu tượng (scripts/theme-apps.sh), trình quản lý tệp đổi theo ngay
+    readonly property string folderColor: look.folderColor
+    onFolderColorChanged: if (ready) Quickshell.execDetached([home + "/.config/hypr/scripts/theme-apps.sh", "folders", folderColor])
+
     onUiFontChanged: if (ready) Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "font-name", uiFont + " 11"])
 
     // ── hình nền khi rút / cắm sạc ──

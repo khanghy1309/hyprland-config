@@ -1,0 +1,78 @@
+/* Liquid Glass cho ứng dụng GTK 4 / libadwaita (Nautilus, Lịch, Cài đặt GNOME, hộp chọn tệp...).
+ *
+ * theme-apps.sh chép tệp này thành ~/.config/gtk-4.0/liquid-glass.css và thêm một dòng
+ * @import vào ~/.config/gtk-4.0/gtk.css. CSS riêng của bạn đặt trong gtk.css, dưới dòng @import đó.
+ * Ứng dụng Flatpak cũng đọc được (theme-apps.sh cho phép chúng đọc thư mục này).
+ *
+ * libadwaita không cho thay hình dáng nút, chỉ cho đổi màu: ở đây dùng đúng bảng màu của
+ * thanh trên và dock (kính tối, chọn = trắng đục chữ tối).
+ */
+
+/* libadwaita 1.6 trở lên đọc biến CSS */
+:root {
+    --accent-bg-color: #e9edef;
+    --accent-fg-color: #14181b;
+    --accent-color: #dfe5e8;
+
+    --window-bg-color: #17191c;
+    --window-fg-color: #f3f6f6;
+    --view-bg-color: #1b1d21;
+    --view-fg-color: #f3f6f6;
+
+    --headerbar-bg-color: #1f2125;
+    --headerbar-fg-color: #f3f6f6;
+    --headerbar-backdrop-color: #1b1d21;
+    --headerbar-shade-color: rgba(0, 0, 0, 0.36);
+
+    --sidebar-bg-color: #1f2125;
+    --sidebar-fg-color: #f3f6f6;
+    --sidebar-backdrop-color: #1c1e22;
+    --sidebar-shade-color: rgba(0, 0, 0, 0.25);
+    --secondary-sidebar-bg-color: #1c1e22;
+    --secondary-sidebar-fg-color: #f3f6f6;
+
+    --card-bg-color: rgba(255, 255, 255, 0.06);
+    --card-fg-color: #f3f6f6;
+    --dialog-bg-color: #202226;
+    --dialog-fg-color: #f3f6f6;
+    --popover-bg-color: #24262b;
+    --popover-fg-color: #f3f6f6;
+    --thumbnail-bg-color: #24262b;
+}
+
+/* bản libadwaita cũ hơn dùng tên màu */
+@define-color accent_bg_color #e9edef;
+@define-color accent_fg_color #14181b;
+@define-color accent_color #dfe5e8;
+@define-color window_bg_color #17191c;
+@define-color window_fg_color #f3f6f6;
+@define-color view_bg_color #1b1d21;
+@define-color view_fg_color #f3f6f6;
+@define-color headerbar_bg_color #1f2125;
+@define-color headerbar_fg_color #f3f6f6;
+@define-color headerbar_backdrop_color #1b1d21;
+@define-color sidebar_bg_color #1f2125;
+@define-color sidebar_fg_color #f3f6f6;
+@define-color sidebar_backdrop_color #1c1e22;
+@define-color card_bg_color rgba(255, 255, 255, 0.06);
+@define-color dialog_bg_color #202226;
+@define-color popover_bg_color #24262b;
+
+/* màu nhấn là trắng nên núm công tắc (mặc định cũng trắng) phải tối mới thấy */
+switch:checked > slider {
+    background-color: #14181b;
+}
+
+/* ── Nautilus: thanh bên kính mờ như Finder ──
+ * Cửa sổ Nautilus (lớp "view") để nền trong suốt, Hyprland làm mờ hình nền phía sau.
+ * Thanh bên hơi trong, phần danh sách tệp vẫn nền đặc cho dễ đọc.
+ * Không thích: xoá khối này, hoặc đặt  window.view { background-color: #1b1d21; }  trong gtk.css. */
+window.view {
+    background-color: transparent;
+}
+window.view overlay-split-view > widget.sidebar-pane {
+    background-color: rgba(31, 33, 37, 0.62);
+}
+window.view overlay-split-view > widget.content-pane {
+    background-color: #1b1d21;
+}

@@ -245,34 +245,26 @@ fi
 echo
 
 # ───────────────────────── giao diện tối cho ứng dụng ─────────────────────────
-bold "4. Giao diện tối cho ứng dụng GTK"
+bold "4. Giao diện cho ứng dụng (GTK, Qt, Flatpak) và thư mục"
 if command -v gsettings >/dev/null 2>&1; then
-    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
-    gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark' || true
-    gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark' || true
     gsettings set org.gnome.desktop.interface font-name 'Geist 11' || true
     gsettings set org.gnome.desktop.interface monospace-font-name 'Geist Mono 11' || true
-    info "Đã đặt chế độ tối, biểu tượng Papirus, phông Geist"
-else
-    warn "Không có gsettings, bỏ qua."
 fi
-
-# Ứng dụng Qt (và launcher của Quickshell) lấy bộ biểu tượng từ qt6ct
+# Qt: phông chữ (qt6ct.conf chỉ tạo khi chưa có; bảng màu và biểu tượng do theme-apps.sh đặt)
 QT6CT="$CONFIG/qt6ct/qt6ct.conf"
 if [[ ! -f "$QT6CT" ]]; then
     mkdir -p "$(dirname "$QT6CT")"
     cat > "$QT6CT" <<'QTEOF'
 [Appearance]
-icon_theme=Papirus-Dark
-style=Fusion
 standard_dialogs=default
 
 [Fonts]
 general="Geist,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 fixed="Geist Mono,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 QTEOF
-    info "Qt: biểu tượng Papirus-Dark, kiểu Fusion"
 fi
+# màu GTK/Qt, Flatpak đọc được theme, màu thư mục (đổi trong Cài đặt → Giao diện), lối tắt thanh bên
+bash "$CONFIG/hypr/scripts/theme-apps.sh" all || warn "Chưa xong phần giao diện ứng dụng; chạy lại: ~/.config/hypr/scripts/theme-apps.sh all"
 echo
 
 # ───────────────────────── dịch vụ ─────────────────────────
