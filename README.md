@@ -200,6 +200,9 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 - **Ứng dụng Qt** (VLC, OBS, qBittorrent…): bảng màu tối Liquid Glass và bo tròn theo cùng kiểu (nút, ô nhập, danh sách, thẻ, thanh trượt, thanh tiến trình, thanh cuộn) qua qt6ct. Menu và danh sách xổ xuống giữ khung ngoài vuông, chỉ bo tròn từng mục, vì Qt không cho các cửa sổ nổi này trong suốt (bo góc ngoài sẽ lộ góc đen). Ứng dụng có theme riêng (như OBS) vẫn dùng theme của nó.
 - **Ứng dụng Flatpak:** đọc được màu Liquid Glass (chỉ đọc), ứng dụng GTK 3 trong Flatpak có theme adw-gtk3 tối; áp cho cả ứng dụng cài sau này.
 - **Màu thư mục:** Cài đặt → Giao diện → *Màu thư mục*, 12 màu (mặc định tím). Đổi là trình quản lý tệp đổi theo ngay.
+- **Menu chuột phải kính lỏng:** menu của ứng dụng GTK (trình quản lý tệp, trình xem ảnh, GIMP…) nền hơi trong, Hyprland làm mờ phía sau, bo 14–16 px, mục được chọn là viên trắng như menu của dock. Menu của ứng dụng Qt vẫn nền đặc khung vuông (Qt không cho menu trong suốt); menu của Firefox, Chrome do trình duyệt tự vẽ.
+- **Hộp Lưu / Mở tệp kính mờ:** dùng chung cho ứng dụng GTK, trình duyệt, ứng dụng Flatpak và cả ứng dụng Qt (qt6ct được đặt dùng hộp chung của hệ thống). Thanh bên trong hơn, danh sách tệp nền đặc cho dễ đọc. Các hộp thoại khác của ứng dụng GTK 3 cũng kính mờ theo.
+- **Chuột phải trên màn hình nền:** menu kính lỏng hiện từ đúng chỗ con trỏ với Mở Terminal, Mở thư mục nhà, Đổi hình nền, Hình nền ngẫu nhiên, Giao diện, Chụp màn hình, Hiện/ẩn dock, Phím tắt.
 
 CSS riêng của bạn: đặt trong `~/.config/gtk-4.0/gtk.css` (hoặc `gtk-3.0`), dưới dòng `@import`. Không thích thanh bên Nautilus trong suốt: thêm `window.view { background-color: #1b1d21; }` vào đó.
 
@@ -362,6 +365,7 @@ config/
     LiquidSwitch.qml  công tắc kính lỏng
     Dissolve.qml      thẻ tan thành bụi
     MinimizeFx.qml    hiệu ứng thu nhỏ vào dock
+    DesktopMenu.qml   menu chuột phải trên màn hình nền
     SafeShot.qml, CaptureGate.js   chụp cửa sổ an toàn (tránh làm sập shell)
     Icon.qml, Icons.qml   biểu tượng nét mảnh
     SysStats.qml      đọc CPU, RAM

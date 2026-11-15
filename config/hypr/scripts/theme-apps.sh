@@ -83,6 +83,8 @@ do_qt() {
     ini_set "$conf" Appearance custom_palette true
     ini_set "$conf" Appearance color_scheme_path "$colors"
     ini_set "$conf" Appearance style Fusion
+    # hộp Lưu / Mở tệp: dùng hộp chung của hệ thống (kính mờ, giống ứng dụng GTK) thay vì hộp riêng của Qt
+    ini_set "$conf" Appearance standard_dialogs xdgdesktopportal
     # tệp kiểu: bo tròn nút, ô nhập, danh sách, thanh trượt... (đường dẫn ảnh phải tuyệt đối)
     local qdir="$CONFIG/qt6ct/qss" img="$CONFIG/qt6ct/qss/liquid-glass"
     mkdir -p "$img"

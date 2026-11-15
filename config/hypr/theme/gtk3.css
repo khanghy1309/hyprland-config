@@ -21,3 +21,73 @@
 switch:checked slider {
     background-color: #14181b;
 }
+
+/* ── menu chuột phải: kính lỏng ──
+ * Menu GTK 3 là một lớp riêng nên Hyprland làm mờ được phía sau (decoration:blur:popups).
+ * Bảng bật lên (popover) của GTK 3 thì vẽ chung trong cửa sổ, không làm mờ được, nên giữ nền đặc. */
+window.popup {
+    background-color: transparent;
+}
+menu, .menu, .context-menu {
+    background-color: rgba(30, 32, 36, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    padding: 5px;
+}
+menu menuitem, .menu menuitem, .context-menu menuitem {
+    border-radius: 9px;
+    padding: 6px 12px;
+}
+menu menuitem:hover, .menu menuitem:hover, .context-menu menuitem:hover {
+    background-color: #e9edef;
+    color: #14181b;
+}
+menu menuitem:hover label, .menu menuitem:hover label, .context-menu menuitem:hover label,
+menu menuitem:hover accelerator {
+    color: #14181b;
+}
+menu separator {
+    background-color: rgba(255, 255, 255, 0.10);
+    margin: 4px 8px;
+}
+
+/* ── hộp thoại: kính mờ ──
+ * Gồm cả hộp Lưu / Mở tệp mà trình duyệt, ứng dụng Flatpak, ứng dụng Qt và GTK 4 dùng chung
+ * (cổng hệ thống xdg-desktop-portal-gtk vẽ bằng GTK 3). Thanh bên trong hơn, danh sách tệp nền đặc. */
+dialog.background {
+    background-color: rgba(23, 25, 28, 0.82);
+}
+dialog headerbar,
+dialog headerbar:backdrop {
+    background-color: rgba(31, 33, 37, 0.55);
+    box-shadow: none;
+}
+dialog filechooser,
+dialog filechooser paned,
+dialog filechooser box {
+    background-color: transparent;
+}
+dialog placessidebar,
+dialog placessidebar list,
+dialog placessidebar row {
+    background-color: transparent;
+}
+dialog placessidebar {
+    background-color: rgba(31, 33, 37, 0.45);
+}
+dialog filechooser treeview.view,
+dialog filechooser scrolledwindow viewport {
+    background-color: #1b1d21;
+}
+dialog placessidebar row {
+    border-radius: 9px;
+    margin: 1px 6px;
+}
+dialog placessidebar row:selected {
+    background-color: #e9edef;
+    color: #14181b;
+}
+dialog placessidebar row:selected label,
+dialog placessidebar row:selected image {
+    color: #14181b;
+}

@@ -26,5 +26,12 @@ Singleton {
     readonly property string cloud: "M7 19h10a4 4 0 0 0 .6-8 6 6 0 0 0-11.5 1.7A3.2 3.2 0 0 0 7 19z"
     readonly property string gamepad: "M6 9h4M8 7v4M15 10h.01M18 8h.01M7 4h10a5 5 0 0 1 4.9 6l-1 5a3 3 0 0 1-5.2 1.4L14 15h-4l-1.7 1.4A3 3 0 0 1 3.1 15l-1-5A5 5 0 0 1 7 4z"
     readonly property string camera: "M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
+    readonly property string terminal: "M4 5h16v14H4zM7.5 9.5l3 2.5-3 2.5M12.5 15h4"
+    readonly property string folder: "M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+    readonly property string image: "M4 5h16v14H4zM4 15l4.5-4.5 4 4 2.5-2.5L20 17M15.5 9h.01"
+    readonly property string palette: "M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.6 0-.9-.7-1.4-.7-2.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4.3-4-7.6-9-7.6zM7.5 12h.01M10.5 8h.01M15 8.5h.01"
+    readonly property string shuffle: "M4 7h3.5c2 0 3 1 4.5 3.5S14.5 17 16.5 17H20M17 14l3 3-3 3M4 17h3.5c1.2 0 2-.4 2.8-1.2M13.7 8.2C14.5 7.4 15.3 7 16.5 7H20M17 4l3 3-3 3"
+    readonly property string dock: "M3 15h18v5H3zM7 17.5h.01M12 17.5h.01M17 17.5h.01"
+    readonly property string keyboard: "M3 7h18v11H3zM7 10.5h.01M10.5 10.5h.01M14 10.5h.01M17.5 10.5h.01M8 14.5h8"
     readonly property string pin: "M12 3v4M12 15v6M9 4h6l-1 6 4 4H6l4-4z"
 }

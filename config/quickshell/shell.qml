@@ -44,6 +44,9 @@ ShellRoot {
     // Hiệu ứng thu nhỏ cửa sổ vào dock (genie)
     MinimizeFx {}
 
+    // Menu chuột phải trên màn hình nền
+    DesktopMenu {}
+
     // Ứng dụng Cài đặt (Super + ,)
     SettingsApp {}
 }

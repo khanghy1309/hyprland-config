@@ -256,7 +256,7 @@ if [[ ! -f "$QT6CT" ]]; then
     mkdir -p "$(dirname "$QT6CT")"
     cat > "$QT6CT" <<'QTEOF'
 [Appearance]
-standard_dialogs=default
+standard_dialogs=xdgdesktopportal
 
 [Fonts]
 general="Geist,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
