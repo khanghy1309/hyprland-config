@@ -83,7 +83,13 @@ do_qt() {
     ini_set "$conf" Appearance custom_palette true
     ini_set "$conf" Appearance color_scheme_path "$colors"
     ini_set "$conf" Appearance style Fusion
-    info "Qt: bảng màu tối Liquid Glass (qt6ct)"
+    # tệp kiểu: bo tròn nút, ô nhập, danh sách, thanh trượt... (đường dẫn ảnh phải tuyệt đối)
+    local qdir="$CONFIG/qt6ct/qss" img="$CONFIG/qt6ct/qss/liquid-glass"
+    mkdir -p "$img"
+    cp "$THEME_SRC"/qt/*.svg "$img/"
+    sed "s|@DIR@|$img|g" "$THEME_SRC/qt-liquid-glass.qss" > "$qdir/liquid-glass.qss"
+    ini_set "$conf" Interface stylesheets "$qdir/liquid-glass.qss"
+    info "Qt: bảng màu tối và bo góc Liquid Glass (qt6ct)"
 }
 
 # ── Flatpak ──

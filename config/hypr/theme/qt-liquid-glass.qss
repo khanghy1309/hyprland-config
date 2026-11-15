@@ -1,0 +1,282 @@
+/* Liquid Glass cho ứng dụng Qt (VLC, OBS, qBittorrent, KeePassXC...).
+ * theme-apps.sh chép tệp này vào ~/.config/qt6ct/qss/ (thay @DIR@ bằng đường dẫn tới ảnh mũi tên,
+ * dấu tích) và bật trong qt6ct.conf. Kiểu riêng của ứng dụng (theme của OBS...) vẫn được ưu tiên.
+ * Màu lấy từ bảng màu qt-colors.conf qua palette(...). Bo góc theo thanh trên và dock:
+ * nút, ô nhập 10 px; danh sách, menu, khung 12-14 px; thanh tiến trình, thanh trượt tròn hẳn.
+ * Menu, danh sách xổ xuống và chú thích là cửa sổ riêng không trong suốt được: bo góc ngoài sẽ lộ
+ * 4 góc đen, nên khung ngoài của chúng để vuông, chỉ từng mục bên trong được bo tròn.
+ * Lưu ý: qt6ct xoá mọi thứ sau hai dấu gạch chéo liền nhau, nên tệp này không dùng chúng. */
+
+QWidget {
+    selection-background-color: palette(highlight);
+    selection-color: palette(highlighted-text);
+}
+
+/* ── nút ── */
+QPushButton, QToolButton[popupMode="1"] {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    padding: 6px 16px;
+    min-height: 20px;
+}
+QPushButton:hover { background-color: rgba(255, 255, 255, 0.13); }
+QPushButton:pressed { background-color: rgba(255, 255, 255, 0.18); }
+QPushButton:default, QPushButton:checked {
+    background-color: palette(highlight);
+    color: palette(highlighted-text);
+    border-color: palette(highlight);
+}
+QPushButton:default:hover, QPushButton:checked:hover { background-color: #ffffff; }
+QPushButton:disabled {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: palette(placeholder-text);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+QPushButton::menu-indicator {
+    image: url(@DIR@/arrow-down.svg);
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    right: 8px;
+}
+
+QToolButton {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    padding: 4px;
+}
+QToolButton:hover { background-color: rgba(255, 255, 255, 0.10); }
+QToolButton:pressed, QToolButton:checked { background-color: rgba(255, 255, 255, 0.16); }
+
+/* ── ô nhập, ô số, hộp chọn ── */
+QLineEdit, QAbstractSpinBox, QComboBox, QDateTimeEdit {
+    background-color: palette(base);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    padding: 5px 10px;
+    min-height: 20px;
+}
+QLineEdit:hover, QAbstractSpinBox:hover, QComboBox:hover { border-color: rgba(255, 255, 255, 0.18); }
+QLineEdit:focus, QAbstractSpinBox:focus, QComboBox:focus, QComboBox:on {
+    border: 1px solid rgba(233, 237, 239, 0.65);
+}
+QLineEdit:disabled, QAbstractSpinBox:disabled, QComboBox:disabled {
+    color: palette(placeholder-text);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+QComboBox { padding-right: 28px; }
+QComboBox:editable { background-color: palette(base); }
+QComboBox:!editable { background-color: rgba(255, 255, 255, 0.08); }
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 24px;
+    border: none;
+    background: transparent;
+}
+QComboBox::down-arrow, QComboBox::down-arrow:on { image: url(@DIR@/arrow-down.svg); width: 12px; height: 12px; }
+QComboBox QAbstractItemView {
+    background-color: palette(alternate-base);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0;
+    padding: 4px;
+    outline: 0;
+}
+QComboBox QAbstractItemView::item {
+    min-height: 26px;
+    padding: 2px 8px;
+    border-radius: 8px;
+}
+
+QAbstractSpinBox { padding-right: 24px; }
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
+    subcontrol-origin: border;
+    width: 22px;
+    border: none;
+    background: transparent;
+}
+QAbstractSpinBox::up-button { subcontrol-position: top right; margin: 2px 2px 0 0; }
+QAbstractSpinBox::down-button { subcontrol-position: bottom right; margin: 0 2px 2px 0; }
+QAbstractSpinBox::up-button:hover, QAbstractSpinBox::down-button:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+    border-radius: 6px;
+}
+QAbstractSpinBox::up-arrow { image: url(@DIR@/arrow-up.svg); width: 10px; height: 10px; }
+QAbstractSpinBox::down-arrow { image: url(@DIR@/arrow-down.svg); width: 10px; height: 10px; }
+
+/* ── ô đánh dấu, nút chọn một ── */
+QCheckBox, QRadioButton { spacing: 8px; }
+QCheckBox::indicator, QRadioButton::indicator, QAbstractItemView::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background-color: rgba(255, 255, 255, 0.06);
+}
+QCheckBox::indicator, QAbstractItemView::indicator { border-radius: 5px; }
+QRadioButton::indicator { border-radius: 9px; }
+QCheckBox::indicator:hover, QRadioButton::indicator:hover { border-color: rgba(255, 255, 255, 0.5); }
+QCheckBox::indicator:checked, QAbstractItemView::indicator:checked {
+    background-color: palette(highlight);
+    border-color: palette(highlight);
+    image: url(@DIR@/check.svg);
+}
+QCheckBox::indicator:indeterminate {
+    background-color: palette(highlight);
+    border-color: palette(highlight);
+    image: url(@DIR@/dash.svg);
+}
+QRadioButton::indicator:checked {
+    background-color: palette(highlight);
+    border-color: palette(highlight);
+    image: url(@DIR@/dot.svg);
+}
+QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { border-color: rgba(255, 255, 255, 0.12); }
+
+/* ── danh sách, bảng, cây ── */
+QAbstractItemView {
+    background-color: palette(base);
+    alternate-background-color: palette(alternate-base);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 4px;
+    outline: 0;
+}
+QListView::item, QTreeView::item {
+    min-height: 24px;
+    padding: 2px 6px;
+    border-radius: 7px;
+}
+QListView::item:hover, QTreeView::item:hover { background-color: rgba(255, 255, 255, 0.07); }
+QListView::item:selected, QTreeView::item:selected {
+    background-color: palette(highlight);
+    color: palette(highlighted-text);
+}
+QTreeView::branch { background: transparent; }
+QTreeView::branch:has-children:closed { image: url(@DIR@/arrow-right.svg); }
+QTreeView::branch:has-children:open { image: url(@DIR@/arrow-down.svg); }
+QTableView { gridline-color: rgba(255, 255, 255, 0.06); padding: 0; }
+QHeaderView { background: transparent; border: none; }
+QHeaderView::section {
+    background-color: transparent;
+    color: palette(placeholder-text);
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 8px;
+    font-weight: 600;
+}
+QTableCornerButton::section { background: transparent; border: none; }
+
+/* ── menu ── */
+QMenuBar { background: transparent; border: none; }
+QMenuBar::item { padding: 4px 10px; border-radius: 8px; background: transparent; }
+QMenuBar::item:selected, QMenuBar::item:pressed { background-color: rgba(255, 255, 255, 0.10); }
+QMenu {
+    background-color: palette(alternate-base);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0;
+    padding: 6px;
+}
+QMenu::item {
+    padding: 6px 28px 6px 12px;
+    border-radius: 8px;
+    background: transparent;
+}
+QMenu::item:selected {
+    background-color: palette(highlight);
+    color: palette(highlighted-text);
+}
+QMenu::item:disabled { color: palette(placeholder-text); }
+QMenu::separator { height: 1px; margin: 5px 8px; background: rgba(255, 255, 255, 0.10); }
+QMenu::icon { padding-left: 8px; }
+QMenu::right-arrow { image: url(@DIR@/arrow-right.svg); width: 12px; height: 12px; margin-right: 8px; }
+QMenu::indicator { width: 14px; height: 14px; margin-left: 6px; border-radius: 4px; }
+QMenu::indicator:checked { image: url(@DIR@/check.svg); background-color: palette(highlight); }
+
+/* ── thẻ ── */
+QTabWidget::pane {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    top: -1px;
+}
+QTabBar { qproperty-drawBase: 0; }
+QTabBar::tab {
+    background: transparent;
+    color: palette(placeholder-text);
+    padding: 6px 14px;
+    margin: 2px;
+    border-radius: 9px;
+}
+QTabBar::tab:hover { background-color: rgba(255, 255, 255, 0.07); color: palette(window-text); }
+QTabBar::tab:selected {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: palette(window-text);
+}
+
+/* ── thanh tiến trình, thanh trượt ── */
+QProgressBar {
+    background-color: rgba(255, 255, 255, 0.10);
+    border: none;
+    border-radius: 7px;
+    min-height: 14px;
+    max-height: 14px;
+    text-align: center;
+    color: palette(window-text);
+}
+QProgressBar::chunk {
+    background-color: palette(highlight);
+    border-radius: 7px;
+}
+
+QSlider::groove:horizontal { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.14); }
+QSlider::groove:vertical { width: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.14); }
+QSlider::sub-page:horizontal { background: palette(highlight); border-radius: 3px; }
+QSlider::add-page:vertical { background: palette(highlight); border-radius: 3px; }
+QSlider::handle:horizontal, QSlider::handle:vertical {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+}
+QSlider::handle:horizontal { margin: -7px 0; }
+QSlider::handle:vertical { margin: 0 -7px; }
+
+/* ── thanh cuộn mảnh, tròn ── */
+QScrollBar { background: transparent; border: none; }
+QScrollBar:vertical { width: 12px; margin: 2px; }
+QScrollBar:horizontal { height: 12px; margin: 2px; }
+QScrollBar::handle {
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 4px;
+    border: 2px solid transparent;
+}
+QScrollBar::handle:vertical { min-height: 32px; }
+QScrollBar::handle:horizontal { min-width: 32px; }
+QScrollBar::handle:hover { background: rgba(255, 255, 255, 0.38); }
+QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; border: none; background: none; }
+QScrollBar::add-page, QScrollBar::sub-page { background: none; }
+
+/* ── khung, nhóm, chú thích ── */
+QGroupBox {
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    margin-top: 14px;
+    padding-top: 6px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 12px;
+    padding: 0 4px;
+    color: palette(placeholder-text);
+}
+QToolTip {
+    background-color: palette(tool-tip-base);
+    color: palette(tool-tip-text);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 5px 9px;
+}
+QStatusBar { background: transparent; }
+QStatusBar::item { border: none; }
+QSplitter::handle { background: transparent; }
+QDockWidget::title { padding: 6px; background: transparent; }

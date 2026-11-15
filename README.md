@@ -197,7 +197,7 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 - **Ứng dụng GTK 4 / libadwaita** (Tệp, Lịch, hộp chọn tệp…): đổi màu theo Liquid Glass. Hình dáng nút giữ nguyên vì libadwaita không cho thay.
 - **Trình quản lý tệp (Nautilus):** thanh bên kính mờ, nhìn xuyên thấy hình nền như Finder; phần danh sách tệp vẫn nền đặc. Thanh bên có sẵn lối tắt Tài liệu, Tải về, Ảnh, Ảnh chụp màn hình, Hình nền, Dự án (chỉ thư mục nào có thật; đã có lối tắt riêng thì giữ nguyên).
 - **Ứng dụng GTK 3** (GIMP, Inkscape…): theme adw-gtk3 tối cùng màu.
-- **Ứng dụng Qt** (VLC, OBS, qBittorrent…): bảng màu tối Liquid Glass qua qt6ct.
+- **Ứng dụng Qt** (VLC, OBS, qBittorrent…): bảng màu tối Liquid Glass và bo tròn theo cùng kiểu (nút, ô nhập, danh sách, thẻ, thanh trượt, thanh tiến trình, thanh cuộn) qua qt6ct. Menu và danh sách xổ xuống giữ khung ngoài vuông, chỉ bo tròn từng mục, vì Qt không cho các cửa sổ nổi này trong suốt (bo góc ngoài sẽ lộ góc đen). Ứng dụng có theme riêng (như OBS) vẫn dùng theme của nó.
 - **Ứng dụng Flatpak:** đọc được màu Liquid Glass (chỉ đọc), ứng dụng GTK 3 trong Flatpak có theme adw-gtk3 tối; áp cho cả ứng dụng cài sau này.
 - **Màu thư mục:** Cài đặt → Giao diện → *Màu thư mục*, 12 màu (mặc định tím). Đổi là trình quản lý tệp đổi theo ngay.
 
@@ -338,7 +338,7 @@ config/
     lg_monitors.lua   màn hình
     lg_env.lua        biến môi trường, bộ gõ
     lg_gpu.lua        biến riêng cho card NVIDIA (do nvidia/setup-nvidia.sh ghi, chỉ có trên máy NVIDIA)
-    theme/            màu cho ứng dụng: gtk4.css, gtk3.css, qt-colors.conf (theme-apps.sh chép đi)
+    theme/            giao diện cho ứng dụng: gtk4.css, gtk3.css, qt-colors.conf, qt-liquid-glass.qss + qt/*.svg (theme-apps.sh chép đi)
     lg_look.lua       kính, bo góc, bóng, chuyển động
     lg_input.lua      bàn phím, touchpad, cử chỉ
     lg_rules.lua      quy tắc cửa sổ và lớp
