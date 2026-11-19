@@ -66,6 +66,9 @@ PKGS=(
     ffmpeg
     # ứng dụng cơ bản: xem ảnh, xem video, đọc PDF, soạn văn bản, máy tính, giải nén, quản lý tác vụ
     loupe celluloid papers gnome-text-editor gnome-calculator file-roller 7zip unrar unzip mission-center
+    # xem nhanh tệp bằng phím Space trong trình quản lý tệp (như Quick Look); gst-plugins-good và
+    # gst-libav để xem được video mp4/mkv, webkitgtk-6.0 để xem trang HTML
+    sushi gst-plugins-good gst-libav webkitgtk-6.0
     # cắm USB, điện thoại, máy ảnh là hiện trong Tệp
     gvfs gvfs-mtp gvfs-gphoto2 udisks2
     # phông tương thích Arial / Times New Roman cho tài liệu từ Windows

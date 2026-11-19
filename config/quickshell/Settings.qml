@@ -27,6 +27,8 @@ Singleton {
     property alias dock: adapter.dock
     property alias display: adapter.display
     property alias power: adapter.power
+    property alias windows: adapter.windows
+    property alias hotCorners: adapter.hotCorners
 
     property bool ready: false
 
@@ -104,6 +106,17 @@ Singleton {
                 property int screenOffAfter: 330
                 property int sleepAfter: 1800
             }
+            property JsonObject windows: JsonObject {
+                property bool snapDrag: true          // kéo cửa sổ chạm mép màn hình để đặt (lg_snap.lua)
+            }
+            // góc nóng: đưa chuột vào góc màn hình để làm một việc (HotCorners.qml)
+            // none | overview | widgets | control | launcher | lock | screenOff
+            property JsonObject hotCorners: JsonObject {
+                property string topLeft: "overview"
+                property string topRight: "none"
+                property string bottomLeft: "none"
+                property string bottomRight: "none"
+            }
             property JsonObject dock: JsonObject {
                 property bool enabled: true
                 property bool autoHide: true          // ẩn khi có cửa sổ che chỗ của dock
@@ -153,6 +166,7 @@ Singleton {
                      disableWhileTyping: I.disableWhileTyping, scrollFactor: I.scrollFactor,
                      sensitivity: I.sensitivity, repeatRate: I.repeatRate, repeatDelay: I.repeatDelay },
             gestures: { workspace: G.workspace, overview: G.overview, dropdown: G.dropdown, panels: G.panels },
+            windows: { snapDrag: windows.snapDrag },
             // từng màn hình: { mode, scale, position, disabled }; xem lg_monitors.lua
             monitors: display.monitors || {}
         };
@@ -211,6 +225,18 @@ Singleton {
         // hypridle không tự đọc lại file: khởi động lại nó
         Quickshell.execDetached(["sh", "-c", "pkill -x hypridle; sleep 0.3; setsid -f hypridle >/dev/null 2>&1"]);
     }
+
+    // ── góc nóng: các việc chọn được (HotCorners.qml làm), [giá trị, nhãn] theo thứ tự trong Cài đặt ──
+    readonly property var hotCornerActions: [
+        ["none",      "Không làm gì"],
+        ["overview",  "Toàn cảnh"],
+        ["widgets",   "Bảng widget"],
+        ["control",   "Trung tâm điều khiển"],
+        ["launcher",  "Launcher"],
+        ["capture",   "Chụp màn hình"],
+        ["lock",      "Khóa màn hình"],
+        ["screenOff", "Tắt màn hình"]
+    ]
 
     // ── phông chữ cho ứng dụng GTK (Tệp, Firefox...) đổi theo ──
     readonly property string uiFont: look.font

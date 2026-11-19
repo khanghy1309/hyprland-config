@@ -94,6 +94,16 @@ hl.window_rule({
     center = true,
 })
 
+-- Xem nhanh (chọn tệp trong trình quản lý tệp rồi bấm Space, như Quick Look của macOS):
+-- nổi ở giữa màn hình, phóng ra từ giữa thay vì trượt vào
+hl.window_rule({
+    name      = "float-quick-look",
+    match     = { class = "^org.gnome.NautilusPreviewer$" },
+    float     = true,
+    center    = true,
+    animation = "popin 85%",
+})
+
 -- Máy tính bỏ túi: nổi, nhỏ gọn
 hl.window_rule({
     name  = "float-calculator",

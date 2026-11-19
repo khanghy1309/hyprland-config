@@ -47,6 +47,9 @@ ShellRoot {
     // Menu chuột phải trên màn hình nền
     DesktopMenu {}
 
+    // Góc nóng: đưa chuột vào góc màn hình (chọn việc trong Cài đặt → Màn hình nền và Dock)
+    HotCorners {}
+
     // Ứng dụng Cài đặt (Super + ,)
     SettingsApp {}
 }

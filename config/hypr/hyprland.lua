@@ -25,6 +25,7 @@ require("lg_look")       -- kính, bo góc, bóng, chuyển động
 require("lg_input")      -- bàn phím, touchpad, cử chỉ
 require("lg_rules")      -- quy tắc cho cửa sổ và lớp (thanh trên, launcher)
 require("lg_keybinds")   -- phím tắt
+require("lg_snap")       -- đặt cửa sổ nhanh: kéo chạm mép, Super + Alt + mũi tên
 require("lg_autostart")  -- chạy khi đăng nhập
 
 -- Chỗ dành cho chỉnh sửa riêng của bạn. File này không bị script cài đặt ghi đè.

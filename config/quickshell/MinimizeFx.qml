@@ -8,7 +8,7 @@ import Quickshell.Hyprland
 //   "genie"  cửa sổ bị hút vào biểu tượng trên dock như macOS (mặc định)
 //   "scale"  cửa sổ thu nhỏ và mờ dần về phía dock
 //   "off"    không hiệu ứng
-// Chọn trong Cài đặt → Dock.
+// Chọn trong Cài đặt → Màn hình nền và Dock.
 //
 // Cách làm: một lớp phủ trong suốt, không nhận chuột, nằm trên mọi cửa sổ, giữ một ảnh chụp tĩnh của
 // cửa sổ và chạy hiệu ứng trên ảnh đó. Cửa sổ thật được cất đi (hoặc đưa về) đúng lúc ảnh đã có,

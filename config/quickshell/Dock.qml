@@ -13,7 +13,7 @@ import Quickshell.Hyprland
 //   - giữ và kéo một biểu tượng đã ghim để đổi chỗ
 // Tự ẩn (mặc định): dock lùi xuống khi có cửa sổ che chỗ của nó; đưa chuột xuống sát mép dưới
 // màn hình để hiện lại. Super + D cũng hiện / ẩn dock.
-// Chỉnh trong Cài đặt → Dock.   Mở từ ngoài:  qs ipc call dock toggle
+// Chỉnh trong Cài đặt → Màn hình nền và Dock.   Mở từ ngoài:  qs ipc call dock toggle
 PanelWindow {
     id: dock
 

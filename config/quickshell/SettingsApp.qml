@@ -24,7 +24,7 @@ FloatingWindow {
     readonly property var pages: [
         { id: "look",      label: "Giao diện",            path: "M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.6 0-.9-.7-1.4-.7-2.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4.3-4-7.6-9-7.6zM7.5 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM10.5 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM15 8.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" },
         { id: "display",   label: "Màn hình",             path: "M3 4h18v12H3zM8 20h8M12 16v4" },
-        { id: "dock",      label: "Dock",                 path: "M3 15h18v5H3zM6 17.5h.01M10 17.5h.01M14 17.5h.01M18 17.5h.01M8 4h8v8H8z" },
+        { id: "dock",      label: "Màn hình nền và Dock", path: "M3 15h18v5H3zM6 17.5h.01M10 17.5h.01M14 17.5h.01M18 17.5h.01M8 4h8v8H8z" },
         { id: "wallpaper", label: "Hình nền",             path: "M3 5h18v14H3zM3 15l5-5 4 4 3-3 6 6M15.5 8.5h.01" },
         { id: "input",     label: "Touchpad và bàn phím", path: "M4 4h16v10H4zM12 14v6M8 20h8" },
         { id: "wifi",      label: "Wi-Fi",                path: Icons.wifi },
@@ -592,7 +592,7 @@ FloatingWindow {
         id: dockPage
         Column {
             spacing: 26
-            PageTitle { text: "Dock" }
+            PageTitle { text: "Màn hình nền và Dock" }
 
             Group {
                 title: ""
@@ -628,6 +628,33 @@ FloatingWindow {
                     value: Settings.dock.iconSize
                     format: v => v + " px"
                     onMoved: v => Settings.dock.iconSize = v
+                    last: true
+                }
+            }
+
+            Group {
+                title: "Đặt cửa sổ"
+                SwitchRow {
+                    label: "Kéo cửa sổ chạm mép màn hình để đặt"
+                    note: "Chạm mép trái hoặc phải: nửa màn hình. Chạm mép trên: lấp đầy. Kéo vào một góc: một phần tư màn hình. Kéo cửa sổ đã đặt ra chỗ khác là nó trở lại cỡ cũ."
+                    on: Settings.windows.snapDrag
+                    onToggled: Settings.windows.snapDrag = !Settings.windows.snapDrag
+                }
+                RowBase {
+                    label: "Phím tắt: giữ Super + Alt rồi bấm"
+                    note: "← → ↑ ↓ nửa màn hình · U I J K bốn góc · D F G một phần ba · E T hai phần ba · Enter lấp đầy · C ra giữa · Backspace trả về như cũ"
+                    reserve: 0
+                    last: true
+                }
+            }
+
+            Group {
+                title: "Góc nóng"
+                HotCornerBox {}
+                RowBase {
+                    label: ""
+                    note: "Đưa chuột vào sát góc màn hình là làm việc đã chọn. Góc nóng tự tắt khi có cửa sổ toàn màn hình hoặc khi bật Chơi game."
+                    reserve: 0
                     last: true
                 }
             }
@@ -2310,6 +2337,169 @@ FloatingWindow {
         }
         // ButtonsRow tự vẽ chú thích ở trên; ẩn cột nhãn của RowBase
         Component.onCompleted: children[0].visible = false
+    }
+
+    // góc nóng: một màn hình thu nhỏ, mỗi góc một nút chọn việc
+    component HotCornerBox: Item {
+        id: hc
+        width: parent ? parent.width : 0
+        height: 290
+        property string opened: ""
+        readonly property var corners: ["topLeft", "topRight", "bottomLeft", "bottomRight"]
+        readonly property real pickW: Math.min(170, (width - screenBox.width) / 2 - 26)
+
+        // màn hình thu nhỏ: viền máy, hình nền, thanh trên, chấm sáng ở góc đang bật
+        Rectangle {
+            id: screenBox
+            anchors.centerIn: parent
+            width: Math.min(270, hc.width * 0.42)
+            height: width * 0.62
+            radius: 14
+            color: "#111417"
+            border.width: 1
+            border.color: Theme.rim
+            Image {
+                id: miniWall
+                anchors.fill: parent
+                anchors.margins: 6
+                source: Glass.fileUrl(Glass.still)
+                sourceSize.width: 540
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+            }
+            Rectangle {
+                x: miniWall.x + 6; y: miniWall.y + 5
+                width: miniWall.width - 12; height: 7; radius: 3.5
+                color: Qt.rgba(1, 1, 1, 0.28)
+            }
+            Repeater {
+                model: hc.corners
+                delegate: Rectangle {
+                    required property string modelData
+                    readonly property bool on: (Settings.hotCorners[modelData] || "none") !== "none"
+                    visible: on
+                    width: 14; height: 14; radius: 7
+                    color: Theme.accent
+                    x: modelData.endsWith("Left") ? miniWall.x - 4 : miniWall.x + miniWall.width - 10
+                    y: modelData.startsWith("top") ? miniWall.y - 4 : miniWall.y + miniWall.height - 10
+                }
+            }
+        }
+
+        // bấm ra ngoài danh sách thì đóng
+        MouseArea {
+            anchors.fill: parent
+            visible: hc.opened !== ""
+            z: 4
+            onClicked: hc.opened = ""
+        }
+
+        Repeater {
+            model: hc.corners
+            delegate: Item {
+                id: cp
+                required property string modelData
+                readonly property bool isLeft: modelData.endsWith("Left")
+                readonly property bool isTop: modelData.startsWith("top")
+                readonly property string current: Settings.hotCorners[modelData] || "none"
+                readonly property bool isOpen: hc.opened === modelData
+                z: isOpen ? 6 : 1
+                width: hc.pickW
+                height: 34
+                x: isLeft ? screenBox.x - width - 16 : screenBox.x + screenBox.width + 16
+                y: isTop ? screenBox.y : screenBox.y + screenBox.height - height
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 11
+                    color: cp.isOpen || pickArea.containsMouse ? Qt.rgba(1, 1, 1, 0.2) : Theme.chip
+                    border.width: 1
+                    border.color: Theme.line
+                    Text {
+                        x: 12
+                        width: parent.width - 36
+                        anchors.verticalCenter: parent.verticalCenter
+                        elide: Text.ElideRight
+                        text: (Settings.hotCornerActions.find(a => a[0] === cp.current) || ["", "Không làm gì"])[1]
+                        font.family: Theme.font
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        color: cp.current === "none" ? Theme.dim : Theme.fg
+                    }
+                    Icon {
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        path: Icons.chevronRight
+                        rotation: 90
+                        size: 13
+                        color: Theme.dim
+                    }
+                    MouseArea {
+                        id: pickArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: hc.opened = cp.isOpen ? "" : cp.modelData
+                    }
+                }
+
+                // danh sách việc: mở sang ngang về phía màn hình thu nhỏ (không che nút của góc khác),
+                // thẳng hàng với nút, không tràn ra ngoài khung
+                Rectangle {
+                    visible: cp.isOpen
+                    width: 210
+                    height: optCol.implicitHeight + 8
+                    x: cp.isLeft ? cp.width + 8 : -width - 8
+                    readonly property real want: cp.isTop ? 0 : cp.height - height
+                    y: Math.max(-cp.y, Math.min(hc.height - cp.y - height, want))
+                    radius: 14
+                    color: "#23272c"
+                    border.width: 1
+                    border.color: Theme.rim
+                    Column {
+                        id: optCol
+                        x: 4; y: 4
+                        width: parent.width - 8
+                        Repeater {
+                            model: Settings.hotCornerActions
+                            delegate: Rectangle {
+                                id: opt
+                                required property var modelData
+                                readonly property bool sel: cp.current === modelData[0]
+                                width: optCol.width
+                                height: 28
+                                radius: 9
+                                color: optArea.containsMouse ? Theme.accent : "transparent"
+                                Icon {
+                                    visible: opt.sel
+                                    x: 8
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    path: Icons.check
+                                    size: 14
+                                    color: optArea.containsMouse ? Theme.ink : Theme.fg
+                                }
+                                Text {
+                                    x: 30
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: opt.modelData[1]
+                                    font.family: Theme.font
+                                    font.pixelSize: 13
+                                    color: optArea.containsMouse ? Theme.ink : Theme.fg
+                                }
+                                MouseArea {
+                                    id: optArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: { Settings.hotCorners[cp.modelData] = opt.modelData[0]; hc.opened = ""; }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     component SmallButton: Rectangle {

@@ -23,8 +23,9 @@ Item {
     onWidthChanged: updateArea()
     onHeightChanged: updateArea()
     Component.onCompleted: updateArea()
-    // bố cục cha có thể xếp xong sau; đo lại một lần nữa
-    Timer { interval: 120; running: true; onTriggered: g.updateArea() }
+    // bố cục cha xếp lại (đổi người dùng, ô mật khẩu lắc...) không báo cho khối kính:
+    // đo lại đều đặn, rất nhẹ vì chỉ là một phép đổi toạ độ
+    Timer { interval: 200; running: g.visible; repeat: true; triggeredOnStart: true; onTriggered: g.updateArea() }
 
     ShaderEffectSource {
         id: crop

@@ -4,11 +4,12 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import Quickshell.Services.Pipewire
+import Quickshell.Services.SystemTray
 
 // Thanh trên: ba viên kính nổi.
 //   trái  – workspace + tên cửa sổ đang dùng
 //   giữa  – chừa chỗ cho đảo động (Island.qml)
-//   phải  – CPU, RAM, âm lượng, pin; bấm để mở trung tâm điều khiển
+//   phải  – biểu tượng ứng dụng chạy nền (khay), rồi CPU, RAM, âm lượng, pin; bấm để mở trung tâm điều khiển
 PanelWindow {
     id: bar
 
@@ -223,6 +224,101 @@ PanelWindow {
                     : bar.battery.percentage > 1 ? bar.battery.percentage : bar.battery.percentage * 100
                 readonly property bool charging: bar.battery && bar.battery.state === UPowerDeviceState.Charging
                 text: "BAT " + Math.round(pct) + "%" + (charging ? " ↑" : "")
+            }
+        }
+    }
+
+    // ───────────────── biểu tượng ứng dụng (menu bar extras) ─────────────────
+    // Ứng dụng chạy nền (Discord, Steam, Telegram, trình quản lý mạng...) đặt biểu tượng ở đây.
+    //   bấm: mở ứng dụng (ứng dụng chỉ có menu thì mở menu) · chuột phải: menu · chuột giữa: việc phụ
+    //   cuộn: tuỳ ứng dụng (ví dụ chỉnh âm lượng)
+    readonly property var trayItems: SystemTray.items.values
+
+    TrayMenu { id: trayMenu; screen: bar.screen }
+
+    GlassPill {
+        id: trayPill
+        tone: bar.pillTone
+        visible: bar.trayItems.length > 0
+        anchors.right: statusPill.left
+        anchors.rightMargin: 10
+        y: Theme.barTop
+        height: Theme.barHeight
+        width: trayRow.implicitWidth + 24
+
+        Row {
+            id: trayRow
+            anchors.centerIn: parent
+            spacing: 6
+
+            Repeater {
+                model: bar.trayItems
+                delegate: Item {
+                    id: tray
+                    required property var modelData
+                    width: 28
+                    height: 28
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: 9
+                        color: trayMenu.item === tray.modelData ? bar.selBg
+                             : trayArea.containsMouse ? Theme.chip : "transparent"
+                        Behavior on color { ColorAnimation { duration: Theme.fast } }
+                    }
+                    Image {
+                        id: trayIcon
+                        anchors.centerIn: parent
+                        width: 18
+                        height: 18
+                        source: tray.modelData.icon
+                        sourceSize: Qt.size(36, 36)
+                        asynchronous: true
+                        smooth: true
+                        visible: status === Image.Ready
+                    }
+                    // ứng dụng không gửi được biểu tượng: hiện chữ cái đầu
+                    Text {
+                        anchors.centerIn: parent
+                        visible: trayIcon.status !== Image.Ready
+                        text: (tray.modelData.title || tray.modelData.id || "?").charAt(0).toUpperCase()
+                        font.family: Theme.font
+                        font.pixelSize: 13
+                        font.weight: Font.Bold
+                        color: trayMenu.item === tray.modelData ? bar.selFg : bar.fg
+                    }
+                    // ứng dụng cần chú ý (tin nhắn mới, pin yếu...)
+                    Rectangle {
+                        visible: tray.modelData.status === Status.NeedsAttention
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.margins: 2
+                        width: 7
+                        height: 7
+                        radius: 3.5
+                        color: "#ff9f0a"
+                    }
+
+                    MouseArea {
+                        id: trayArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                        function showMenu() {
+                            if (trayMenu.item === tray.modelData) { trayMenu.close(); return; }
+                            trayMenu.open(tray.modelData, tray.mapToItem(null, 0, 0).x);
+                        }
+                        onClicked: mouse => {
+                            const it = tray.modelData;
+                            if (mouse.button === Qt.MiddleButton) it.secondaryActivate();
+                            else if (mouse.button === Qt.RightButton || it.onlyMenu) { if (it.hasMenu) showMenu(); }
+                            else { trayMenu.close(); it.activate(); }
+                        }
+                        onWheel: wheel => tray.modelData.scroll(wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x,
+                                                                wheel.angleDelta.y === 0)
+                    }
+                }
             }
         }
     }

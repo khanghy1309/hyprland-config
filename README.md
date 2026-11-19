@@ -126,6 +126,8 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 
 **Thanh trên:** bấm số workspace để chuyển, cuộn chuột trên viên bên trái để đổi workspace. Bấm `VOL` để tắt/bật tiếng, cuộn chuột trên đó để chỉnh âm lượng. Bấm chỗ khác trên viên bên phải để mở trung tâm điều khiển.
 
+**Biểu tượng ứng dụng trên thanh trên** (như menu bar extras của macOS): ứng dụng chạy nền (Discord, Steam, Telegram, trình quản lý mạng…) đặt biểu tượng trong một viên kính nằm bên trái viên trạng thái. Bấm để mở ứng dụng (ứng dụng chỉ có menu thì mở menu), chuột phải để mở menu của ứng dụng, chuột giữa cho việc phụ, cuộn chuột tuỳ ứng dụng. Menu là menu thật của ứng dụng, vẽ lại thành viên kính lỏng; mục có menu con thì bấm để đi vào, bấm hàng trên cùng để quay ra. Chấm cam ở góc biểu tượng nghĩa là ứng dụng cần bạn chú ý. Không có ứng dụng nào chạy nền thì viên này tự ẩn.
+
 **Đảo động** (viên ở giữa thanh trên) tự đổi theo việc đang diễn ra, ưu tiên theo thứ tự:
 
 1. Đổi âm lượng hoặc độ sáng: hiện thanh mức trong khoảng 1,5 giây.
@@ -161,12 +163,22 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - Bấm chuột giữa: mở thêm một cửa sổ mới.
 - Chuột phải: danh sách cửa sổ, *Mở cửa sổ mới*, *Ghim vào Dock* / *Bỏ ghim*, *Đóng*. Chuột phải vào thùng rác để dọn sạch.
 - Giữ và kéo một biểu tượng đã ghim sang trái/phải để đổi chỗ.
-- **Ghim ứng dụng chưa mở:** trong launcher, chọn ứng dụng rồi bấm `Ctrl + P` (hoặc chuột phải vào nó); bấm lại để bỏ ghim. Hoặc vào Cài đặt → Dock, gõ tên ứng dụng ở ô *Thêm ứng dụng*. Trang đó cũng có nút ↑ ↓ để đổi thứ tự và *Bỏ ghim*.
+- **Ghim ứng dụng chưa mở:** trong launcher, chọn ứng dụng rồi bấm `Ctrl + P` (hoặc chuột phải vào nó); bấm lại để bỏ ghim. Hoặc vào Cài đặt → Màn hình nền và Dock, gõ tên ứng dụng ở ô *Thêm ứng dụng*. Trang đó cũng có nút ↑ ↓ để đổi thứ tự và *Bỏ ghim*.
 - **Tự ẩn** (mặc định): dock lùi xuống khi có cửa sổ che chỗ của nó, nên cửa sổ vẫn dùng hết màn hình. Đưa chuột sát mép dưới màn hình (khoảng giữa) hoặc bấm `Super + D` để hiện lại. Workspace trống thì dock luôn hiện.
-- **Thu nhỏ** (`Super + H`, hoặc chuột phải → thu nhỏ): cửa sổ bị hút vào biểu tượng của nó trên dock như macOS; bấm biểu tượng thì cửa sổ bay ngược ra. Đổi sang kiểu thu nhỏ thường hoặc tắt: Cài đặt → Dock.
-- Đổi kích thước, tắt phóng to, tắt tự ẩn: Cài đặt → Dock.
+- **Thu nhỏ** (`Super + H`, hoặc chuột phải → thu nhỏ): cửa sổ bị hút vào biểu tượng của nó trên dock như macOS; bấm biểu tượng thì cửa sổ bay ngược ra. Đổi sang kiểu thu nhỏ thường hoặc tắt: Cài đặt → Màn hình nền và Dock.
+- Đổi kích thước, tắt phóng to, tắt tự ẩn: Cài đặt → Màn hình nền và Dock.
+
+**Đặt cửa sổ nhanh** (như macOS Sequoia/Tahoe và ứng dụng Rectangle): kéo cửa sổ (bằng thanh tiêu đề, hoặc `Super` + kéo chuột trái) cho con trỏ chạm mép màn hình rồi thả.
+- Chạm mép trái hoặc phải: cửa sổ chiếm nửa màn hình bên đó. Chạm mép trên: lấp đầy màn hình. Kéo vào một góc: chiếm một phần tư màn hình ở góc đó. Mép dưới là chỗ của dock nên không làm gì.
+- Kéo cửa sổ đã đặt ra chỗ khác: cửa sổ trở lại cỡ cũ.
+- Phím tắt, giữ `Super + Alt` rồi bấm: `← → ↑ ↓` nửa màn hình, `U I J K` bốn góc, `D F G` một phần ba (trái, giữa, phải), `E T` hai phần ba, `Enter` lấp đầy, `C` ra giữa, `Backspace` trả cửa sổ về như trước khi đặt (về lại lưới nếu trước đó nó đang xếp lưới).
+- Cửa sổ được đặt sẽ chuyển sang nổi; khoảng cách giữa hai cửa sổ cạnh nhau bằng khoảng cách khi xếp lưới. Khác macOS: lúc kéo chưa có khung xem trước, vì Hyprland không báo vị trí con trỏ trong lúc kéo; thả tay ra là cửa sổ vào chỗ.
+- Tắt kéo chạm mép: Cài đặt → Màn hình nền và Dock → *Kéo cửa sổ chạm mép màn hình để đặt*.
+
+**Góc nóng** (như Hot Corners của macOS): đưa chuột vào sát một góc màn hình là làm việc đã chọn cho góc đó: Toàn cảnh, Bảng widget, Trung tâm điều khiển, Launcher, Chụp màn hình, Khóa màn hình, Tắt màn hình. Mặc định chỉ góc trên trái mở Toàn cảnh. Chọn việc cho từng góc ở Cài đặt → Màn hình nền và Dock → *Góc nóng*. Con trỏ phải dừng ở góc khoảng 0,1 giây mới tính, nên lướt chuột qua không mở nhầm. Góc nóng tự tắt khi có cửa sổ toàn màn hình (xem phim, chơi game) hoặc khi bật Chơi game.
 
 **Cài đặt** (`Super + ,`, hoặc gõ "cài đặt" trong launcher): một cửa sổ kính, đổi gì là áp dụng ngay, không có nút Lưu.
+- *Màn hình nền và Dock:* hiện / tự ẩn dock, phóng to biểu tượng, hiệu ứng thu nhỏ, kích thước biểu tượng, đặt cửa sổ khi kéo chạm mép, góc nóng (một màn hình thu nhỏ, mỗi góc một nút chọn việc), ứng dụng ghim.
 - *Giao diện:* phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kính của cửa sổ (acrylic / mờ thường / tắt), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, màu thư mục, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
 - *Hình nền:* bấm vào ảnh để đổi. Video và GIF có nhãn ở góc. Chọn lúc nào video tạm dừng (khi có cửa sổ toàn màn hình, khi có bất kỳ cửa sổ nào, hoặc không bao giờ), có dùng ảnh tĩnh khi chạy pin không, và hiệu ứng khi đổi ảnh.
 - *Touchpad và bàn phím:* cuộn tự nhiên, chạm để bấm, tắt touchpad khi gõ, tốc độ cuộn và con trỏ, bật/tắt từng cử chỉ, tốc độ lặp phím (có ô gõ thử).
@@ -195,6 +207,7 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 Ứng dụng mở trong cửa sổ cũng dùng chung bảng màu với thanh trên và dock: nền kính tối, mục được chọn trắng đục chữ tối.
 
 - **Ứng dụng GTK 4 / libadwaita** (Tệp, Lịch, hộp chọn tệp…): đổi màu theo Liquid Glass. Hình dáng nút giữ nguyên vì libadwaita không cho thay.
+- **Xem nhanh bằng phím Space** (như Quick Look của macOS): trong trình quản lý tệp, chọn một tệp rồi bấm `Space` để xem ngay ảnh, PDF, video, nhạc, văn bản, mã nguồn, trang HTML; bấm `Space` lần nữa để đóng. Cửa sổ xem nhanh nổi giữa màn hình, cùng màu Liquid Glass. Video và ảnh: bấm đúp để phóng to. Do gói `sushi` (GNOME) làm.
 - **Trình quản lý tệp (Nautilus):** thanh bên kính mờ, nhìn xuyên thấy hình nền như Finder; phần danh sách tệp vẫn nền đặc. Thanh bên có sẵn lối tắt Tài liệu, Tải về, Ảnh, Ảnh chụp màn hình, Hình nền, Dự án (chỉ thư mục nào có thật; đã có lối tắt riêng thì giữ nguyên).
 - **Ứng dụng GTK 3** (GIMP, Inkscape…): theme adw-gtk3 tối cùng màu.
 - **Ứng dụng Qt** (VLC, OBS, qBittorrent…): bảng màu tối Liquid Glass và bo tròn theo cùng kiểu (nút, ô nhập, danh sách, thẻ, thanh trượt, thanh tiến trình, thanh cuộn) qua qt6ct. Menu và danh sách xổ xuống giữ khung ngoài vuông, chỉ bo tròn từng mục, vì Qt không cho các cửa sổ nổi này trong suốt (bo góc ngoài sẽ lộ góc đen). Ứng dụng có theme riêng (như OBS) vẫn dùng theme của nó.
@@ -229,7 +242,13 @@ Chạy lại tay (sau khi cài thêm Papirus, Flatpak…): `~/.config/hypr/scrip
 
 **Menu nguồn** (`Super + Esc`): Khóa (L), Đăng xuất (E), Ngủ (U), Ngủ đông (H), Khởi động lại (R), Tắt máy (S). Bấm chữ cái để chọn nhanh, hoặc `← →` rồi `Enter`. Mục được chọn sẵn là Khóa, để lỡ tay bấm Enter cũng không tắt máy. Ngủ đông chỉ chạy khi máy đã có phân vùng swap đủ lớn.
 
-**Màn hình đăng nhập** (SDDM): lời chào theo buổi, ô mật khẩu, chọn phiên và bố cục bàn phím (bấm vào viên để đổi), các nút ngủ / khởi động lại / tắt máy. Khối kính được làm mờ ngay trong theme vì lúc đăng nhập chưa có Hyprland.
+**Màn hình đăng nhập** (SDDM), bố cục như màn hình đăng nhập của macOS:
+- Giữa phía trên: ngày ("Thứ Năm, 19 tháng 11") và giờ lớn.
+- Giữa phía dưới: ảnh đại diện tròn, tên, ô mật khẩu dạng viên kính nhỏ. Gõ mật khẩu thì nút → hiện ở cuối ô; Caps Lock đang bật thì có dấu ⇪ trong ô. Gõ sai thì ô lắc ngang như trên Mac và báo "Sai mật khẩu".
+- Máy có nhiều người dùng: ảnh đại diện xếp thành hàng, người đang chọn to hơn; bấm vào ảnh để đổi người.
+- Dưới cùng: Ngủ, Khởi động lại, Tắt máy (nút tròn kính, nhãn bên dưới).
+- Góc trên phải: phiên (khi có nhiều phiên) và bố cục bàn phím (khi có nhiều bố cục); bấm để đổi.
+- Khối kính được làm mờ ngay trong theme vì lúc đăng nhập chưa có Hyprland. Chữ tự to nhỏ theo chiều cao màn hình.
 - Thử theme mà không cần đăng xuất: `sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/liquid-glass`
 - Ảnh đại diện: lưu một ảnh vuông thành `~/.face` rồi chạy lại `./install.sh`. Không có ảnh thì hiện chữ cái đầu của tên.
 - Đổi ảnh nền hoặc phông: sửa `/usr/share/sddm/themes/liquid-glass/theme.conf` (cần `sudo`).
@@ -346,6 +365,7 @@ config/
     lg_input.lua      bàn phím, touchpad, cử chỉ
     lg_rules.lua      quy tắc cửa sổ và lớp
     lg_keybinds.lua   phím tắt
+    lg_snap.lua       đặt cửa sổ nhanh: kéo chạm mép, Super + Alt + …
     lg_autostart.lua  chạy khi đăng nhập
     lg_settings.lua   do ứng dụng Cài đặt tự ghi (không sửa tay)
     hyprlock.conf     màn hình khóa
@@ -366,6 +386,8 @@ config/
     Dissolve.qml      thẻ tan thành bụi
     MinimizeFx.qml    hiệu ứng thu nhỏ vào dock
     DesktopMenu.qml   menu chuột phải trên màn hình nền
+    TrayMenu.qml      menu kính lỏng của biểu tượng ứng dụng trên thanh trên
+    HotCorners.qml    góc nóng
     SafeShot.qml, CaptureGate.js   chụp cửa sổ an toàn (tránh làm sập shell)
     Icon.qml, Icons.qml   biểu tượng nét mảnh
     SysStats.qml      đọc CPU, RAM

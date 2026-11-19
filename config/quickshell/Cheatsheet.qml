@@ -50,6 +50,19 @@ PanelWindow {
             [["Super", "kéo chuột trái"], "Di chuyển"],
             [["Super", "kéo chuột phải"], "Đổi kích thước"]
         ] },
+        { title: "Đặt cửa sổ", items: [
+            [["kéo chạm mép trái / phải"], "Nửa màn hình"],
+            [["kéo chạm mép trên"], "Lấp đầy màn hình"],
+            [["kéo vào góc"], "Một phần tư màn hình"],
+            [["Super", "Alt", "← → ↑ ↓"], "Nửa trái / phải / trên / dưới"],
+            [["Super", "Alt", "U I J K"], "Bốn góc"],
+            [["Super", "Alt", "D F G"], "Một phần ba: trái / giữa / phải"],
+            [["Super", "Alt", "E T"], "Hai phần ba: trái / phải"],
+            [["Super", "Alt", "Enter"], "Lấp đầy"],
+            [["Super", "Alt", "C"], "Ra giữa"],
+            [["Super", "Alt", "Backspace"], "Trả về như cũ"],
+            [["chuột vào góc màn hình"], "Góc nóng"]
+        ] },
         { title: "Workspace", items: [
             [["Super", "Tab"], "Toàn cảnh"],
             [["Super", "1 … 9"], "Sang workspace"],

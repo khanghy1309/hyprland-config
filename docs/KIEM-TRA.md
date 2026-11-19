@@ -104,6 +104,8 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 - **Popover của GTK 3** đục, vì GTK 3 vẽ popover ngay trong cửa sổ nên Hyprland không làm mờ được.
 - **Độ trong của kính** (blur, khúc xạ trên Wayland thật) chỉ xem được trên Hyprland thật. Bản giả chỉ ghép blur gần đúng.
 - **Giao diện GTK 3 với adw-gtk3** chưa xem bằng mắt, vì không dựng được adw-gtk3 trong máy kiểm tra.
+- **Kéo chạm mép** chưa có khung xem trước như macOS, vì Hyprland không báo vị trí con trỏ trong lúc kéo (không có sự kiện chuột cho Lua). Thả tay ra là cửa sổ vào chỗ.
+- **Góc nóng** là một lớp 2 × 2 px ở góc: bấm đúng điểm ảnh ở góc màn hình sẽ trúng lớp đó thay vì cửa sổ. Lớp tự tắt khi có cửa sổ toàn màn hình, nên không vướng.
 - **Chưa thử trên phần cứng thật**: cài driver NVIDIA, Plymouth lúc khởi động thật, SDDM thật, đèn bàn phím và đèn màn hình qua `brightnessctl` trên nhiều loại máy.
 
 ## Báo động nhầm (đừng "sửa")
@@ -112,9 +114,50 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 - Thuộc tính kiểu `list<string>` trong QML không khớp các regex tìm thuộc tính đơn giản. Thuộc tính vẫn đúng.
 - `Osd.qml`: cảnh báo "onConnectedChanged … no signal" chỉ có trong bản giả, vì ở đó Bluetooth là đối tượng JS đơn giản. `BluetoothDevice` thật của Quickshell có tín hiệu `connectedChanged`.
 - `shellcheck` báo SC2016 với các lệnh `sh -c '… "$1" …'`. Đó là chủ ý: dữ liệu được truyền qua `$1` để tránh chèn lệnh. Mức `-S warning` không báo lỗi này.
+- Trong bản giả, ô biểu tượng ứng dụng không sáng lên khi menu đang mở, vì Repeater chép đối tượng JS nên phép so `===` sai. Trên máy thật mỗi ứng dụng là một QObject nên phép so đúng.
 - Lệnh `>` trong trình mở ứng dụng chạy thẳng `sh -c` với nội dung người dùng gõ. Đây là tính năng, không phải lỗ hổng.
 
 ## Nhật ký kiểm tra
+
+### 2026-11-19 (chiều): thêm tính năng học từ macOS
+
+Thêm: biểu tượng ứng dụng trên thanh trên, xem nhanh bằng Space, đặt cửa sổ nhanh, góc nóng, màn hình đăng nhập kiểu macOS.
+
+**Biểu tượng ứng dụng** (`Bar.qml`, `TrayMenu.qml`)
+- API đối chiếu với mã nguồn Quickshell 0.3.2:
+  - `SystemTray.items` và `SystemTrayItem`, gồm `activate`, `secondaryActivate`, `scroll`, `menu`, `onlyMenu`, `status`;
+  - `QsMenuOpener.children` và `QsMenuEntry`, gồm `isSeparator`, `enabled`, `buttonType`, `checkState`, `hasChildren`, `triggered()`.
+- Chạy trong bản giả với 4 ứng dụng: một ứng dụng không có biểu tượng (hiện chữ cái đầu), một ứng dụng cần chú ý (chấm cam), và menu có ô đánh dấu, mục tắt và menu con.
+
+**Đặt cửa sổ** (`lg_snap.lua`)
+- Đối chiếu với mã nguồn Hyprland 0.57:
+  - các hàm `hl.dsp.window.float`, `resize`, `move`, `center`, `fullscreen` (vị trí tuyệt đối, nhận `window = "address:…"`), `hl.get_config` và `hl.get_cursor_pos`;
+  - `hl.get_monitor_at_cursor` (`width`/`height` là điểm ảnh thật nên phải chia tỉ lệ; `reserved` theo đơn vị logic).
+- Bắt chuột trái được kiểm tra trong `src/keybinds/Manager.cpp`:
+  - lúc thả chuột, việc kéo kết thúc (`endDragTarget`) trước khi chạy phím tắt;
+  - phím tắt `release` có `ignore_mods` thì khớp theo phím giữ lúc nhấn;
+  - phải có `transparent` thì phím tắt Super + chuột trái (kéo cửa sổ) không che mất nó;
+  - có `non_consuming` thì cú bấm vẫn tới ứng dụng.
+- Chạy với một Hyprland giả bằng Lua: màn hình 2560×1600 tỉ lệ 1,25, thanh trên 60 px.
+  - Đã thử: nửa màn hình, góc, lấp đầy, trả về, kéo chạm mép, kéo ra, bấm ở mép mà không kéo, đổi cỡ bằng mép trái, cửa sổ lưới.
+  - Hai nửa cách nhau 16 px (2 × gaps_in + 2 viền), đúng như khi xếp lưới.
+
+**Góc nóng** (`HotCorners.qml`, trang Cài đặt)
+- Chạy trong bản giả, xem cả hai hướng mở danh sách.
+- Bản giả bắt được lỗi `left`/`top` trùng thuộc tính có sẵn của Item; đã đổi tên.
+- `misc:mouse_move_enables_dpms` và `key_press_enables_dpms` có trong Hyprland 0.57; giờ đã bật trong `lg_look.lua`.
+
+**Xem nhanh**
+- `sushi` 51 trên Arch (GTK 4) có mã ứng dụng `org.gnome.NautilusPreviewer`, theo tệp dịch vụ D-Bus và metainfo trong gói.
+
+**SDDM** (`Main.qml`)
+- Chạy với SDDM giả, một và hai người dùng, Caps Lock, sai mật khẩu.
+- Bản giả bắt được lỗi `MouseArea anchors.fill` bên trong Column; đã sửa.
+
+**Chưa thử trên máy thật:**
+- kéo chạm mép trên Hyprland thật, cả khi kéo bằng thanh tiêu đề của ứng dụng;
+- biểu tượng thật của Discord, Steam;
+- sushi mở từ Nautilus.
 
 ### 2026-11-19: soát toàn bộ repo (sau commit 232b610)
 

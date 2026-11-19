@@ -82,6 +82,9 @@ hl.config({
         disable_hyprland_logo   = true,
         disable_splash_rendering = true,
         focus_on_activate       = true,
+        -- màn hình đang tắt (tự tắt, hoặc góc nóng "Tắt màn hình") thì rê chuột / bấm phím là sáng lại
+        mouse_move_enables_dpms = true,
+        key_press_enables_dpms  = true,
     },
 
     dwindle = {
