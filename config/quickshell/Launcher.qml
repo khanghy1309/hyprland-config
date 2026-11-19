@@ -251,8 +251,11 @@ PanelWindow {
         onTriggered: {
             const q = root.query.slice(1).trim();
             if (q.length < 2) { root.fileResults = []; return; }
-            fileProc.command = ["fd", "--type", "f", "--max-results", "40",
-                                "--base-directory", Quickshell.env("HOME"), q];
+            // --fixed-strings: gõ "(", "[" hay "+" vẫn tìm đúng chữ đó, không bị hiểu là biểu thức chính quy.
+            // "--" trước từ khoá: gõ chữ bắt đầu bằng "-" không bị fd hiểu thành tuỳ chọn (kể cả --exec).
+            fileProc.running = false;      // đang tìm dở từ khoá cũ: dừng, tìm lại với từ khoá mới
+            fileProc.command = ["fd", "--type", "f", "--fixed-strings", "--max-results", "40",
+                                "--base-directory", Quickshell.env("HOME"), "--", q];
             fileProc.running = true;
         }
     }

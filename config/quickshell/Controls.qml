@@ -86,13 +86,17 @@ Singleton {
 
     function setBrightness(v) {
         const pct = Math.round(Math.max(0.01, Math.min(1, v)) * 100);
-        Quickshell.execDetached(["brightnessctl", "-q", "set", pct + "%"]);
+        Quickshell.execDetached(["brightnessctl", "-q", "-d", root.backlight, "set", pct + "%"]);
         brightness = pct / 100;
     }
 
     Process {
         running: true
-        command: ["sh", "-c", "ls /sys/class/backlight 2>/dev/null | head -n1"]
+        // Hỏi brightnessctl đang chỉnh đèn nền nào, để thanh trượt đọc đúng cái mà phím độ sáng chỉnh
+        // (máy có hai thư mục đèn nền, ví dụ acpi_video0 và intel_backlight, không chọn nhầm).
+        // Không có brightnessctl thì lấy thư mục đầu tiên.
+        command: ["sh", "-c", "brightnessctl -m -c backlight info 2>/dev/null | head -n1 | cut -d, -f1 | grep . "
+                  + "|| ls /sys/class/backlight 2>/dev/null | head -n1"]
         stdout: StdioCollector { onStreamFinished: root.backlight = text.trim() }
     }
     FileView {

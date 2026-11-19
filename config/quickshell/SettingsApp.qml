@@ -144,6 +144,9 @@ FloatingWindow {
             x: 36
             y: 30
             width: flick.width - 72
+            // Chỉ giữ trang khi cửa sổ đang mở. Nếu không, đóng cửa sổ lúc đang ở trang Bluetooth thì máy
+            // cứ tìm thiết bị mãi, ở trang Wi-Fi thì cứ 15 giây quét mạng một lần.
+            active: win.visible
             sourceComponent: ({ look: lookPage, display: displayPage, dock: dockPage, wallpaper: wallPage, input: inputPage, wifi: wifiPage, bluetooth: btPage, sound: soundPage, power: powerPage, datetime: dtPage, apps: appsPage,
                                 weather: weatherPage, about: aboutPage })[win.page]
             onLoaded: flick.contentY = 0
@@ -445,6 +448,8 @@ FloatingWindow {
                 countdown = 15;
             }
             function keep() { countdown = 0; previous = null; dp.read(); }
+            // đóng cửa sổ hoặc sang trang khác khi chưa bấm "Giữ thay đổi": coi như không giữ, trả lại như cũ
+            Component.onDestruction: if (countdown > 0 && previous !== null) Settings.display.monitors = previous
             function revert() {
                 if (previous !== null) Settings.display.monitors = previous;
                 countdown = 0;

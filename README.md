@@ -400,8 +400,12 @@ sddm/liquid-glass/   theme màn hình đăng nhập (Main.qml, GlassBox.qml...)
 nvidia/setup-nvidia.sh   nhận card NVIDIA và cài đúng driver
 fonts/               Geist, Geist Mono, Be Vietnam Pro, Onest (giấy phép SIL OFL)
 wallpapers/ridge.png  hình nền mặc định (4K)
+tools/kiem-tra.sh    sổ kiểm tra: tệp nào đổi từ lần soát trước, kiểm tra tự động
+docs/KIEM-TRA.md     đã kiểm tra những gì, bằng cách nào, giới hạn đã biết
 install.sh
 ```
+
+Sửa repo xong, chạy `tools/kiem-tra.sh` để biết tệp nào cần soát lại và `tools/kiem-tra.sh chay` để kiểm tra tự động; cách làm và kết quả các lần soát trước ở `docs/KIEM-TRA.md`.
 
 ## Ghi công
 

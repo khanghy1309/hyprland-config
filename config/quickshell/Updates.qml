@@ -31,7 +31,9 @@ Singleton {
         command: ["sh", "-c",
             "a=$(checkupdates 2>/dev/null | wc -l); "
             + "b=0; command -v yay >/dev/null 2>&1 && b=$(yay -Qua 2>/dev/null | wc -l); "
-            + "c=0; command -v flatpak >/dev/null 2>&1 && c=$(flatpak remote-ls --updates --user --columns=application 2>/dev/null | wc -l); "
+            // Flatpak: đếm cả ứng dụng cài riêng cho bạn (--user) lẫn cài cho cả máy (--system, Kho ứng dụng hay cài kiểu này)
+            + "c=0; command -v flatpak >/dev/null 2>&1 && c=$( { flatpak remote-ls --updates --user --columns=application; "
+            + "flatpak remote-ls --updates --system --columns=application; } 2>/dev/null | sort -u | grep -c . ); "
             + "printf '%s\\n%s\\n%s\\n' \"$a\" \"$b\" \"$c\""]
         stdout: StdioCollector {
             onStreamFinished: {
@@ -70,7 +72,7 @@ Singleton {
         command: ["kitty", "--class", "lg-update", "--title", "Cập nhật phần mềm", "-e", "sh", "-c",
             "echo '== Gói Arch =='; sudo pacman -Syu; "
             + "if command -v yay >/dev/null 2>&1; then echo; echo '== Gói AUR =='; yay -Sua; fi; "
-            + "if command -v flatpak >/dev/null 2>&1; then echo; echo '== Ứng dụng Flatpak =='; flatpak update --user -y; fi; "
+            + "if command -v flatpak >/dev/null 2>&1; then echo; echo '== Ứng dụng Flatpak =='; flatpak update -y; fi; "
             + "echo; echo 'Xong. Nếu có cập nhật kernel, khởi động lại máy để dùng bản mới.'; "
             + "printf 'Bấm Enter để đóng… '; read -r _"]
         onExited: { root.updating = false; root.check(); }

@@ -382,6 +382,8 @@ Item {
         interval: 600
         onTriggered: notesFile.setText(notes.text)
     }
+    // đảo thu lại ngay sau khi gõ (chưa tới 0,6 giây): lưu luôn, không mất mấy chữ cuối
+    Component.onDestruction: if (saveTimer.running) notesFile.setText(notes.text)
 
     // ── dung lượng ổ đĩa ──
     property real diskUsed: 0

@@ -197,7 +197,8 @@ Singleton {
             if (off) L.push("    on-resume = " + off);
             L.push("}", "");
         };
-        add(dim, "brightnessctl -s set 10", "brightnessctl -r", "làm tối màn hình trước khi tắt/khóa");
+        // "10%" chứ không phải "10": số trơn là mức thô của phần cứng (có máy tối đa tới 96000), 10 gần như tắt hẳn đèn
+        add(dim, "brightnessctl -s set 10%", "brightnessctl -r", "làm tối màn hình trước khi tắt/khóa");
         add(P.lockAfter, "loginctl lock-session", "", "khóa màn hình");
         add(P.screenOffAfter, dpmsOff, dpmsOn, "tắt màn hình");
         add(P.sleepAfter, "systemctl suspend", "", "cho máy ngủ");
