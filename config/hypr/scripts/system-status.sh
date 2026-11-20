@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Tình trạng máy in, điểm khôi phục, nén RAM, gói cũ cho Cài đặt (Máy in và máy quét, Sao lưu và bảo trì).
+# Tình trạng máy in, điểm khôi phục, nén RAM, gói cũ, tường lửa cho Cài đặt (Máy in và máy quét, Bảo mật và sao lưu).
 # Chỉ đọc, không cần quyền quản trị. In ra từng dòng  khoá=giá trị  (máy in: printer=tên|trạng thái|mặc định).
 #
 #   system-status.sh printers    dịch vụ in và danh sách máy in
-#   system-status.sh maint       điểm khôi phục, zram, gói cũ
+#   system-status.sh maint       điểm khôi phục, zram, gói cũ, tường lửa
 
 set -uo pipefail
 export LC_ALL=C   # lpstat, swapon... in tiếng Anh để đọc được, không theo ngôn ngữ máy
@@ -48,6 +48,17 @@ maint() {
     systemctl is-enabled --quiet paccache.timer 2>/dev/null && echo "paccache=on" || echo "paccache=off"
     echo "pkgcache=$(du -sb /var/cache/pacman/pkg 2>/dev/null | cut -f1)"
     command -v gnome-disks >/dev/null 2>&1 && echo "disks=yes" || echo "disks=no"
+    # tường lửa: ufw.conf và user.rules ai cũng đọc được, không cần quyền quản trị như "ufw status"
+    if systemctl is-active --quiet firewalld 2>/dev/null; then
+        echo "fw=firewalld"
+    elif grep -qs '^ENABLED=yes' "$ETC/ufw/ufw.conf"; then
+        echo "fw=on"
+    else
+        echo "fw=off"
+    fi
+    command -v ufw >/dev/null 2>&1 && echo "ufwapp=yes" || echo "ufwapp=no"
+    # số luật cho phép đi vào bạn tự thêm (ufw allow ...), đếm theo IPv4
+    echo "fwrules=$(grep -cEs '^### tuple ### (allow|limit)' "$ETC/ufw/user.rules")"
 }
 
 case "${1:-}" in

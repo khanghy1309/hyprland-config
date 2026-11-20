@@ -42,7 +42,8 @@ Script hỏi trước mỗi bước cần `sudo`:
 5. Bật NetworkManager, bluetooth và power-profiles-daemon (cho công tắc tiết kiệm pin).
 6. Máy có card NVIDIA: tự nhận đời card và cài driver hợp (không có card NVIDIA thì bỏ qua, không hỏi gì).
 7. Cài theme đăng nhập vào `/usr/share/sddm/themes/liquid-glass` và bật SDDM nếu máy chưa dùng trình đăng nhập nào khác.
-8. Tuỳ chọn: màn hình khởi động Plymouth.
+8. Hỏi từng phần: dịch vụ in và dò máy in, điểm khôi phục hệ thống (Timeshift), nén RAM (zram), tự dọn gói cũ, tường lửa (ufw).
+9. Tuỳ chọn: màn hình khởi động Plymouth.
 
 ### Card NVIDIA
 
@@ -197,17 +198,18 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 
 **Góc nóng** (như Hot Corners của macOS): đưa chuột vào sát một góc màn hình là làm việc đã chọn cho góc đó: Toàn cảnh, Bảng widget, Trung tâm điều khiển, Launcher, Chụp màn hình, Khóa màn hình, Tắt màn hình. Mặc định chỉ góc trên trái mở Toàn cảnh. Chọn việc cho từng góc ở Cài đặt → Màn hình nền và Dock → *Góc nóng*. Con trỏ phải dừng ở góc khoảng 0,1 giây mới tính, nên lướt chuột qua không mở nhầm. Góc nóng tự tắt khi có cửa sổ toàn màn hình (xem phim, chơi game) hoặc khi bật Chơi game.
 
-**Văn phòng, in ấn, USB, sao lưu** (install.sh cài gói; bước 8 bật dịch vụ, hỏi từng phần):
+**Văn phòng, in ấn, USB, sao lưu, tường lửa** (install.sh cài gói; bước 8 bật dịch vụ, hỏi từng phần):
 - **Văn phòng:** LibreOffice giao diện tiếng Việt mở và lưu được Word, Excel, PowerPoint; bấm đúp tệp `.docx`, `.xlsx`, `.pptx` là mở. Chính tả: có tiếng Anh; kho của Arch chưa có từ điển chính tả tiếng Việt.
 - **Máy in và máy quét** (Cài đặt → Máy in và máy quét): máy in Wi-Fi và máy in USB đời mới tự hiện sau vài giây, không cần cài driver. Máy in HP (hplip) và máy in cũ (gutenprint): bấm *Thêm máy in*. Trang này hiện máy in nào đang sẵn sàng, đang in, đang tắt và số lệnh in đang chờ. *Quét tài liệu* mở ứng dụng quét (máy quét đời mới tự nhận), lưu ra PDF hoặc ảnh.
-- **USB, thẻ nhớ, ổ của Windows:** đọc ghi được exFAT, NTFS, FAT32. Ứng dụng *Ổ đĩa* (Cài đặt → Sao lưu và bảo trì → *Ổ đĩa*) để định dạng; chọn exFAT để dùng chung với Windows và Mac.
-- **Điểm khôi phục hệ thống** (Timeshift; Cài đặt → Sao lưu và bảo trì): trước mỗi lần cài, gỡ hay cập nhật phần mềm, máy tự chụp lại hệ thống (cách nhau ít nhất 30 phút), giữ 5 bản gần nhất, và chụp thêm mỗi ngày một lần. Chỉ chụp hệ thống, không đụng thư mục nhà: quay về thì tài liệu, ảnh vẫn giữ nguyên.
+- **USB, thẻ nhớ, ổ của Windows:** đọc ghi được exFAT, NTFS, FAT32. Ứng dụng *Ổ đĩa* (Cài đặt → Bảo mật và sao lưu → *Ổ đĩa*) để định dạng; chọn exFAT để dùng chung với Windows và Mac.
+- **Điểm khôi phục hệ thống** (Timeshift; Cài đặt → Bảo mật và sao lưu): trước mỗi lần cài, gỡ hay cập nhật phần mềm, máy tự chụp lại hệ thống (cách nhau ít nhất 30 phút), giữ 5 bản gần nhất, và chụp thêm mỗi ngày một lần. Chỉ chụp hệ thống, không đụng thư mục nhà: quay về thì tài liệu, ảnh vẫn giữ nguyên.
   - Ổ gốc Btrfs (subvolume `@`, như archinstall tạo): chụp tức thì, gần như không tốn chỗ. Máy dùng GRUB thì menu khởi động có thêm mục *Arch Linux snapshots*, khởi động thẳng vào bản cũ khi máy hỏng sau cập nhật.
   - Ổ khác (ext4…): sao chép bằng rsync vào `/timeshift`; lần đầu mất vài phút, các lần sau chỉ chép phần đổi.
-  - Máy lỗi sau cập nhật: Cài đặt → Sao lưu và bảo trì → *Mở Timeshift* → chọn điểm khôi phục → *Khôi phục*, rồi khởi động lại. *Chụp ngay* để tự chụp một bản trước khi thử gì đó.
+  - Máy lỗi sau cập nhật: Cài đặt → Bảo mật và sao lưu → *Mở Timeshift* → chọn điểm khôi phục → *Khôi phục*, rồi khởi động lại. *Chụp ngay* để tự chụp một bản trước khi thử gì đó.
 - **Nén RAM (zram):** khi RAM sắp đầy, máy nén bớt phần ít dùng ngay trong RAM thay vì đơ (dùng tối đa nửa RAM, không quá 8 GB). Máy 8 GB mở nhiều tab mượt hơn hẳn.
-- **Tự dọn gói cũ:** mỗi tuần xoá bớt bản cũ của các gói, chỉ giữ 3 bản gần nhất; trang Sao lưu và bảo trì có nút *Dọn gói cũ ngay* và hiện dung lượng đang chiếm.
-- Bật lại hay chỉnh các phần trên: Cài đặt → Sao lưu và bảo trì → *Thiết lập…* (mở `~/.config/hypr/scripts/setup-system.sh` trong terminal, hỏi từng phần, sao lưu tệp hệ thống trước khi sửa).
+- **Tự dọn gói cũ:** mỗi tuần xoá bớt bản cũ của các gói, chỉ giữ 3 bản gần nhất; trang Bảo mật và sao lưu có nút *Dọn gói cũ ngay* và hiện dung lượng đang chiếm.
+- **Tường lửa** (ufw; Cài đặt → Bảo mật và sao lưu): như tường lửa của Windows, chặn mọi kết nối từ máy khác đi vào máy bạn, nên mang laptop ra quán cà phê, sân bay vẫn yên tâm; ứng dụng của bạn vẫn ra mạng bình thường, máy in trong mạng vẫn tìm thấy. Máy đang bật SSH thì script hỏi có cho SSH vào không trước khi bật. Cần mở cổng cho một ứng dụng (ví dụ chơi game mạng LAN, chia sẻ tệp): `sudo ufw allow <cổng>`; xem luật: `sudo ufw status`.
+- Bật lại hay chỉnh các phần trên: Cài đặt → Bảo mật và sao lưu → *Thiết lập…* (mở `~/.config/hypr/scripts/setup-system.sh` trong terminal, hỏi từng phần, sao lưu tệp hệ thống trước khi sửa).
 
 **Công cụ đi kèm** (cài cùng install.sh, chạy sẵn khi đăng nhập):
 - **Giữ nội dung vừa chép** (wl-clip-persist): trên Wayland, chép chữ rồi đóng ứng dụng đó là mất nội dung vừa chép; giờ nội dung vẫn còn để dán, như Windows và Mac.
@@ -237,7 +239,7 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - *Nguồn điện:* tiết kiệm pin / cân bằng / hiệu năng; sau bao lâu thì tắt màn hình, khóa, cho máy ngủ.
 - *Ngày giờ:* tự đặt giờ qua mạng, kiểu 24 giờ hay 12 giờ, đổi múi giờ (tìm theo tên thành phố).
 - *Máy in và máy quét:* danh sách máy in và trạng thái, thêm máy in, lệnh in đang chờ, quét tài liệu.
-- *Sao lưu và bảo trì:* điểm khôi phục (chụp ngay, mở Timeshift), nén RAM, gói cũ (dọn ngay), ứng dụng Ổ đĩa.
+- *Bảo mật và sao lưu:* tường lửa (bật, tắt), điểm khôi phục (chụp ngay, mở Timeshift), nén RAM, gói cũ (dọn ngay), ứng dụng Ổ đĩa.
 - *Ứng dụng mặc định:* mở web, thư mục, ảnh, video, nhạc, PDF, văn bản, tệp nén bằng ứng dụng nào.
 - *Thời tiết:* gõ tên thành phố rồi chọn trong danh sách. Không cần tự tìm toạ độ nữa.
 - *Giới thiệu:* tên máy, phiên bản Hyprland, Quickshell, kernel; kiểm tra cập nhật, mở kho ứng dụng.
@@ -334,7 +336,7 @@ Muốn shell đăng nhập cũng là fish: `chsh -s /usr/bin/fish` (không bắt
 
 Lúc bật máy, trên nền đen: chữ **hello** tự viết ra bằng nét sáng tím hồng, rồi từng đoạn nét trôi như chất lỏng từ trái sang phải và **biến thành chữ ký**; xong chữ ký sáng nhịp nhàng, có ba chấm chờ bên dưới. Máy có ổ đĩa mã hoá thì ô nhập mật khẩu hiện ngay dưới chữ ký. Lúc tắt máy hoặc khởi động lại: chữ ký hiện dần kèm dòng "Đang tắt máy…" / "Đang khởi động lại…".
 
-Cài bằng `./install.sh` (bước 8) hoặc riêng: `./plymouth/install-plymouth.sh`. Script hỏi trước khi sửa `/etc/mkinitcpio.conf` và dòng lệnh kernel (GRUB, systemd-boot hoặc `/etc/kernel/cmdline`), và sao lưu từng file trước khi sửa.
+Cài bằng `./install.sh` (bước 9) hoặc riêng: `./plymouth/install-plymouth.sh`. Script hỏi trước khi sửa `/etc/mkinitcpio.conf` và dòng lệnh kernel (GRUB, systemd-boot hoặc `/etc/kernel/cmdline`), và sao lưu từng file trước khi sửa.
 
 - Xem thử không cần khởi động lại: `sudo plymouthd; sudo plymouth --show-splash; sleep 8; sudo plymouth --quit`
 - Đổi chữ ký hoặc chữ hello: sửa danh sách điểm trong `plymouth/src/anim.html`, rồi chạy `node plymouth/src/render.js /tmp/khung` và `python3 plymouth/src/pack.py /tmp/khung plymouth/liquid-glass`, cập nhật số khung trong `liquid-glass.script` theo `layout.txt`, rồi cài lại.
@@ -388,6 +390,8 @@ Sửa file nào thì Hyprland và Quickshell tự tải lại, không cần đă
 ---
 
 ## Sự cố thường gặp
+
+**Bật tường lửa xong, một ứng dụng không kết nối được với máy khác trong mạng** (game mạng LAN, chia sẻ tệp, truyền lên TV). Tường lửa chặn kết nối đi vào. Xem ứng dụng cần cổng nào rồi mở riêng cổng đó, ví dụ `sudo ufw allow 1714:1764/tcp`; hoặc tạm tắt ở Cài đặt → Bảo mật và sao lưu để thử xem có phải do tường lửa không.
 
 **Góc màn hình hiện thông báo lỗi đỏ.** Đó là lỗi trong cấu hình Hyprland, thông báo ghi tên file và dòng. Gửi nguyên văn thông báo cho mình để sửa. Trong lúc chờ, các phím tắt cơ bản vẫn dùng được.
 
@@ -460,7 +464,7 @@ config/
     hyprlock.conf     màn hình khóa
     hypridle.conf     tự khóa khi không dùng máy
     scripts/wallpaper.sh, capture.sh, vndate.sh, battery.sh, gamemode.sh, theme-apps.sh,
-                      setup-system.sh (máy in, điểm khôi phục, zram, dọn gói), system-status.sh
+                      setup-system.sh (máy in, điểm khôi phục, zram, dọn gói, tường lửa), system-status.sh
   quickshell/
     shell.qml         điểm vào
     Theme.qml         màu, phông, kích thước

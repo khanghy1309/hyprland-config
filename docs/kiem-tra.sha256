@@ -1,8 +1,8 @@
 # Mốc kiểm tra của repo (tools/kiem-tra.sh ghi). Không sửa tay.
-# lúc: 2026-11-20 12:01 +0700
-# commit gốc: 87139dc
+# lúc: 2026-11-20 18:18 +0700
+# commit gốc: ed62ca7
 d573008f5adf0504005552d750fcb0ae228300804a1014d67f98423a54fc1407  .gitignore
-d5cf538faf600bd5ff60452165a65bc8d0eaf329030212a3aefb74d27d4e02e8  README.md
+3f65406cf84df3513e116ba4baba74dd8d495801ace723f5e294be17b9b0a438  README.md
 60cb32063bcdc2feee6421bcba37906dcd5c9b20325826d2c4d29c9e77cb9cfd  THIRD_PARTY_NOTICES.md
 c345a57d995bed37283a4f9f3d087ae0e9a6fd5565b493b58f0f6f2a443b8855  config/applications/claude-code.desktop
 2346e3b601220a7b0d1b1099fc7db25f701466d99f721733240ba5a5478f3539  config/applications/liquid-glass-settings.desktop
@@ -23,8 +23,8 @@ b59a52d866d940637144e8f43c88145ddb97b12a9214fdeb8781cf2fff312ebc  config/hypr/lg
 108e24f73ab68a522bea6d2a5341a551648a88b8e73ee625955cd4849532e81e  config/hypr/scripts/battery.sh
 f4f92dd3b198377f79b9eb6d961f07379bf05ec70844c31e509628e9d8b13995  config/hypr/scripts/capture.sh
 1cb3db328a2f0b6383e1c598f8a21ee919498e96f159331714625a7801b3041a  config/hypr/scripts/gamemode.sh
-bdd4eab477db58ec94c6527191292edad03e75e6435071e2f1b5c0f00bee79b8  config/hypr/scripts/setup-system.sh
-34f006b2c8d1aa1c4970ca120825f8a2e7d357c5fc0fdea91b6c3eae01ce357d  config/hypr/scripts/system-status.sh
+27337cf7bd3127811815ca2cf2cb0a540039f2c22469c33e67f1624b992878f6  config/hypr/scripts/setup-system.sh
+de83ecb1963473d311708c6a160a97672cb70d275a9d1a6221a9af2f25f7ba28  config/hypr/scripts/system-status.sh
 e477d15d64eeb05614d9d325754661c25c04e19ccee5f86f7c36b9e40984a310  config/hypr/scripts/theme-apps.sh
 2757f041ab63f3c323ae1311f0b957affe3c62df00d907eef8786a7ffcd9adb2  config/hypr/scripts/vndate.sh
 374bbae9123015859e8d06e3b239d7e991224053d042de9a7cdc1e6bf2cf325f  config/hypr/scripts/wallpaper.sh
@@ -75,7 +75,7 @@ d40f863e6db6fcc7d3fda1a847aa674d35005391a55dc1f74abd862b98fe3afa  config/quicksh
 032a567445fabec40864d6f521518a6e9c664937e073c9ba0bf20d22ba6424b6  config/quickshell/Recorder.qml
 216c8d1371482d8020d38e1f8fd37176b33816ec63dab471b2b18c70c460be73  config/quickshell/SafeShot.qml
 6e72638373988abdc7fe6945c3bbdeea0a4783ee64165f77d73dddd50ccf151b  config/quickshell/Settings.qml
-f5a095cbb4ced6a60c43ecbbb81eeab5f6fe919875616438794213d359bb6855  config/quickshell/SettingsApp.qml
+485e5d0b5848fe9e1dcf75288d0a7769310140e0010d0c80e88ecbe2f2cf74de  config/quickshell/SettingsApp.qml
 3542da923ff2354271aa7f3af574cfbbd6e69173291afe05a84c952d9c124bb0  config/quickshell/Spring.qml
 05865d3749fc386ea744bfe5b2f14f2ec7187998234e9ef5c18d10f42fe10bed  config/quickshell/Switcher.qml
 282740c8c3a040555a530e94e983bb4eb7ad182d7e2e948cc35aa11a510803e5  config/quickshell/SysStats.qml
@@ -112,7 +112,7 @@ a464348abe41a6392f18d04c0ac2ad3c26619357ff5fdd76aff3059116f45e62  fonts/geist/Ge
 fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602  fonts/open-sans/OFL.txt
 fe269381e992f32e135801740998544d6235061e37c93ec067ad2be3edd5b17b  fonts/open-sans/OpenSans-Italic[wdth,wght].ttf
 36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878  fonts/open-sans/OpenSans[wdth,wght].ttf
-01ed7223c5ee7ca34c2df3a62d066c8cc44419ac6e13a8ecb159ae43fe70274c  install.sh
+e278a3acd8b3a54d7cf43952f4aaa3f5f5e17fcaef2bae985149aeaf80a72136  install.sh
 b65d6b4c8b30b10b2a3558a96ca6463dd5fbdb8fedf658a5ea9e5effec993dd5  nvidia/setup-nvidia.sh
 68998e1ca6af51469ff76e7bf9c1b30d4065255abe047e9236639629b8274fa5  plymouth/install-plymouth.sh
 1f1d8b276e42b163cce0b53edc2cb79d9e3cc9f888067580120aa3500159f5d8  plymouth/liquid-glass/box.png

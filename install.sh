@@ -77,6 +77,8 @@ PKGS=(
     exfatprogs ntfs-3g dosfstools gnome-disk-utility
     # điểm khôi phục hệ thống (config/hypr/scripts/setup-system.sh), nén RAM
     timeshift cronie zram-generator
+    # tường lửa: chặn kết nối từ ngoài vào (bật ở bước 8, setup-system.sh)
+    ufw
     # phím Fn và nhạc
     brightnessctl playerctl
     # đảo động và trung tâm điều khiển: sóng âm, ánh sáng đêm, tiết kiệm pin
@@ -439,8 +441,8 @@ if ask "Cài theme đăng nhập Liquid Glass vào $THEME_DIR (cần sudo)?"; th
 fi
 echo
 
-# ───────────────────────── máy in, điểm khôi phục, zram, dọn gói ─────────────────────────
-bold "8. Máy in, điểm khôi phục hệ thống, nén RAM, dọn gói cũ"
+# ───────────────────────── máy in, điểm khôi phục, zram, dọn gói, tường lửa ─────────────────────────
+bold "8. Máy in, điểm khôi phục hệ thống, nén RAM, dọn gói cũ, tường lửa"
 bash "$HERE/config/hypr/scripts/setup-system.sh" || warn "Phần này chưa xong; chạy lại: ~/.config/hypr/scripts/setup-system.sh"
 echo
 

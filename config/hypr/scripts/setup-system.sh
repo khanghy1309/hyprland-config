@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Những thứ một máy dùng hằng ngày cần mà Arch không tự bật: máy in và máy quét, điểm khôi phục
-# hệ thống trước mỗi lần cập nhật, zram (nén RAM) và tự dọn gói cài đặt cũ.
+# hệ thống trước mỗi lần cập nhật, zram (nén RAM), tự dọn gói cài đặt cũ và tường lửa.
 # Chạy riêng được (~/.config/hypr/scripts/setup-system.sh, hoặc nút Thiết lập trong Cài đặt →
-# Sao lưu và bảo trì) hoặc qua ./install.sh (bước 8).
+# Bảo mật và sao lưu) hoặc qua ./install.sh (bước 8).
 #
 #   setup-system.sh             hỏi trước từng phần
 #   setup-system.sh --dry-run   chỉ in ra sẽ làm gì, không đổi gì
@@ -17,6 +17,7 @@
 #   LG_ROOTFS, LG_FSROOT, LG_ROOTSRC   kiểu ổ, subvolume và thiết bị của thư mục gốc
 #   LG_UUID, LG_PARENT_UUID            UUID của ổ gốc và của phân vùng mã hoá chứa nó
 #   LG_BOOT       grub | systemd-boot | other
+#   LG_UFW        lệnh thay cho ufw
 #   LG_YES=1      đồng ý hết, không hỏi
 
 set -uo pipefail
@@ -242,6 +243,34 @@ bold "Tự dọn gói cài đặt cũ"
 info "Mỗi lần cập nhật, bản cũ của gói được giữ lại trong /var/cache/pacman/pkg; lâu dần chiếm nhiều GB."
 if ask "Mỗi tuần tự xoá bớt, chỉ giữ 3 bản gần nhất của mỗi gói (paccache.timer)?"; then
     svc enable --now paccache.timer
+fi
+echo
+
+# ───────────────────────── 5. tường lửa ─────────────────────────
+bold "Tường lửa"
+UFW="${LG_UFW:-ufw}"
+if [[ -z ${LG_UFW:-} ]] && ! command -v ufw >/dev/null 2>&1; then
+    warn "Chưa có ufw (cài bằng: sudo pacman -S ufw), bỏ qua."
+elif "$SYSTEMCTL" is-active --quiet firewalld 2>/dev/null; then
+    info "Máy đang dùng firewalld: giữ nguyên."
+elif grep -qs '^ENABLED=yes' "$ETC/ufw/ufw.conf"; then
+    info "Tường lửa đã bật."
+else
+    info "Chặn mọi kết nối từ máy khác đi vào máy bạn, như tường lửa của Windows. Ứng dụng của bạn vẫn"
+    info "ra mạng bình thường; máy in trong mạng vẫn tìm thấy (luật sẵn có của ufw cho mDNS)."
+    if ask "Bật tường lửa (ufw)?"; then
+        # máy đang cho đăng nhập từ xa: hỏi trước, kẻo bật xong thì bị chặn ngoài
+        if "$SYSTEMCTL" is-enabled --quiet sshd.service 2>/dev/null \
+            && ask "Máy đang bật SSH: vẫn cho đăng nhập từ xa qua SSH (cổng 22)?"; then
+            run "$UFW" allow ssh
+        fi
+        if run "$UFW" default deny incoming && run "$UFW" default allow outgoing && run "$UFW" --force enable; then
+            # ufw.service nạp lại luật mỗi lần khởi động (Arch wiki: Uncomplicated Firewall)
+            svc enable --now ufw.service
+        else
+            warn "Chưa bật được tường lửa."
+        fi
+    fi
 fi
 echo
 exit 0

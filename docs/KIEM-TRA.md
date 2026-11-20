@@ -119,6 +119,25 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (tối): tường lửa ufw
+
+- **Gói:** `ufw` 0.36.2 có trong `extra.db`. Đọc gói tải từ mirror:
+  - `/etc/ufw/ufw.conf` (`ENABLED=no` lúc mới cài), `user.rules` và `/etc/default/ufw` đều quyền 644. Vì vậy Cài đặt đọc được tình trạng mà không cần `sudo ufw status`.
+  - `ufw.service` chạy `ufw-init start` lúc khởi động.
+  - `before.rules` sẵn có cho qua DHCP, mDNS (224.0.0.251:5353) và UPnP (239.255.255.250:1900); `before6.rules` cho qua mDNS IPv6 (ff02::fb, lấy từ mã nguồn ufw trên git.launchpad.net). Nhờ vậy vẫn dò thấy máy in trong mạng sau khi bật.
+- **Mã nguồn ufw:**
+  - Mỗi luật trong `user.rules` có dòng `### tuple ### <hành động> …` (`backend_iptables.py`); hành động là `allow`, `limit`, có thể kèm `_log`, nên đếm số cổng mở theo mẫu `(allow|limit)`.
+  - `ufw enable` chỉ hỏi lại khi chạy qua SSH (`under_ssh`). Script và nút trong Cài đặt vẫn dùng `--force` cho chắc.
+- **`setup-system.sh` phần 5:** chạy thử với `/etc` giả, ufw và systemctl giả, các trường hợp:
+  - Bật: gọi đúng thứ tự `default deny incoming`, `default allow outgoing`, `--force enable`, rồi `systemctl enable --now ufw.service`.
+  - Chạy lần hai: báo "đã bật", không gọi lại.
+  - sshd đang bật: hỏi rồi `ufw allow ssh` trước khi bật tường lửa.
+  - `--dry-run`: chỉ in lệnh, không gọi ufw.
+  - firewalld đang chạy: giữ nguyên, không cài chồng.
+- **`system-status.sh maint`:** in `fw=on|off|firewalld`, `ufwapp`, `fwrules`. Đã thử với `ufw.conf` và `user.rules` giả có một luật: ra `fw=on`, `fwrules=1`.
+- **Cài đặt:** trang đổi tên thành *Bảo mật và sao lưu*, thêm nhóm *Tường lửa* (nút Bật / Tắt qua pkexec, một lần hỏi mật khẩu). Bản giả đúng cả lúc bật lẫn lúc tắt. Chuỗi "bật · chặn kết nối từ ngoài vào" bị cắt vì dài quá, nên rút còn "bật · chặn mọi kết nối vào" / "bật · mở N cổng".
+- **Chưa thử trên máy thật:** bật ufw thật (cần iptables-nft trong kernel), truyền hình (cast) từ Edge lên TV khi tường lửa bật. Câu trả lời dò thiết bị qua SSDP có thể là gói unicast tới cổng ngẫu nhiên, không chắc qua được.
+
 ### 2026-11-20 (chiều): terminal, Claude Code, Microsoft Edge thay Firefox
 
 - **Tên gói:** đối chiếu với `core.db` / `extra.db` tải từ mirror chính thức hôm nay: cả 123 gói trong `PKGS` đều có. Mới thêm: fish 4.9.3, starship 1.27.0, fastfetch 2.71.0, eza, bat, zoxide, fzf 0.75 (có `fzf --fish`), ripgrep, btop, tealdeer, man-db, man-pages, git, nano, ttf-cascadia-code. Đã bỏ `firefox`.

@@ -33,7 +33,7 @@ FloatingWindow {
         { id: "power",     label: "Nguồn điện",           path: "M13 3L5 14h6l-1 7 8-11h-6l1-7z" },
         { id: "datetime",  label: "Ngày giờ",             path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2" },
         { id: "printers",  label: "Máy in và máy quét",   path: "M7 8V3h10v5M6 17H4v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6h-2M7 14h10v7H7z" },
-        { id: "maint",     label: "Sao lưu và bảo trì",   path: "M4 12a8 8 0 1 0 2.3-5.6M4 4v5h5M12 8v4l3 2" },
+        { id: "maint",     label: "Bảo mật và sao lưu",   path: "M4 12a8 8 0 1 0 2.3-5.6M4 4v5h5M12 8v4l3 2" },
         { id: "apps",      label: "Ứng dụng mặc định",    path: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" },
         { id: "weather",   label: "Thời tiết",            path: Icons.cloud },
         { id: "about",     label: "Giới thiệu",           path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8h.01" }
@@ -2140,7 +2140,7 @@ FloatingWindow {
         }
     }
 
-    // ── Sao lưu và bảo trì ──
+    // ── Bảo mật và sao lưu ──
     Component {
         id: maintPage
         Column {
@@ -2177,7 +2177,31 @@ FloatingWindow {
                     "_", ok, fail].concat(args));
             }
 
-            PageTitle { text: "Sao lưu và bảo trì" }
+            PageTitle { text: "Bảo mật và sao lưu" }
+
+            Group {
+                title: "Tường lửa"
+                InfoRow {
+                    label: "Tường lửa"
+                    value: mp.st.fw === "on"
+                        ? "bật" + ((parseInt(mp.st.fwrules) || 0) > 0 ? " · mở " + parseInt(mp.st.fwrules) + " cổng" : " · chặn mọi kết nối vào")
+                        : mp.st.fw === "firewalld" ? "bật · do firewalld quản lý"
+                        : mp.st.fw === "off" ? "đang tắt" : ""
+                }
+                ButtonsRow {
+                    // pkexec chạy cả chuỗi bằng quyền quản trị: một lần hỏi mật khẩu
+                    buttons: mp.st.fw === "on"
+                        ? [["Tắt tường lửa", () => mp.admin(["ufw", "disable"], "Đã tắt tường lửa", "Chưa tắt được tường lửa")]]
+                        : [["Bật tường lửa", () => mp.admin(["sh", "-c",
+                              "ufw default deny incoming && ufw default allow outgoing && ufw --force enable && systemctl enable --now ufw.service"],
+                              "Đã bật tường lửa", "Chưa bật được tường lửa")]]
+                    enabled: mp.st.ufwapp === "yes" && mp.st.fw !== "firewalld"
+                    note: mp.st.ufwapp === "no" && mp.st.fw !== "firewalld"
+                        ? "Cần gói ufw: sudo pacman -S ufw"
+                        : "Như tường lửa của Windows: máy khác trong mạng (quán cà phê, sân bay) không tự kết nối vào máy bạn được. Ứng dụng của bạn vẫn ra mạng bình thường, máy in trong mạng vẫn tìm thấy. Cần mở thêm cổng cho một ứng dụng: sudo ufw allow <cổng>."
+                    last: true
+                }
+            }
 
             Group {
                 title: "Điểm khôi phục hệ thống"
@@ -2218,7 +2242,7 @@ FloatingWindow {
                     buttons: [["Dọn gói cũ ngay", () => mp.admin(["paccache", "-rk2"], "Đã dọn gói cũ", "Chưa dọn được gói cũ")],
                               ["Ổ đĩa", () => Quickshell.execDetached(["gnome-disks"])],
                               ["Thiết lập…", () => mp.setup()]]
-                    note: "Dọn gói cũ giữ lại 2 bản gần nhất của mỗi gói. Ổ đĩa: định dạng USB, thẻ nhớ (exFAT cho cả Windows lẫn Mac). Thiết lập: bật zram, tự dọn gói, máy in, điểm khôi phục."
+                    note: "Dọn gói cũ giữ lại 2 bản gần nhất của mỗi gói. Ổ đĩa: định dạng USB, thẻ nhớ (exFAT cho cả Windows lẫn Mac). Thiết lập: bật zram, tự dọn gói, máy in, điểm khôi phục, tường lửa."
                     last: true
                 }
             }
