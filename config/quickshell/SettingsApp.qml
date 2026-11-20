@@ -289,14 +289,26 @@ FloatingWindow {
                 }
             }
 
+            // Segoe UI (phông của Windows) không được phép đi kèm bộ cài; máy nào đã chép từ
+            // Windows sang (xem README, mục Phông chữ của Windows) thì hiện thêm lựa chọn này
+            Process {
+                running: true
+                command: ["sh", "-c", "fc-list -q 'Segoe UI' && echo yes"]
+                stdout: StdioCollector { onStreamFinished: fontGroup.hasSegoe = text.trim() === "yes" }
+            }
+
             Group {
+                id: fontGroup
+                property bool hasSegoe: false
                 title: "Phông chữ"
                 Repeater {
                     // [tên phông, mô tả]; tất cả đều đủ dấu tiếng Việt và đi kèm bộ cài
                     model: [["Geist", "Gọn, hiện đại, gần với phông của macOS"],
+                            ["Open Sans", "Cùng người thiết kế với Segoe UI của Windows, nhìn rất quen"],
                             ["Inter", "Rõ ở cỡ nhỏ, rất phổ biến"],
                             ["Be Vietnam Pro", "Thiết kế riêng cho tiếng Việt, dấu đặt đẹp"],
                             ["Onest", "Tròn, mềm, thân thiện"]]
+                        .concat(fontGroup.hasSegoe ? [["Segoe UI", "Phông của Windows 10 và 11, chép từ máy Windows của bạn"]] : [])
                     delegate: PickRow {
                         required property var modelData
                         label: "Thứ Sáu, 13 tháng 11 · " + modelData[0]

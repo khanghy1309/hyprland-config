@@ -215,7 +215,7 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 
 **Cài đặt** (`Super + ,`, hoặc gõ "cài đặt" trong launcher): một cửa sổ kính, đổi gì là áp dụng ngay, không có nút Lưu.
 - *Màn hình nền và Dock:* hiện / tự ẩn dock, phóng to biểu tượng, kích thước biểu tượng, bố cục cửa sổ (xếp ô / cuộn ngang), terminal nhường chỗ, đặt cửa sổ khi kéo chạm mép, góc nóng (một màn hình thu nhỏ, mỗi góc một nút chọn việc), ứng dụng ghim.
-- *Giao diện:* kiểu kính của cửa sổ, cửa sổ dẻo, mờ khi chuyển động, nút trên thanh tiêu đề ứng dụng, phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kính của cửa sổ (acrylic / mờ thường / tắt), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, màu thư mục, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
+- *Giao diện:* kiểu kính của cửa sổ, cửa sổ dẻo, mờ khi chuyển động, nút trên thanh tiêu đề ứng dụng, phông chữ (Geist mặc định, Open Sans, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt; thêm Segoe UI nếu đã chép từ Windows, xem *Phông chữ của Windows*), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, màu thư mục, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
 - *Hình nền:* bấm vào ảnh để đổi. Video và GIF có nhãn ở góc. Chọn lúc nào video tạm dừng (khi có cửa sổ toàn màn hình, khi có bất kỳ cửa sổ nào, hoặc không bao giờ), có dùng ảnh tĩnh khi chạy pin không, và hiệu ứng khi đổi ảnh.
 - *Touchpad và bàn phím:* cuộn tự nhiên, chạm để bấm, tắt touchpad khi gõ, tốc độ cuộn và con trỏ, bật/tắt từng cử chỉ, tốc độ lặp phím (có ô gõ thử).
 - *Wi-Fi:* bật/tắt, danh sách mạng xung quanh, bấm để kết nối (mạng có khoá thì hiện ô mật khẩu ngay bên dưới), quên mạng, ngắt kết nối.
@@ -321,6 +321,14 @@ hoặc bấm `Super + Shift + W` để chọn ngẫu nhiên. Hình nền đượ
 - Video dùng `mpvpaper` (cài ở bước 2). Video không có tiếng, tự lặp, **tự tạm dừng khi bị che hoặc khi có cửa sổ toàn màn hình**. Hình nền video vẫn tốn pin hơn ảnh tĩnh vì lớp kính phải làm mờ lại liên tục, nên khi dùng pin bạn nên chuyển về ảnh tĩnh.
 
 ---
+
+## Phông chữ của Windows
+
+Windows 10 và 11 dùng phông **Segoe UI**. Phông này thuộc bản quyền của Microsoft, chỉ được dùng kèm Windows, nên bộ cài này không mang theo được.
+
+- **Có sẵn, giống nhất:** *Open Sans* (Cài đặt → Giao diện → Phông chữ). Open Sans do Steve Matteson vẽ, cũng là người vẽ Segoe UI, nên dáng chữ rất giống và nhìn quen. Phông này đủ dấu tiếng Việt và đi kèm bộ cài.
+- **Không chọn Selawik:** Microsoft có làm Selawik, một phông mở thay cho Segoe UI, nhưng nó thiếu chữ tiếng Việt (ơ, ư, ạ, ế…). Vì vậy bộ cài không dùng Selawik.
+- **Muốn đúng Segoe UI:** nếu bạn có máy Windows có bản quyền (kể cả Windows trên cùng máy này), chép các tệp `segoeui*.ttf`, `seguisb.ttf`, `seguisbi.ttf`, `seguisl.ttf`, `seguili.ttf` (và `SegUIVar.ttf` của Windows 11) trong `C:\Windows\Fonts` sang thư mục `~/.local/share/fonts/` của máy này. Đăng xuất rồi vào lại, mục *Segoe UI* sẽ tự hiện trong Cài đặt → Giao diện → Phông chữ.
 
 ## Tuỳ chỉnh
 
@@ -458,7 +466,7 @@ config/
     kitty.conf, glass-theme.conf
 sddm/liquid-glass/   theme màn hình đăng nhập (Main.qml, GlassBox.qml...)
 nvidia/setup-nvidia.sh   nhận card NVIDIA và cài đúng driver
-fonts/               Geist, Geist Mono, Be Vietnam Pro, Onest (giấy phép SIL OFL)
+fonts/               Geist, Geist Mono, Open Sans, Be Vietnam Pro, Onest (giấy phép SIL OFL)
 wallpapers/ridge.png  hình nền mặc định (4K)
 tools/kiem-tra.sh    sổ kiểm tra: tệp nào đổi từ lần soát trước, kiểm tra tự động
 docs/KIEM-TRA.md     đã kiểm tra những gì, bằng cách nào, giới hạn đã biết

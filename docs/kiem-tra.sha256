@@ -1,8 +1,8 @@
 # Mốc kiểm tra của repo (tools/kiem-tra.sh ghi). Không sửa tay.
-# lúc: 2026-11-20 11:25 +0700
-# commit gốc: 1cafa8a
+# lúc: 2026-11-20 11:30 +0700
+# commit gốc: 0f09621
 d573008f5adf0504005552d750fcb0ae228300804a1014d67f98423a54fc1407  .gitignore
-4a282a0b152f0d2e7c9911f2572a63017cec54b82bf37f6a213e784d9c14951e  README.md
+fbf5cae4dcb5d27a765a77148381867d82c888616487633114cf1f22de750b0c  README.md
 60cb32063bcdc2feee6421bcba37906dcd5c9b20325826d2c4d29c9e77cb9cfd  THIRD_PARTY_NOTICES.md
 2346e3b601220a7b0d1b1099fc7db25f701466d99f721733240ba5a5478f3539  config/applications/liquid-glass-settings.desktop
 241f0469431aaecdf182c8ba02d950743abaf43c2569d523b83a0b3632b1c783  config/hypr/hypridle.conf
@@ -69,8 +69,8 @@ d40f863e6db6fcc7d3fda1a847aa674d35005391a55dc1f74abd862b98fe3afa  config/quicksh
 9076f8f89a21790b56cccac0a5561d23c01c81ef8d10eb32115cd015b5f9bc8f  config/quickshell/PowerMenu.qml
 032a567445fabec40864d6f521518a6e9c664937e073c9ba0bf20d22ba6424b6  config/quickshell/Recorder.qml
 216c8d1371482d8020d38e1f8fd37176b33816ec63dab471b2b18c70c460be73  config/quickshell/SafeShot.qml
-515ea71947848f6c86f80bab19ed2250dcc6eade9b1f56739cefc5ef8be69144  config/quickshell/Settings.qml
-dd85d989882cbecc0da108b538d26a51dd202f6bb941be3e9920f0669ee89a1f  config/quickshell/SettingsApp.qml
+2247e7bc5fb6f08be5f266470664a939af240305edf006cfe6444bd14f833c2d  config/quickshell/Settings.qml
+4e807310917c558e3e7b3b5e785f9b58ba3e1c14f62606bfa2b25ab89f7a5ea4  config/quickshell/SettingsApp.qml
 3542da923ff2354271aa7f3af574cfbbd6e69173291afe05a84c952d9c124bb0  config/quickshell/Spring.qml
 05865d3749fc386ea744bfe5b2f14f2ec7187998234e9ef5c18d10f42fe10bed  config/quickshell/Switcher.qml
 282740c8c3a040555a530e94e983bb4eb7ad182d7e2e948cc35aa11a510803e5  config/quickshell/SysStats.qml
@@ -103,7 +103,10 @@ a464348abe41a6392f18d04c0ac2ad3c26619357ff5fdd76aff3059116f45e62  fonts/geist/Ge
 1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f  fonts/geist/OFL.txt
 071195d8806e226faeee60259c28ca67b458227af5195a73f5cfcab06e3003bc  fonts/onest/OFL.txt
 966c5c29b4755da84b6854d5c21dd4eaa2420225d0e9874de602de176d4a9f31  fonts/onest/Onest[wght].ttf
-4d81236a157a85fb309c7acb3250eec4aaf1f1f238c2e63a5cca5b2a316affde  install.sh
+fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602  fonts/open-sans/OFL.txt
+fe269381e992f32e135801740998544d6235061e37c93ec067ad2be3edd5b17b  fonts/open-sans/OpenSans-Italic[wdth,wght].ttf
+36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878  fonts/open-sans/OpenSans[wdth,wght].ttf
+de36fa7bf1b72c37e24ae62995020ea2a98073ab99ed795b16870e140d4f91e3  install.sh
 b65d6b4c8b30b10b2a3558a96ca6463dd5fbdb8fedf658a5ea9e5effec993dd5  nvidia/setup-nvidia.sh
 68998e1ca6af51469ff76e7bf9c1b30d4065255abe047e9236639629b8274fa5  plymouth/install-plymouth.sh
 1f1d8b276e42b163cce0b53edc2cb79d9e3cc9f888067580120aa3500159f5d8  plymouth/liquid-glass/box.png

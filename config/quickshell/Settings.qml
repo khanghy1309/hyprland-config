@@ -59,7 +59,7 @@ Singleton {
                 property bool borders: true
                 property bool animations: true
                 property real animScale: 1           // 0,7 nhanh · 1 vừa · 1,4 chậm
-                property string font: "Geist"         // Geist | Inter | Be Vietnam Pro | Onest
+                property string font: "Geist"         // Geist | Open Sans | Inter | Be Vietnam Pro | Onest | Segoe UI (nếu đã chép từ Windows)
                 property string monoFont: "Geist Mono" // Geist Mono | JetBrains Mono
                 property string material: "liquid"   // liquid | rim | flat  (xem Glass.qml)
                 property bool refractVideo: false    // khúc xạ cả khi hình nền là video (dùng một khung hình tĩnh)

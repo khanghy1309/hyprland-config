@@ -220,12 +220,12 @@ fi
 echo
 
 # ───────────────────────── phông chữ ─────────────────────────
-# Geist, Geist Mono, Be Vietnam Pro, Onest (giấy phép SIL OFL, đủ dấu tiếng Việt).
+# Geist, Geist Mono, Open Sans, Be Vietnam Pro, Onest (giấy phép SIL OFL, đủ dấu tiếng Việt).
 # Cài cho cả máy để màn hình đăng nhập (chạy bằng tài khoản sddm) cũng dùng được.
 FONT_DIR=/usr/local/share/fonts/liquid-glass
 if sudo mkdir -p "$FONT_DIR" && sudo cp -r "$HERE/fonts/." "$FONT_DIR/"; then
     fc-cache -f >/dev/null 2>&1 || true
-    info "Đã cài phông Geist, Be Vietnam Pro, Onest (đổi trong Cài đặt → Giao diện)"
+    info "Đã cài phông Geist, Open Sans, Be Vietnam Pro, Onest (đổi trong Cài đặt → Giao diện)"
 else
     warn "Chưa cài được phông chữ (cần sudo). Giao diện sẽ dùng phông dự phòng; chạy lại script để cài."
 fi

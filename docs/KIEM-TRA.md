@@ -119,6 +119,15 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (trưa): phông chữ giống Windows
+
+- Đã đếm bằng fontTools đủ 67 chữ tiếng Việt có dấu, cả hoa lẫn thường:
+  - Open Sans (bản biến thiên của Google Fonts, giấy phép OFL) đủ hết;
+  - Noto Sans đủ hết;
+  - Selawik (phông mở của Microsoft thay Segoe UI) thiếu ơ, ư, ĩ, ũ và mọi chữ có dấu nặng, hỏi, ngã, nên không dùng.
+- Segoe UI là phông có bản quyền của Microsoft, nên không đi kèm. Nếu máy có Segoe UI (`fc-list -q 'Segoe UI'`), Cài đặt hiện thêm lựa chọn này.
+- Bản giả: danh sách phông hiện Open Sans đúng mặt chữ. Không lỗi.
+
 ### 2026-11-20 (trưa, sau): bốn công cụ đi kèm
 
 - **wl-clip-persist**: chạy khi đăng nhập với `--clipboard regular`, theo README của công cụ. Không dùng `both`, để không đụng vùng chọn chuột giữa.
