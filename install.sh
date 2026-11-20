@@ -26,6 +26,26 @@ ask()   { local a; read -r -p "  ? $1 [y/N] " a; [[ "${a,,}" == y* ]]; }
 # bước bắt buộc: Enter là đồng ý
 ask_y() { local a; read -r -p "  ? $1 [Y/n] " a; [[ -z "$a" || "${a,,}" == y* ]]; }
 
+# Thiếu những lệnh này thì sau khi đăng nhập chỉ thấy màn hình tối và con trỏ chuột
+check_need() {
+    local NEED=(Hyprland:hyprland qs:quickshell awww:awww kitty:kitty fish:fish hypridle:hypridle hyprlock:hyprlock
+                fcitx5:fcitx5 jq:jq wl-paste:wl-clipboard cliphist:cliphist)
+    local LACK=() n
+    for n in "${NEED[@]}"; do command -v "${n%%:*}" >/dev/null 2>&1 || LACK+=("${n#*:}"); done
+    if ((${#LACK[@]} > 0)); then
+        printf '\n\033[1;31m  ✗ CHƯA CÀI ĐỦ: %s\033[0m\n' "${LACK[*]}"
+        warn "Thiếu các gói này thì đăng nhập vào sẽ chỉ thấy màn hình tối. Cài rồi đăng nhập lại:"
+        warn "  sudo pacman -Syu --needed ${LACK[*]}"
+        echo
+        return 1
+    fi
+    printf '\n\033[1;32m  ✓ Đã đủ các gói chính.\033[0m\n\n'
+}
+
+# ./install.sh --goi : chỉ cài gói (bước 1) rồi kiểm tra, không hỏi gì khác
+ONLY_PKGS=0
+[[ ${1:-} == --goi ]] && ONLY_PKGS=1
+
 # ───────────────────────── kiểm tra ─────────────────────────
 if [[ $EUID -eq 0 ]]; then
     echo "Đừng chạy script này bằng sudo/root. Chạy bằng tài khoản thường: ./install.sh"
@@ -117,7 +137,9 @@ info "${#PKGS[@]} gói, gói nào có rồi sẽ được bỏ qua. Bước này
 if ask_y "Cập nhật máy và cài bằng sudo pacman?"; then
     # Arch không hỗ trợ cập nhật một phần: cài gói mới lên hệ thống chưa cập nhật dễ vỡ phụ thuộc
     # (pacman từ chối cả loạt). Nên cập nhật cả máy trước, rồi mới lọc và cài.
-    sudo pacman -Syu || warn "Cập nhật máy chưa xong; vẫn thử cài các gói."
+    # khoá ký gói trước: máy cài từ ISO cũ hay báo "invalid or corrupted package (PGP signature)"
+    sudo pacman -Sy --needed --noconfirm archlinux-keyring || warn "Chưa cập nhật được archlinux-keyring."
+    sudo pacman -Su || warn "Cập nhật máy chưa xong; vẫn thử cài các gói."
     # Một tên gói không còn trong kho (bị đổi tên, bị gỡ) sẽ làm pacman từ chối cài TẤT CẢ.
     # Lọc trước: gói nào kho không có thì báo ra và bỏ qua, phần còn lại vẫn cài.
     mapfile -t AVAILABLE < <(pacman -Slq 2>/dev/null | sort -u)
@@ -154,6 +176,10 @@ else
     warn "Bỏ qua. Các phần cần gói còn thiếu sẽ không chạy (thanh trên, hình nền… sẽ không hiện)."
 fi
 echo
+if ((ONLY_PKGS)); then
+    check_need && info "Khởi động lại máy (gõ reboot) rồi đăng nhập." || true
+    exit 0
+fi
 
 # ───────────────────────── AUR (tuỳ chọn) ─────────────────────────
 bold "2. Gói AUR: trình duyệt Microsoft Edge; tuỳ chọn: hình nền video (mpvpaper), thông tin máy (hyprsysteminfo)"
@@ -474,18 +500,7 @@ if ask "Cài màn hình khởi động? (sẽ hỏi trước khi sửa mkinitcpi
 fi
 echo
 
-# ───────────────────────── kiểm tra lần cuối ─────────────────────────
-# Thiếu những lệnh này thì sau khi đăng nhập chỉ thấy màn hình tối và con trỏ chuột
-NEED=(Hyprland:hyprland qs:quickshell awww:awww kitty:kitty fish:fish hypridle:hypridle hyprlock:hyprlock
-      fcitx5:fcitx5 jq:jq wl-paste:wl-clipboard cliphist:cliphist)
-LACK=()
-for n in "${NEED[@]}"; do command -v "${n%%:*}" >/dev/null 2>&1 || LACK+=("${n#*:}"); done
-if ((${#LACK[@]} > 0)); then
-    printf '\n\033[1;31m  ✗ CHƯA CÀI ĐỦ: %s\033[0m\n' "${LACK[*]}"
-    warn "Thiếu các gói này thì đăng nhập vào sẽ chỉ thấy màn hình tối. Cài rồi đăng nhập lại:"
-    warn "  sudo pacman -Syu --needed ${LACK[*]}"
-    echo
-fi
+check_need || true
 
 bold "Xong cả 5 đợt."
 cat <<'EOF'

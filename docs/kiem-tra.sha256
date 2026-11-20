@@ -1,6 +1,6 @@
 # Mốc kiểm tra của repo (tools/kiem-tra.sh ghi). Không sửa tay.
-# lúc: 2026-11-20 21:37 +0700
-# commit gốc: cff97a3
+# lúc: 2026-11-20 21:39 +0700
+# commit gốc: 89cf906
 d573008f5adf0504005552d750fcb0ae228300804a1014d67f98423a54fc1407  .gitignore
 7cbab0756ac5bced2159b351771fe35492b4bfd401ce287e5ed66d478b8ec2be  README.md
 60cb32063bcdc2feee6421bcba37906dcd5c9b20325826d2c4d29c9e77cb9cfd  THIRD_PARTY_NOTICES.md
@@ -113,7 +113,7 @@ a464348abe41a6392f18d04c0ac2ad3c26619357ff5fdd76aff3059116f45e62  fonts/geist/Ge
 fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602  fonts/open-sans/OFL.txt
 fe269381e992f32e135801740998544d6235061e37c93ec067ad2be3edd5b17b  fonts/open-sans/OpenSans-Italic[wdth,wght].ttf
 36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878  fonts/open-sans/OpenSans[wdth,wght].ttf
-0ab8eaab0de0bbbd171a8de6ebc46d95545039b2b35372d4e8803b5df8a85820  install.sh
+4470615a0c43cd1a7deed0898a8dd7dbda38fe9a096778bb0824138cf6e57fbf  install.sh
 b65d6b4c8b30b10b2a3558a96ca6463dd5fbdb8fedf658a5ea9e5effec993dd5  nvidia/setup-nvidia.sh
 68998e1ca6af51469ff76e7bf9c1b30d4065255abe047e9236639629b8274fa5  plymouth/install-plymouth.sh
 1f1d8b276e42b163cce0b53edc2cb79d9e3cc9f888067580120aa3500159f5d8  plymouth/liquid-glass/box.png
