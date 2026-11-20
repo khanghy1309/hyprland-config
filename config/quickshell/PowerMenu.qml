@@ -57,7 +57,7 @@ PanelWindow {
     }
     Timer {
         id: runTimer
-        interval: 180
+        interval: Settings.look.animations ? 40 + Math.round(150 * Settings.look.animScale) : 40
         onTriggered: if (root.pending) { Quickshell.execDetached(root.pending); root.pending = null; }
     }
 

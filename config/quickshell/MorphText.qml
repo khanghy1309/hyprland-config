@@ -11,7 +11,7 @@ Item {
     property font font: Qt.font({ family: Theme.font, pixelSize: 14 })
     property color color: Theme.fg
     property int elide: Text.ElideNone
-    property int duration: 340
+    property int duration: Theme.ms(340)
 
     implicitWidth: Math.max(a.implicitWidth, b.implicitWidth * b.opacity)
     implicitHeight: Math.max(a.implicitHeight, b.implicitHeight)

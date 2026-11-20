@@ -38,7 +38,12 @@ Singleton {
     readonly property int barHeight: 42
     readonly property int edge: 24
 
-    // Thời gian chuyển động (ms)
-    readonly property int fast: 140
-    readonly property int normal: 240
+    // Thời gian chuyển động (ms), theo Cài đặt → Giao diện → Chuyển động: tốc độ Nhanh / Vừa / Chậm nhân
+    // thời gian với 0,7 / 1 / 1,4 (cùng hệ số với Hyprland, lg_look.lua); tắt hiệu ứng thì bằng 0 (đổi ngay).
+    readonly property real motion: Settings.look.animations ? Settings.look.animScale : 0
+    readonly property int fast: Math.round(140 * motion)
+    readonly property int normal: Math.round(240 * motion)
+    function ms(x) { return Math.round(x * motion); }
+    // hẹn giờ chờ một hiệu ứng chạy xong: không bao giờ 0 (Timer 0 ms chạy ngay trong lúc đang đổi trạng thái)
+    function wait(x) { return Math.max(1, ms(x)); }
 }

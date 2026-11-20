@@ -82,7 +82,7 @@ Item {
                         height: Math.max(3, 36 * Math.min(1, modelData))
                         radius: 2
                         color: Theme.accent
-                        Behavior on height { NumberAnimation { duration: 60 } }
+                        Behavior on height { NumberAnimation { duration: Theme.ms(60) } }
                     }
                 }
             }

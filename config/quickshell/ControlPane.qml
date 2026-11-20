@@ -264,7 +264,7 @@ GlassPill {
                     onClicked: {
                         if (clearLater.running) return;
                         Notifs.clearing();
-                        clearLater.interval = Math.min(list.count, 8) * 70 + (Settings.look.animations ? 950 : 200);
+                        clearLater.interval = Math.min(list.count, 8) * 70 + (Settings.look.animations ? Math.round(900 * Settings.look.animScale) + 50 : 200);
                         clearLater.restart();
                     }
                     Timer { id: clearLater; onTriggered: Notifs.clearAll() }

@@ -14,7 +14,9 @@ local VARIANTS = {
 }
 local layout   = LG_opt("windows", "layout", "dwindle")  -- "dwindle" (xếp ô) | "scrolling" (cuộn ngang)
 local borders  = LG_opt("look", "borders", true)
-local animMul  = LG_opt("look", "animScale", 1)          -- >1 chậm hơn, <1 nhanh hơn
+-- >1 chậm hơn, <1 nhanh hơn (Cài đặt ghi 0,7 / 1 / 1,4); giữ trong khoảng an toàn kẻo lò xo chia cho 0
+local animMul  = math.max(0.5, math.min(2, tonumber(LG_opt("look", "animScale", 1)) or 1))
+local animOn   = LG_opt("look", "animations", true)      -- Cài đặt → Giao diện → Hiệu ứng chuyển động
 local function sp(x) return x * animMul end
 
 hl.config({
@@ -52,12 +54,13 @@ hl.config({
         },
 
         -- Cửa sổ dẻo: kéo hoặc đổi cỡ thì rung rinh như thạch (mới trong Hyprland 0.57)
+        -- (tắt Hiệu ứng chuyển động thì tắt luôn hai thứ này: chúng cũng là chuyển động)
         wobble = {
-            enabled = LG_opt("look", "wobble", false),
+            enabled = animOn and LG_opt("look", "wobble", false),
         },
         -- Mờ khi chuyển động: vệt mờ theo cửa sổ đang di chuyển
         motion_blur = {
-            enabled = LG_opt("look", "motionBlur", false),
+            enabled = animOn and LG_opt("look", "motionBlur", false),
         },
 
         -- Ánh sáng mép trong của cửa sổ, rất nhẹ
@@ -87,11 +90,15 @@ hl.config({
                 aberration = 0.02,   -- tách màu ở mép
                 tint       = 0x14F2F4F6,
             },
+            -- kiểu Cực quang: dải màu trôi chậm; tắt Hiệu ứng chuyển động thì đứng yên
+            aurora = {
+                speed = animOn and 1 or 0,
+            },
         },
     },
 
     animations = {
-        enabled = LG_opt("look", "animations", true),
+        enabled = animOn,
     },
 
     misc = {
@@ -167,7 +174,9 @@ hl.curve("easeInOutCubic", { type = "bezier", points = { {0.65, 0.05}, {0.36, 1}
 hl.curve("linear",         { type = "bezier", points = { {0, 0},       {1, 1}    } })
 hl.curve("almostLinear",   { type = "bezier", points = { {0.5, 0.5},   {0.75, 1} } })
 hl.curve("quick",          { type = "bezier", points = { {0.15, 0},    {0.1, 1}  } })
-hl.curve("easy",           { type = "spring", mass = 1, stiffness = 238.1191, damping = 24.21279333 })
+-- Lò xo không dùng "speed" của hl.animation (Hyprland tính theo thời gian thật), nên tốc độ Nhanh / Chậm
+-- được áp vào chính lò xo: chậm đi s lần thì độ cứng chia s², lực cản chia s (giữ nguyên độ nảy).
+hl.curve("easy",           { type = "spring", mass = 1, stiffness = 238.1191 / (animMul * animMul), damping = 24.21279333 / animMul })
 
 hl.animation({ leaf = "global",        enabled = true, speed = sp(10),   bezier = "default" })
 hl.animation({ leaf = "border",        enabled = true, speed = sp(5.39), bezier = "easeOutQuint" })

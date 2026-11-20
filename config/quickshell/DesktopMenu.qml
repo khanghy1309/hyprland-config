@@ -89,7 +89,7 @@ Scope {
 
                 // mở: nảy nhẹ từ góc gần con trỏ; đóng: mờ nhanh
                 Spring { id: grow; target: pop.mine ? 1 : 0; response: 0.3; damping: 0.72 }
-                Timer { id: closing; interval: 160 }
+                Timer { id: closing; interval: Theme.wait(160) }
                 onMineChanged: if (!mine) closing.restart()
 
                 GlassPill {
@@ -109,7 +109,7 @@ Scope {
                                            : (flipY ? Item.BottomLeft : Item.TopLeft)
                     scale: 0.9 + 0.1 * Math.min(1.04, grow.value)
                     opacity: pop.mine ? Math.min(1, grow.value * 1.6) : 0
-                    Behavior on opacity { enabled: !pop.mine; NumberAnimation { duration: 140 } }
+                    Behavior on opacity { enabled: !pop.mine; NumberAnimation { duration: Theme.ms(140) } }
 
                     focus: pop.mine
                     Keys.onEscapePressed: root.close()

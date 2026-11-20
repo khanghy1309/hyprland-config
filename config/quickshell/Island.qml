@@ -309,8 +309,9 @@ PanelWindow {
                     height: 10
                     radius: 5
                     color: "#ff5a5f"
+                    // chấm đỏ nhấp nháy khi đang quay; tắt hiệu ứng thì đứng yên
                     SequentialAnimation on opacity {
-                        running: win.mode === "rec"
+                        running: win.mode === "rec" && Settings.look.animations
                         loops: Animation.Infinite
                         NumberAnimation { to: 0.35; duration: 700; easing.type: Easing.InOutSine }
                         NumberAnimation { to: 1; duration: 700; easing.type: Easing.InOutSine }

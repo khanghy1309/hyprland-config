@@ -119,6 +119,31 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (tối, muộn): soát toàn bộ hiệu ứng chuyển động
+
+- **Hyprland (`lg_look.lua`), đối chiếu mã nguồn 0.57.0:**
+  - Mọi tên hoạt ảnh có trong `AnimationTree.cpp`. Mọi kiểu (`popin 90%`, `slide`, `slidevert`, `fade` cho layers) qua `styleValidInConfigVar` của `AnimationManager.cpp`.
+  - `speed` ≤ 100. Lò xo có `stiffness`, `damping`, `mass` > 0,5 như `hl.curve` đòi.
+  - Đã thử bằng Hyprland giả theo đúng các luật đó với tốc độ 0,7 / 1 / 1,4, khi tắt hiệu ứng và khi giá trị hỏng (0, chữ): không lỗi.
+- **Lỗi tìm thấy và đã sửa:**
+  - **Lò xo không theo tốc độ.** Đọc hyprutils (`AnimatedVariable.cpp`) thì thấy hoạt ảnh lò xo chạy theo thời gian thật, không dùng `speed`. Cửa sổ mở, đóng, di chuyển (lò xo "easy") vì vậy không đổi theo Nhanh / Chậm.
+    - Sửa: chậm đi `s` lần thì `stiffness / s²` và `damping / s`, giữ nguyên độ nảy.
+    - Mô phỏng: tới 99% mất ≈ 372 / 508 / 674 ms ở 0,7 / 1 / 1,4.
+  - **Tắt Hiệu ứng chuyển động vẫn còn chuyển động.** Cửa sổ dẻo, mờ khi chuyển động và dải màu trôi của kính Cực quang (`aurora:speed`) vẫn chạy. Giờ tắt theo.
+  - **Hiệu ứng của Quickshell không theo Cài đặt.** `Theme.fast` / `Theme.normal` là hằng số, nên tắt hiệu ứng hay đổi tốc độ thì các hiệu ứng `Behavior` vẫn chạy như cũ (khoảng 40 chỗ) và 12 chỗ ghi thẳng số ms.
+    - Sửa: `Theme.motion`, `Theme.ms()`, `Theme.wait()` theo `animations` × `animScale`.
+  - **Hẹn giờ đóng ngắn hơn hiệu ứng khi chạy chậm.** Ở tốc độ Chậm, các hẹn giờ chờ hiệu ứng (đóng bảng điều khiển 420 ms, đóng menu 160 ms, dock nảy 1400 ms) xong trước hiệu ứng, cắt ngang giữa chừng. Giờ nhân theo tốc độ.
+    - Hẹn giờ chụp màn hình / menu nguồn chờ lớp mờ đi theo `layersOut` × tốc độ.
+  - **Vòng lặp vô tận khi tắt hiệu ứng.** Chấm đỏ đang quay (vòng lặp vô tận) và dock nảy (3 vòng) sẽ thành vòng lặp 0 ms. Giờ không chạy khi tắt hiệu ứng; dock nảy dừng thì về 0.
+  - Bụi tan của thông báo (900 ms) giờ cũng theo tốc độ.
+- **Quay trong bản giả:** chạy chậm 6 lần rồi ghép lại đúng thời gian thật (khoảng 30–50 ms một khung), cả mở lẫn đóng. Đã quay 12 cảnh, thêm 1 cảnh ở tốc độ Chậm và 2 cảnh khi tắt hiệu ứng:
+  - trung tâm điều khiển, bảng widget, launcher, menu nguồn, toàn cảnh;
+  - menu chuột phải, menu khay, menu hệ thống;
+  - thông báo, âm lượng ở đảo động, Alt + Tab, dock phóng to khi rê chuột.
+
+  Không lỗi QML. Ở tốc độ Chậm, bảng trượt ra hết rồi mới ẩn; tắt hiệu ứng thì mở và đóng tức thì.
+- **Giới hạn:** bản giả không có lớp làm mờ dần của Hyprland (layersIn/Out) và hiệu ứng cửa sổ. Launcher, menu nguồn trong bản giả biến mất ngay khi đóng; trên máy thật Hyprland làm mờ dần thêm khoảng 150 ms. Trong bản giả, Alt + Tab không đóng theo lệnh của bản giả (trên máy thật đóng khi nhả Alt).
+
 ### 2026-11-20 (tối): tường lửa ufw
 
 - **Gói:** `ufw` 0.36.2 có trong `extra.db`. Đọc gói tải từ mirror:

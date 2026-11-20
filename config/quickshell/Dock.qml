@@ -111,7 +111,7 @@ PanelWindow {
         bouncing = app.id;
         bounceTimer.restart();
     }
-    Timer { id: bounceTimer; interval: 1400; onTriggered: dock.bouncing = "" }
+    Timer { id: bounceTimer; interval: Theme.wait(1400); onTriggered: dock.bouncing = "" }
 
     function activate(app) {
         if (app.wins.length === 0) { launch(app); return; }
@@ -247,7 +247,7 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         y: slide.value
         Spring { id: slide; target: dock.revealed ? dock.height - body.height - dock.margin : dock.height + 6; response: 0.36 }
-        Behavior on width { NumberAnimation { duration: 90 } }
+        Behavior on width { NumberAnimation { duration: Theme.ms(90) } }
 
         Row {
             id: row
@@ -269,7 +269,7 @@ PanelWindow {
 
                     width: dock.base * s + (index === dock.pinnedCount && dock.hasUnpinned ? dock.spacing + 1 : 0)
                     height: dock.base
-                    Behavior on width { enabled: dock.mouseX < -1e4; NumberAnimation { duration: 120 } }
+                    Behavior on width { enabled: dock.mouseX < -1e4; NumberAnimation { duration: Theme.ms(120) } }
 
                     // vạch ngăn trước nhóm ứng dụng chưa ghim
                     Rectangle {
@@ -453,10 +453,11 @@ PanelWindow {
         id: bounce
         property real v: 0
         property SequentialAnimation anim: SequentialAnimation {
-            running: dock.bouncing !== ""
+            running: dock.bouncing !== "" && Settings.look.animations
             loops: 3
-            NumberAnimation { target: bounce; property: "v"; to: 16; duration: 220; easing.type: Easing.OutQuad }
-            NumberAnimation { target: bounce; property: "v"; to: 0; duration: 220; easing.type: Easing.InQuad }
+            onStopped: bounce.v = 0
+            NumberAnimation { target: bounce; property: "v"; to: 16; duration: Theme.ms(220); easing.type: Easing.OutQuad }
+            NumberAnimation { target: bounce; property: "v"; to: 0; duration: Theme.ms(220); easing.type: Easing.InQuad }
         }
     }
 

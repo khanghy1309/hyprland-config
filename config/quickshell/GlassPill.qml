@@ -76,7 +76,7 @@ Item {
         return !Glass.blocked(_win.screen, { x: _sp.x, y: _sp.y, w: width, h: height });
     }
     property real refractAmt: _clear ? 1 : 0
-    Behavior on refractAmt { NumberAnimation { duration: 260; easing.type: Easing.InOutQuad } }
+    Behavior on refractAmt { NumberAnimation { duration: Theme.ms(260); easing.type: Easing.InOutQuad } }
 
     // ảnh hình nền: chỉ nạp khi cần khúc xạ
     Image {

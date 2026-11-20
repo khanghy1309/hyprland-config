@@ -71,7 +71,8 @@ PanelWindow {
     }
     Timer {
         id: runTimer
-        interval: 220
+        // chờ Hyprland làm mờ xong bảng này (layersOut ~150 ms × tốc độ) để ảnh chụp không dính bảng
+        interval: Settings.look.animations ? 80 + Math.round(150 * Settings.look.animScale) : 60
         onTriggered: if (root.pending) { Quickshell.execDetached(root.pending); root.pending = null; }
     }
 

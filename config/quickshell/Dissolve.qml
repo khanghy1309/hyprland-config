@@ -22,7 +22,7 @@ Item {
     NumberAnimation {
         id: anim
         target: root; property: "progress"; from: 0; to: 1
-        duration: Settings.look.animations ? 900 : 160
+        duration: Settings.look.animations ? Math.round(900 * Settings.look.animScale) : 160
         onFinished: { const f = root.done; root.done = null; if (f) f(); }
     }
 

@@ -44,7 +44,7 @@ PanelWindow {
     }
 
     Spring { id: grow; target: pop.shown ? 1 : 0; response: 0.3; damping: 0.72 }
-    Timer { id: closing; interval: 160 }
+    Timer { id: closing; interval: Theme.wait(160) }
     onShownChanged: if (!shown) closing.restart()
 
     QsMenuOpener { id: opener; menu: pop.current }
@@ -63,7 +63,7 @@ PanelWindow {
         transformOrigin: Item.Top
         scale: 0.92 + 0.08 * Math.min(1.04, grow.value)
         opacity: pop.shown ? Math.min(1, grow.value * 1.6) : 0
-        Behavior on opacity { enabled: !pop.shown; NumberAnimation { duration: 140 } }
+        Behavior on opacity { enabled: !pop.shown; NumberAnimation { duration: Theme.ms(140) } }
 
         focus: pop.shown
         Keys.onEscapePressed: pop.stack.length ? pop.back() : pop.close()

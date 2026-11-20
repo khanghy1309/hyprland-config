@@ -16,7 +16,7 @@ PanelWindow {
         if (shown) { hideTimer.stop(); alive = true; }
         else hideTimer.restart();
     }
-    Timer { id: hideTimer; interval: 420; onTriggered: win.alive = false }
+    Timer { id: hideTimer; interval: Theme.wait(420); onTriggered: win.alive = false }
 
     visible: alive
     screen: Quickshell.screens.find(s => Hyprland.focusedMonitor && s.name === Hyprland.focusedMonitor.name)
