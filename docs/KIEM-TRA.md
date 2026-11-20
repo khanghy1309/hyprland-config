@@ -45,7 +45,7 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 ### QML của Quickshell (`config/quickshell/`)
 
 - **Chạy trong bản giả.** Một bản giả của Quickshell viết bằng PySide6 (Hyprland, Pipewire, Mpris, Bluetooth, mạng, thông báo… đều là đối tượng giả) chạy trên Xvfb. Nền đồ hoạ là xcb kèm Mesa llvmpipe, nên shader chạy thật.
-  - Đã chụp từng trạng thái: màn hình nền, dock, Alt+Tab, trình mở ứng dụng, tổng quan, bảng điều khiển, bảng widget, thông báo, OSD, menu nguồn, chụp màn hình, bảng phím tắt, menu chuột phải, hiệu ứng thần đèn, và từng trang Cài đặt.
+  - Đã chụp từng trạng thái: màn hình nền, dock, Alt+Tab, trình mở ứng dụng, tổng quan, bảng điều khiển, bảng widget, thông báo, OSD, menu nguồn, chụp màn hình, bảng phím tắt, menu chuột phải, và từng trang Cài đặt.
   - Chụp cả khi có lẫn không có cửa sổ, với hình nền sáng và hình nền tối.
   - Tiêu chí: không có lỗi hay `TypeError` trong log, và ảnh trông đúng.
 - **Đọc lại mã**, tìm các lỗi sau:
@@ -78,7 +78,7 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ### Shader (`config/quickshell/shaders/`)
 
-- Dịch bằng `qsb`, rồi chạy thật trong bản giả: kính lỏng, thần đèn, tan thành bụi.
+- Dịch bằng `qsb`, rồi chạy thật trong bản giả: kính lỏng, tan thành bụi. (Hiệu ứng thần đèn đã xoá ngày 2026-11-20.)
 - Biến uniform không được trùng tên hàm có sẵn của GLSL. Lỗi `refract` đã gặp và đã sửa thành `refractAmt`.
 
 ### Giao diện ứng dụng (`theme/`)

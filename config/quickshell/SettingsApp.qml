@@ -621,13 +621,6 @@ FloatingWindow {
                     on: Settings.dock.magnify
                     onToggled: Settings.dock.magnify = !Settings.dock.magnify
                 }
-                SegRow {
-                    label: "Hiệu ứng thu nhỏ cửa sổ"
-                    note: "Thần đèn: cửa sổ bị hút vào biểu tượng trên dock như macOS. Bấm Super + H để thu nhỏ."
-                    options: [["genie", "Thần đèn"], ["scale", "Thu nhỏ"], ["off", "Tắt"]]
-                    current: Settings.dock.minimizeFx
-                    onPicked: v => Settings.dock.minimizeFx = v
-                }
                 SliderRow {
                     label: "Kích thước biểu tượng"
                     enabled: Settings.dock.enabled

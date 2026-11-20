@@ -3,6 +3,8 @@
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
+import Quickshell.Hyprland
 
 ShellRoot {
     // Khởi động sẵn các dịch vụ chạy nền (nhận thông báo, theo dõi âm lượng, nhạc...)
@@ -41,8 +43,14 @@ ShellRoot {
     // Bảng phím tắt (Super + /)
     Cheatsheet {}
 
-    // Hiệu ứng thu nhỏ cửa sổ vào dock (genie)
-    MinimizeFx {}
+    // Super + H:  qs ipc call window minimize  → cất cửa sổ đang dùng xuống dock
+    IpcHandler {
+        target: "window"
+        function minimize(): void {
+            const w = Hyprland.activeToplevel;
+            if (w && WinOps.usable(w)) WinOps.minimize(w);
+        }
+    }
 
     // Menu chuột phải trên màn hình nền
     DesktopMenu {}

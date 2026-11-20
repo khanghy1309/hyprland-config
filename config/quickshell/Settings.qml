@@ -125,7 +125,6 @@ Singleton {
                 property bool autoHide: true          // ẩn khi có cửa sổ che chỗ của dock
                 property int iconSize: 48
                 property bool magnify: true           // phóng to biểu tượng khi rê chuột
-                property string minimizeFx: "genie"   // genie | scale | off  (xem MinimizeFx.qml)
                 // id của tệp .desktop, theo thứ tự trên dock
                 property list<string> pinned: ["org.gnome.Nautilus", "firefox", "kitty", "liquid-glass-settings"]
             }

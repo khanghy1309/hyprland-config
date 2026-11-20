@@ -14,14 +14,6 @@ hl.layer_rule({
     ignore_alpha = 0.05,
 })
 
--- Lớp phủ của hiệu ứng thu nhỏ (thần đèn): phải hiện ngay lập tức, đúng lúc cửa sổ thật được cất đi.
--- Nếu để Hyprland cho nó hiện dần như các lớp khác thì cửa sổ sẽ chớp một cái trước khi bay vào dock.
-hl.layer_rule({
-    name  = "minimize-overlay",
-    match = { namespace = "^lg-minimize$" },
-    no_anim = true,
-})
-
 -------------------------------------------------------------------
 -- Cửa sổ
 -------------------------------------------------------------------

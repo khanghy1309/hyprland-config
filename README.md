@@ -14,7 +14,7 @@
 | **4** | Toàn cảnh workspace, bảng phím tắt, bảng chụp/quay, đọc chữ, bộ nhớ tạm và emoji | **có** |
 | **5** | Ứng dụng Cài đặt | **có** |
 | **+** | Màn hình khởi động Plymouth (hello → chữ ký) | **có** |
-| **+** | Kính khúc xạ, hiệu ứng thần đèn khi thu nhỏ, chuyển động lò xo, chế độ chơi game | **có** |
+| **+** | Kính khúc xạ, chuyển động lò xo, chế độ chơi game | **có** |
 
 Viết cho **Hyprland 0.57.2** (cấu hình bằng Lua) và **Quickshell 0.3.2**, là bản đang có trong kho Arch lúc soạn (12/11/2026). Mình đã kiểm tra cú pháp của mọi file và đối chiếu tên lệnh, tên tuỳ chọn với mã nguồn của hai phần mềm này, nhưng **chưa chạy thử trên một máy Arch thật**. Lần đầu khởi động có thể còn lỗi nhỏ; xem mục "Sự cố thường gặp".
 
@@ -102,7 +102,7 @@ Mọi việc đều bấm được bằng chuột hoặc touchpad, như trên Ma
 | `Super + N` | Trung tâm điều khiển và thông báo |
 | `Super + Q` hoặc `Alt + F4` | Đóng cửa sổ |
 | `Alt + Tab` | Chuyển cửa sổ (giữ Alt, bấm Tab để chọn, thả Alt để chuyển) |
-| `Super + H` | Thu nhỏ cửa sổ xuống dock (hiệu ứng thần đèn) |
+| `Super + H` | Thu nhỏ cửa sổ xuống dock |
 | `Ctrl + Shift + Esc` | Trình quản lý tác vụ |
 | `Super + V` | Bật/tắt cửa sổ nổi |
 | `Super + F` | Toàn màn hình |
@@ -185,7 +185,7 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - Giữ và kéo một biểu tượng đã ghim sang trái/phải để đổi chỗ.
 - **Ghim ứng dụng chưa mở:** trong launcher, chọn ứng dụng rồi bấm `Ctrl + P` (hoặc chuột phải vào nó); bấm lại để bỏ ghim. Hoặc vào Cài đặt → Màn hình nền và Dock, gõ tên ứng dụng ở ô *Thêm ứng dụng*. Trang đó cũng có nút ↑ ↓ để đổi thứ tự và *Bỏ ghim*.
 - **Tự ẩn** (mặc định): dock lùi xuống khi có cửa sổ che chỗ của nó, nên cửa sổ vẫn dùng hết màn hình. Đưa chuột sát mép dưới màn hình (khoảng giữa) hoặc bấm `Super + D` để hiện lại. Workspace trống thì dock luôn hiện.
-- **Thu nhỏ** (`Super + H`, hoặc chuột phải → thu nhỏ): cửa sổ bị hút vào biểu tượng của nó trên dock như macOS; bấm biểu tượng thì cửa sổ bay ngược ra. Đổi sang kiểu thu nhỏ thường hoặc tắt: Cài đặt → Màn hình nền và Dock.
+- **Thu nhỏ** (`Super + H`, hoặc chuột phải → *Tuỳ chọn cửa sổ* → *Thu nhỏ xuống dock*): cửa sổ biến khỏi màn hình ngay, không có hiệu ứng; bấm biểu tượng trên dock để mở lại.
 - Đổi kích thước, tắt phóng to, tắt tự ẩn: Cài đặt → Màn hình nền và Dock.
 
 **Đặt cửa sổ nhanh** (như macOS Sequoia/Tahoe và ứng dụng Rectangle): kéo cửa sổ (bằng thanh tiêu đề, hoặc `Super` + kéo chuột trái) cho con trỏ chạm mép màn hình rồi thả.
@@ -400,12 +400,11 @@ config/
     SettingsApp.qml   ứng dụng Cài đặt
     GlassPill.qml     viên kính dùng chung (vẽ bằng shaders/glass.frag)
     Glass.qml         hình nền cho kính, cửa sổ nào nằm sau kính
-    shaders/          glass.frag (kính), genie.vert/.frag (thu nhỏ), dust.frag (tan thành bụi), build.sh
+    shaders/          glass.frag (kính), dust.frag (tan thành bụi), build.sh
     Spring.qml        chuyển động lò xo
     MorphText.qml     chữ đổi bằng hiệu ứng nhoè
     LiquidSwitch.qml  công tắc kính lỏng
     Dissolve.qml      thẻ tan thành bụi
-    MinimizeFx.qml    hiệu ứng thu nhỏ vào dock
     DesktopMenu.qml   menu chuột phải trên màn hình nền
     TrayMenu.qml      menu kính lỏng của biểu tượng ứng dụng trên thanh trên
     GlassMenuCard.qml thẻ menu kính lỏng dùng chung (menu hệ thống, menu cửa sổ), có menu con
@@ -454,4 +453,4 @@ Sửa repo xong, chạy `tools/kiem-tra.sh` để biết tệp nào cần soát 
 
 ## Ghi công
 
-Kính khúc xạ, hiệu ứng thần đèn, chuyển động lò xo, chữ nhoè, công tắc kính, thẻ tan thành bụi, chụp cửa sổ an toàn và chế độ chơi game học cách làm từ [MacShell](https://github.com/0-ss/MacShell) của Rickky (giấy phép MIT). Mã ở đây được viết lại cho repo này; chỗ nào học ý tưởng đều ghi trong chú thích đầu tệp.
+Kính khúc xạ, chuyển động lò xo, chữ nhoè, công tắc kính, thẻ tan thành bụi, chụp cửa sổ an toàn và chế độ chơi game học cách làm từ [MacShell](https://github.com/0-ss/MacShell) của Rickky (giấy phép MIT). Mã ở đây được viết lại cho repo này; chỗ nào học ý tưởng đều ghi trong chú thích đầu tệp.
