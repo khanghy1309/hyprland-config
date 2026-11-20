@@ -119,6 +119,39 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (trưa, muộn): văn phòng, in ấn, USB, điểm khôi phục, zram, dọn gói
+
+- **Tên gói:** đối chiếu với cơ sở dữ liệu gói `core.db` / `extra.db` tải từ mirror chính thức của Arch hôm nay.
+  - Có đủ: libreoffice-fresh(-vi), cups, cups-pdf, cups-pk-helper, system-config-printer, avahi, nss-mdns, ipp-usb, hplip, gutenprint, sane, sane-airscan, simple-scan, exfatprogs, ntfs-3g, dosfstools, gnome-disk-utility, timeshift, cronie, grub-btrfs, inotify-tools, zram-generator.
+  - Không có `hunspell-vi`, nên chưa có chính tả tiếng Việt.
+- **Tên tệp:** đối chiếu với `extra.files`.
+  - Tệp `.desktop`: `libreoffice-writer/calc/impress.desktop` (dùng cho ứng dụng mặc định), `system-config-printer.desktop`, `org.gnome.SimpleScan.desktop`, `org.gnome.DiskUtility.desktop`.
+  - Lệnh: `timeshift-launcher`, `gnome-disks`.
+- **Timeshift:** đối chiếu với mã nguồn (linuxmint/timeshift).
+  - Các khoá của `timeshift.json` là những khoá `save_app_config` ghi.
+  - Phần loại trừ dùng đúng mẫu mặc định cho thư mục nhà: `/root/**`, `/home/*/**`.
+  - Kiểu Btrfs cần subvolume `@`.
+  - Chạy `timeshift` một lần (bất kỳ lệnh nào) là nó tự ghi lịch cron vào `/etc/cron.d`.
+  - Thẻ D để Timeshift tự xoá bản cũ.
+  - Hộp chọn của polkit chỉ cho `timeshift-gtk` giữ DISPLAY, nên Timeshift chạy qua XWayland.
+- **nsswitch:** sau khi sửa, dòng hosts khớp đúng mẫu của Arch wiki: `mymachines mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files myhostname dns`.
+- **`setup-system.sh`:** chạy thử trong thư mục /etc giả (biến LG_*, lệnh giả), các trường hợp:
+  - Btrfs `@` + GRUB + systemd-resolved đang bật;
+  - ext4 trên LUKS + systemd-boot: điền đủ `parent_device_uuid`;
+  - chạy lại lần hai: không sửa lại, không sao lưu thêm;
+  - `--dry-run`: không ghi tệp nào.
+
+  Kết quả: `timeshift.json` hợp lệ, script trong pacman hook qua `sh -n`.
+- **`system-status.sh printers`:** thử với `lpstat` giả có máy đang in, máy sẵn sàng (mặc định) và máy đang tắt. Cả ba đều đọc đúng; script đặt `LC_ALL=C` để không vướng lpstat tiếng Việt.
+- **Lệnh cần quyền quản trị trong Cài đặt** (pkexec rồi báo thông báo): đã thử với pkexec giả, cả khi thành công lẫn khi lỗi.
+- **Bản giả:** trang Máy in và máy quét, Sao lưu và bảo trì, Giới thiệu không lỗi.
+  - Trong bản giả, trang Máy in hiện "Chưa có máy in nào" thay vì "Dịch vụ in đang tắt". Lý do: `HOME` của bản giả khác, script không chạy, nên giữ giá trị mặc định. Đây là giới hạn của bản giả.
+- **Chưa thử trên máy thật:**
+  - máy in, máy quét thật;
+  - Timeshift chụp và khôi phục thật;
+  - grub-btrfs;
+  - cửa sổ Timeshift (chạy bằng quyền root qua XWayland) có mở được trên Hyprland không. Nếu không mở được: `sudo -E timeshift-gtk` trong terminal.
+
 ### 2026-11-20 (trưa): phông chữ giống Windows
 
 - Đã đếm bằng fontTools đủ 67 chữ tiếng Việt có dấu, cả hoa lẫn thường:

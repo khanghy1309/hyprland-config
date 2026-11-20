@@ -32,6 +32,8 @@ FloatingWindow {
         { id: "sound",     label: "Âm thanh",             path: Icons.volume },
         { id: "power",     label: "Nguồn điện",           path: "M13 3L5 14h6l-1 7 8-11h-6l1-7z" },
         { id: "datetime",  label: "Ngày giờ",             path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2" },
+        { id: "printers",  label: "Máy in và máy quét",   path: "M7 8V3h10v5M6 17H4v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6h-2M7 14h10v7H7z" },
+        { id: "maint",     label: "Sao lưu và bảo trì",   path: "M4 12a8 8 0 1 0 2.3-5.6M4 4v5h5M12 8v4l3 2" },
         { id: "apps",      label: "Ứng dụng mặc định",    path: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" },
         { id: "weather",   label: "Thời tiết",            path: Icons.cloud },
         { id: "about",     label: "Giới thiệu",           path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8h.01" }
@@ -147,7 +149,7 @@ FloatingWindow {
             // Chỉ giữ trang khi cửa sổ đang mở. Nếu không, đóng cửa sổ lúc đang ở trang Bluetooth thì máy
             // cứ tìm thiết bị mãi, ở trang Wi-Fi thì cứ 15 giây quét mạng một lần.
             active: win.visible
-            sourceComponent: ({ look: lookPage, display: displayPage, dock: dockPage, wallpaper: wallPage, input: inputPage, wifi: wifiPage, bluetooth: btPage, sound: soundPage, power: powerPage, datetime: dtPage, apps: appsPage,
+            sourceComponent: ({ look: lookPage, display: displayPage, dock: dockPage, wallpaper: wallPage, input: inputPage, wifi: wifiPage, bluetooth: btPage, sound: soundPage, power: powerPage, datetime: dtPage, printers: printPage, maint: maintPage, apps: appsPage,
                                 weather: weatherPage, about: aboutPage })[win.page]
             onLoaded: flick.contentY = 0
         }
@@ -2026,6 +2028,166 @@ FloatingWindow {
                 ButtonsRow {
                     buttons: Settings.weather.city ? [["Bỏ vị trí", () => { Settings.weather.city = ""; }]] : []
                     note: wp2.status || "Dữ liệu từ open-meteo.com, cập nhật mỗi 30 phút. Chỉ tên thành phố được gửi đi khi tìm."
+                    last: true
+                }
+            }
+        }
+    }
+
+    // ── Máy in và máy quét ──
+    Component {
+        id: printPage
+        Column {
+            id: pp
+            spacing: 26
+            property bool cupsOn: true
+            property var printers: []      // [{ name, state: idle | busy | off, def }]
+            property int jobs: 0
+            readonly property string scripts: Quickshell.env("HOME") + "/.config/hypr/scripts"
+            Process {
+                id: lpProc
+                running: true
+                command: [pp.scripts + "/system-status.sh", "printers"]
+                stdout: StdioCollector {
+                    onStreamFinished: {
+                        const list = [];
+                        let on = false, jobs = 0;
+                        for (const line of text.split("\n")) {
+                            const i = line.indexOf("=");
+                            if (i < 0) continue;
+                            const k = line.slice(0, i), v = line.slice(i + 1);
+                            if (k === "cups") on = v === "on";
+                            else if (k === "jobs") jobs = parseInt(v) || 0;
+                            else if (k === "printer") { const p = v.split("|"); list.push({ name: p[0], state: p[1], def: p[2] === "1" }); }
+                        }
+                        pp.cupsOn = on; pp.printers = list; pp.jobs = jobs;
+                    }
+                }
+            }
+            // máy in mạng mới bật, lệnh in xong: hỏi lại vài giây một lần (chỉ khi trang đang mở)
+            Timer { interval: 4000; running: true; repeat: true; onTriggered: lpProc.running = true }
+
+            PageTitle { text: "Máy in và máy quét" }
+
+            Group {
+                title: "Máy in"
+                ButtonsRow {
+                    visible: !pp.cupsOn
+                    note: "Dịch vụ in đang tắt. Bật để thêm máy in và in được."
+                    buttons: [["Bật dịch vụ in", () => Quickshell.execDetached(["pkexec", "systemctl", "enable", "--now", "cups.socket", "avahi-daemon.service"])]]
+                }
+                Repeater {
+                    model: pp.printers
+                    delegate: InfoRow {
+                        required property var modelData
+                        label: modelData.name.replace(/_/g, " ") + (modelData.def ? "  ·  mặc định" : "")
+                        value: modelData.state === "busy" ? "đang in" : modelData.state === "off" ? "đang tắt" : "sẵn sàng"
+                    }
+                }
+                InfoRow {
+                    visible: pp.cupsOn && pp.printers.length === 0
+                    label: "Chưa có máy in nào"
+                    value: ""
+                }
+                ButtonsRow {
+                    buttons: [["Thêm máy in", () => Quickshell.execDetached(["system-config-printer"])],
+                              ["Lệnh in đang chờ" + (pp.jobs > 0 ? " (" + pp.jobs + ")" : ""), () => Quickshell.execDetached(["xdg-open", "http://localhost:631/jobs"])]]
+                    note: "Máy in mạng (Wi-Fi) và máy in USB đời mới thường tự hiện sau vài giây, không cần cài driver. Máy in HP và máy in cũ: bấm Thêm máy in."
+                    enabled: pp.cupsOn
+                    last: true
+                }
+            }
+
+            Group {
+                title: "Máy quét"
+                ButtonsRow {
+                    buttons: [["Quét tài liệu", () => Quickshell.execDetached(["simple-scan"])]]
+                    note: "Máy quét và máy in kèm máy quét đời mới tự nhận, không cần driver. Lưu ra PDF hoặc ảnh."
+                    last: true
+                }
+            }
+        }
+    }
+
+    // ── Sao lưu và bảo trì ──
+    Component {
+        id: maintPage
+        Column {
+            id: mp
+            spacing: 26
+            property var st: ({})
+            readonly property string scripts: Quickshell.env("HOME") + "/.config/hypr/scripts"
+            function gb(b) { return (b / 1073741824).toFixed(1).replace(".", ",") + " GB"; }
+            function refresh() { stProc.running = true; }
+            Process {
+                id: stProc
+                running: true
+                command: [mp.scripts + "/system-status.sh", "maint"]
+                stdout: StdioCollector {
+                    onStreamFinished: {
+                        const o = {};
+                        for (const line of text.split("\n")) {
+                            const i = line.indexOf("=");
+                            if (i > 0) o[line.slice(0, i)] = line.slice(i + 1);
+                        }
+                        mp.st = o;
+                    }
+                }
+            }
+            Timer { interval: 5000; running: true; repeat: true; onTriggered: mp.refresh() }
+            // chạy setup-system.sh trong terminal (nó hỏi từng phần, hỏi mật khẩu khi cần)
+            function setup() {
+                Quickshell.execDetached(["kitty", "--hold", "--title", "Thiết lập máy", mp.scripts + "/setup-system.sh"]);
+            }
+            // việc cần quyền quản trị: hỏi mật khẩu bằng hộp thoại, xong thì báo
+            function admin(args, ok, fail) {
+                Quickshell.execDetached(["sh", "-c",
+                    "ok=$1; fail=$2; shift 2; if pkexec \"$@\"; then notify-send -a 'Cài đặt' \"$ok\"; else notify-send -a 'Cài đặt' -u critical \"$fail\"; fi",
+                    "_", ok, fail].concat(args));
+            }
+
+            PageTitle { text: "Sao lưu và bảo trì" }
+
+            Group {
+                title: "Điểm khôi phục hệ thống"
+                InfoRow {
+                    label: "Điểm khôi phục"
+                    value: mp.st.timeshift === "on" ? (mp.st.tsmode === "btrfs" ? "bật · chụp Btrfs tức thì" : "bật · sao chép (rsync)") : "chưa bật"
+                }
+                InfoRow {
+                    label: "Tự chụp trước mỗi lần cập nhật"
+                    value: mp.st.tshook === "on" ? "bật · giữ 5 bản gần nhất" : "chưa bật"
+                }
+                ButtonsRow {
+                    buttons: mp.st.timeshift === "on"
+                        ? [["Chụp ngay", () => mp.admin(["timeshift", "--create", "--scripted", "--tags", "O", "--comments", "Chụp tay từ Cài đặt"],
+                                                         "Đã chụp điểm khôi phục", "Chưa chụp được điểm khôi phục")],
+                           ["Mở Timeshift", () => Quickshell.execDetached(["timeshift-launcher"])]]
+                        : [["Thiết lập…", () => mp.setup()]]
+                    note: mp.st.timeshift === "on"
+                        ? "Máy lỗi sau một lần cập nhật: Mở Timeshift → chọn điểm khôi phục → Khôi phục, rồi khởi động lại. Chỉ hệ thống quay về; tài liệu, ảnh trong thư mục nhà giữ nguyên."
+                        : "Tự chụp lại hệ thống trước mỗi lần cập nhật, để quay về được khi cập nhật làm hỏng máy."
+                    enabled: mp.st.tsapp !== "no" || mp.st.timeshift !== "on"
+                    last: true
+                }
+            }
+
+            Group {
+                title: "Bộ nhớ và ổ đĩa"
+                InfoRow {
+                    label: "Nén RAM (zram)"
+                    value: (parseInt(mp.st.zram) || 0) > 0 ? "bật · " + mp.gb(parseInt(mp.st.zram)) : "chưa bật"
+                }
+                InfoRow {
+                    label: "Gói cài đặt cũ"
+                    value: (mp.st.pkgcache ? mp.gb(parseInt(mp.st.pkgcache)) : "?")
+                           + (mp.st.paccache === "on" ? " · tự dọn mỗi tuần" : " · chưa tự dọn")
+                }
+                ButtonsRow {
+                    buttons: [["Dọn gói cũ ngay", () => mp.admin(["paccache", "-rk2"], "Đã dọn gói cũ", "Chưa dọn được gói cũ")],
+                              ["Ổ đĩa", () => Quickshell.execDetached(["gnome-disks"])],
+                              ["Thiết lập…", () => mp.setup()]]
+                    note: "Dọn gói cũ giữ lại 2 bản gần nhất của mỗi gói. Ổ đĩa: định dạng USB, thẻ nhớ (exFAT cho cả Windows lẫn Mac). Thiết lập: bật zram, tự dọn gói, máy in, điểm khôi phục."
                     last: true
                 }
             }

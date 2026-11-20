@@ -60,6 +60,16 @@ PKGS=(
     udisks2 udiskie
     # tắt máy / khởi động lại / đăng xuất êm: đóng từng ứng dụng cho chúng kịp lưu rồi mới thoát
     hyprshutdown
+    # bộ văn phòng (mở được Word, Excel, PowerPoint), giao diện tiếng Việt, chính tả tiếng Anh
+    # (kho Arch chưa có từ điển chính tả tiếng Việt)
+    libreoffice-fresh libreoffice-fresh-vi hunspell hunspell-en_us
+    # in và quét: CUPS, dò máy in trong mạng, driver HP và máy in cũ, quét không cần driver
+    cups cups-pdf cups-pk-helper system-config-printer avahi nss-mdns ipp-usb hplip gutenprint
+    sane sane-airscan simple-scan
+    # USB, thẻ nhớ, ổ của Windows: đọc ghi exFAT / NTFS / FAT32, ứng dụng Ổ đĩa để định dạng
+    exfatprogs ntfs-3g dosfstools gnome-disk-utility
+    # điểm khôi phục hệ thống (config/hypr/scripts/setup-system.sh), nén RAM
+    timeshift cronie zram-generator
     # phím Fn và nhạc
     brightnessctl playerctl
     # đảo động và trung tâm điều khiển: sóng âm, ánh sáng đêm, tiết kiệm pin
@@ -238,6 +248,10 @@ if command -v xdg-mime >/dev/null 2>&1; then
     setdef firefox.desktop text/html x-scheme-handler/http x-scheme-handler/https
     setdef org.gnome.Nautilus.desktop inode/directory
     setdef org.gnome.Loupe.desktop image/png image/jpeg image/webp image/gif image/bmp image/tiff image/avif image/heic image/svg+xml
+    # tài liệu văn phòng (Word, Excel, PowerPoint, OpenDocument): LibreOffice
+    setdef libreoffice-writer.desktop application/vnd.openxmlformats-officedocument.wordprocessingml.document application/msword application/vnd.oasis.opendocument.text application/rtf
+    setdef libreoffice-calc.desktop application/vnd.openxmlformats-officedocument.spreadsheetml.sheet application/vnd.ms-excel application/vnd.oasis.opendocument.spreadsheet text/csv
+    setdef libreoffice-impress.desktop application/vnd.openxmlformats-officedocument.presentationml.presentation application/vnd.ms-powerpoint application/vnd.oasis.opendocument.presentation
     setdef io.github.celluloid_player.Celluloid.desktop video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg \
         audio/mpeg audio/flac audio/ogg audio/x-wav audio/mp4 audio/aac
     setdef org.gnome.Papers.desktop application/pdf
@@ -337,8 +351,13 @@ if ask "Cài theme đăng nhập Liquid Glass vào $THEME_DIR (cần sudo)?"; th
 fi
 echo
 
+# ───────────────────────── máy in, điểm khôi phục, zram, dọn gói ─────────────────────────
+bold "8. Máy in, điểm khôi phục hệ thống, nén RAM, dọn gói cũ"
+bash "$HERE/config/hypr/scripts/setup-system.sh" || warn "Phần này chưa xong; chạy lại: ~/.config/hypr/scripts/setup-system.sh"
+echo
+
 # ───────────────────────── màn hình khởi động ─────────────────────────
-bold "8. Màn hình khởi động (Plymouth)"
+bold "9. Màn hình khởi động (Plymouth)"
 info "Chữ hello tự viết rồi chuyển thành chữ ký, hiện lúc bật máy, nhập mật khẩu ổ đĩa và tắt máy."
 if ask "Cài màn hình khởi động? (sẽ hỏi trước khi sửa mkinitcpio và dòng lệnh kernel)"; then
     bash "$HERE/plymouth/install-plymouth.sh" || warn "Phần màn hình khởi động chưa xong; chạy lại: ./plymouth/install-plymouth.sh"

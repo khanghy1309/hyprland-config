@@ -197,6 +197,18 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 
 **Góc nóng** (như Hot Corners của macOS): đưa chuột vào sát một góc màn hình là làm việc đã chọn cho góc đó: Toàn cảnh, Bảng widget, Trung tâm điều khiển, Launcher, Chụp màn hình, Khóa màn hình, Tắt màn hình. Mặc định chỉ góc trên trái mở Toàn cảnh. Chọn việc cho từng góc ở Cài đặt → Màn hình nền và Dock → *Góc nóng*. Con trỏ phải dừng ở góc khoảng 0,1 giây mới tính, nên lướt chuột qua không mở nhầm. Góc nóng tự tắt khi có cửa sổ toàn màn hình (xem phim, chơi game) hoặc khi bật Chơi game.
 
+**Văn phòng, in ấn, USB, sao lưu** (install.sh cài gói; bước 8 bật dịch vụ, hỏi từng phần):
+- **Văn phòng:** LibreOffice giao diện tiếng Việt mở và lưu được Word, Excel, PowerPoint; bấm đúp tệp `.docx`, `.xlsx`, `.pptx` là mở. Chính tả: có tiếng Anh; kho của Arch chưa có từ điển chính tả tiếng Việt.
+- **Máy in và máy quét** (Cài đặt → Máy in và máy quét): máy in Wi-Fi và máy in USB đời mới tự hiện sau vài giây, không cần cài driver. Máy in HP (hplip) và máy in cũ (gutenprint): bấm *Thêm máy in*. Trang này hiện máy in nào đang sẵn sàng, đang in, đang tắt và số lệnh in đang chờ. *Quét tài liệu* mở ứng dụng quét (máy quét đời mới tự nhận), lưu ra PDF hoặc ảnh.
+- **USB, thẻ nhớ, ổ của Windows:** đọc ghi được exFAT, NTFS, FAT32. Ứng dụng *Ổ đĩa* (Cài đặt → Sao lưu và bảo trì → *Ổ đĩa*) để định dạng; chọn exFAT để dùng chung với Windows và Mac.
+- **Điểm khôi phục hệ thống** (Timeshift; Cài đặt → Sao lưu và bảo trì): trước mỗi lần cài, gỡ hay cập nhật phần mềm, máy tự chụp lại hệ thống (cách nhau ít nhất 30 phút), giữ 5 bản gần nhất, và chụp thêm mỗi ngày một lần. Chỉ chụp hệ thống, không đụng thư mục nhà: quay về thì tài liệu, ảnh vẫn giữ nguyên.
+  - Ổ gốc Btrfs (subvolume `@`, như archinstall tạo): chụp tức thì, gần như không tốn chỗ. Máy dùng GRUB thì menu khởi động có thêm mục *Arch Linux snapshots*, khởi động thẳng vào bản cũ khi máy hỏng sau cập nhật.
+  - Ổ khác (ext4…): sao chép bằng rsync vào `/timeshift`; lần đầu mất vài phút, các lần sau chỉ chép phần đổi.
+  - Máy lỗi sau cập nhật: Cài đặt → Sao lưu và bảo trì → *Mở Timeshift* → chọn điểm khôi phục → *Khôi phục*, rồi khởi động lại. *Chụp ngay* để tự chụp một bản trước khi thử gì đó.
+- **Nén RAM (zram):** khi RAM sắp đầy, máy nén bớt phần ít dùng ngay trong RAM thay vì đơ (dùng tối đa nửa RAM, không quá 8 GB). Máy 8 GB mở nhiều tab mượt hơn hẳn.
+- **Tự dọn gói cũ:** mỗi tuần xoá bớt bản cũ của các gói, chỉ giữ 3 bản gần nhất; trang Sao lưu và bảo trì có nút *Dọn gói cũ ngay* và hiện dung lượng đang chiếm.
+- Bật lại hay chỉnh các phần trên: Cài đặt → Sao lưu và bảo trì → *Thiết lập…* (mở `~/.config/hypr/scripts/setup-system.sh` trong terminal, hỏi từng phần, sao lưu tệp hệ thống trước khi sửa).
+
 **Công cụ đi kèm** (cài cùng install.sh, chạy sẵn khi đăng nhập):
 - **Giữ nội dung vừa chép** (wl-clip-persist): trên Wayland, chép chữ rồi đóng ứng dụng đó là mất nội dung vừa chép; giờ nội dung vẫn còn để dán, như Windows và Mac.
 - **Tự gắn USB, thẻ nhớ** (udiskie): cắm vào là ổ được gắn và hiện thông báo, không cần mở trình quản lý tệp trước. Rút ra thì bấm nút ⏏ cạnh tên ổ trong thanh bên trình quản lý tệp.
@@ -224,6 +236,8 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 - *Màn hình:* độ phân giải, tần số quét, tỉ lệ 100–200%, bật/tắt và vị trí màn hình phụ (trái/phải/trên/dưới). Bấm *Áp dụng* xong, nếu không bấm *Giữ thay đổi* trong 15 giây thì tự quay lại như cũ (phòng khi màn hình đen).
 - *Nguồn điện:* tiết kiệm pin / cân bằng / hiệu năng; sau bao lâu thì tắt màn hình, khóa, cho máy ngủ.
 - *Ngày giờ:* tự đặt giờ qua mạng, kiểu 24 giờ hay 12 giờ, đổi múi giờ (tìm theo tên thành phố).
+- *Máy in và máy quét:* danh sách máy in và trạng thái, thêm máy in, lệnh in đang chờ, quét tài liệu.
+- *Sao lưu và bảo trì:* điểm khôi phục (chụp ngay, mở Timeshift), nén RAM, gói cũ (dọn ngay), ứng dụng Ổ đĩa.
 - *Ứng dụng mặc định:* mở web, thư mục, ảnh, video, nhạc, PDF, văn bản, tệp nén bằng ứng dụng nào.
 - *Thời tiết:* gõ tên thành phố rồi chọn trong danh sách. Không cần tự tìm toạ độ nữa.
 - *Giới thiệu:* tên máy, phiên bản Hyprland, Quickshell, kernel; kiểm tra cập nhật, mở kho ứng dụng.
@@ -351,6 +365,10 @@ Sửa file nào thì Hyprland và Quickshell tự tải lại, không cần đă
 
 **Góc màn hình hiện thông báo lỗi đỏ.** Đó là lỗi trong cấu hình Hyprland, thông báo ghi tên file và dòng. Gửi nguyên văn thông báo cho mình để sửa. Trong lúc chờ, các phím tắt cơ bản vẫn dùng được.
 
+**Bấm Mở Timeshift mà không thấy cửa sổ.** Timeshift chạy bằng quyền quản trị qua XWayland. Mở terminal và chạy `sudo -E timeshift-gtk`; nếu báo lỗi, gửi nguyên văn cho mình.
+
+**Không thấy máy in.** Máy in và máy tính phải chung một mạng Wi-Fi. Đợi vài giây sau khi bật máy in, rồi vào Cài đặt → Máy in và máy quét → *Thêm máy in*. Máy in HP đời cũ: trong *Thêm máy in*, chọn driver HPLIP.
+
 **Không thấy thanh trên.** Mở terminal (`Super + Enter`) và chạy `qs`. Lỗi của Quickshell sẽ in ra ngay trong terminal.
 
 **Thông báo không hiện lên đảo động.** Một trình thông báo khác (mako, dunst, swaync) đang giữ chỗ. Gỡ nó rồi chạy lại `qs`.
@@ -415,7 +433,8 @@ config/
     lg_settings.lua   do ứng dụng Cài đặt tự ghi (không sửa tay)
     hyprlock.conf     màn hình khóa
     hypridle.conf     tự khóa khi không dùng máy
-    scripts/wallpaper.sh, capture.sh, vndate.sh, battery.sh, gamemode.sh, theme-apps.sh
+    scripts/wallpaper.sh, capture.sh, vndate.sh, battery.sh, gamemode.sh, theme-apps.sh,
+                      setup-system.sh (máy in, điểm khôi phục, zram, dọn gói), system-status.sh
   quickshell/
     shell.qml         điểm vào
     Theme.qml         màu, phông, kích thước
