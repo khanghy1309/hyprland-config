@@ -5,13 +5,14 @@
  * Ứng dụng Flatpak cũng đọc được (theme-apps.sh cho phép chúng đọc thư mục này).
  *
  * libadwaita không cho thay hình dáng nút, chỉ cho đổi màu: ở đây dùng đúng bảng màu của
- * thanh trên và dock (kính tối, chọn = trắng đục chữ tối).
+ * thanh trên và dock: kính tối, màu nhấn (mục đang chọn, nút chính, công tắc bật) là kính xám
+ * sáng hơn nền, chữ luôn trắng như macOS 26 chế độ tối.
  */
 
 /* libadwaita 1.6 trở lên đọc biến CSS */
 :root {
-    --accent-bg-color: #e9edef;
-    --accent-fg-color: #14181b;
+    --accent-bg-color: #4f565d;
+    --accent-fg-color: #f3f6f6;
     --accent-color: #dfe5e8;
 
     --window-bg-color: #17191c;
@@ -41,8 +42,8 @@
 }
 
 /* bản libadwaita cũ hơn dùng tên màu */
-@define-color accent_bg_color #e9edef;
-@define-color accent_fg_color #14181b;
+@define-color accent_bg_color #4f565d;
+@define-color accent_fg_color #f3f6f6;
 @define-color accent_color #dfe5e8;
 @define-color window_bg_color #17191c;
 @define-color window_fg_color #f3f6f6;
@@ -58,9 +59,9 @@
 @define-color dialog_bg_color #202226;
 @define-color popover_bg_color #24262b;
 
-/* màu nhấn là trắng nên núm công tắc (mặc định cũng trắng) phải tối mới thấy */
+/* công tắc đang bật: rãnh kính xám, núm trắng như macOS */
 switch:checked > slider {
-    background-color: #14181b;
+    background-color: #f3f6f6;
 }
 
 /* ── Nautilus: thanh bên kính mờ như Finder ──

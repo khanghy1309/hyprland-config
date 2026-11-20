@@ -482,7 +482,7 @@ PanelWindow {
                         height: 28
                         radius: 14
                         color: delArea.containsMouse ? "#ff8a80" : Theme.chip
-                        Icon { anchors.centerIn: parent; path: Icons.close; size: 12; stroke: 2.2; color: delArea.containsMouse ? Theme.ink : Theme.fg }
+                        Icon { anchors.centerIn: parent; path: Icons.close; size: 12; stroke: 2.2; color: delArea.containsMouse ? "white" : Theme.fg }
                         MouseArea {
                             id: delArea
                             anchors.fill: parent

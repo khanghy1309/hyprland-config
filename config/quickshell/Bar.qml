@@ -32,16 +32,17 @@ PanelWindow {
     // Hình nền sáng (trời trắng, tuyết...) thì kính của thanh chuyển sang tông tối để chữ trắng vẫn rõ.
     // Đo một lần mỗi khi đổi hình nền, trên ảnh tĩnh (video thì một khung hình), không chụp màn hình.
     readonly property bool bright: Glass.topBright
-    readonly property string pillTone: "light"
-    // nền sáng: chữ tối, nút đang chọn tối chữ sáng (như macOS 26 tự đổi màu chữ theo nền)
-    readonly property color fg: bright ? Theme.ink : Theme.fg
-    readonly property color dim: bright ? Theme.inkDim : Theme.dim
-    // mục đang chọn trên thanh: viên kính trong (tối hơn một chút khi dải hình nền sau thanh sáng),
-    // hoặc viên trắng / đen đặc nếu Cài đặt chọn "Trắng đục"
-    readonly property color selBg: Theme.glassSel ? (bright ? Qt.rgba(0, 0, 0, 0.16) : Qt.rgba(1, 1, 1, 0.22))
-                                                  : bright ? Theme.ink : Theme.accent
-    readonly property color selFg: Theme.glassSel ? fg : bright ? Theme.accent : Theme.ink
-    readonly property color selRim: bright ? Qt.rgba(0, 0, 0, 0.22) : Theme.selRim
+    // như thanh menu của macOS 26 (chế độ tối): chữ luôn trắng; hình nền sau thanh sáng thì kính của thanh
+    // tối lại để chữ trắng vẫn rõ, không đổi chữ sang màu đen
+    readonly property string pillTone: bright ? "dark" : "light"
+    // tối đủ để chữ trắng rõ trên trời trắng, tuyết…; nền tối thì là kính sáng như thường
+    readonly property color pillColor: bright ? Qt.rgba(24 / 255, 26 / 255, 30 / 255, Math.max(0.72, Theme.glassAlpha + 0.2)) : Theme.glass
+    readonly property color fg: Theme.fg
+    readonly property color dim: Theme.dim
+    // mục đang chọn trên thanh: viên kính trong (hoặc trắng đục chữ tối nếu Cài đặt chọn "Trắng đục")
+    readonly property color selBg: Theme.glassSel ? Qt.rgba(1, 1, 1, bright ? 0.18 : 0.22) : Theme.accent
+    readonly property color selFg: Theme.glassSel ? Theme.fg : Theme.ink
+    readonly property color selRim: Theme.selRim
     readonly property int selBorder: Theme.glassSel ? 1 : 0
     Canvas {
         id: probe
@@ -131,6 +132,7 @@ PanelWindow {
     GlassPill {
         id: sysPill
         tone: bar.pillTone
+        color: bar.pillColor
         x: Theme.edge
         y: Theme.barTop
         height: Theme.barHeight
@@ -164,6 +166,7 @@ PanelWindow {
     GlassPill {
         id: wsPill
         tone: bar.pillTone
+        color: bar.pillColor
         x: sysPill.x + sysPill.width + 8
         y: Theme.barTop
         height: Theme.barHeight
@@ -249,6 +252,7 @@ PanelWindow {
     GlassPill {
         id: statusPill
         tone: bar.pillTone
+        color: bar.pillColor
         anchors.right: parent.right
         anchors.rightMargin: Theme.edge
         y: Theme.barTop
@@ -308,6 +312,7 @@ PanelWindow {
     GlassPill {
         id: trayPill
         tone: bar.pillTone
+        color: bar.pillColor
         visible: bar.trayItems.length > 0
         anchors.right: statusPill.left
         anchors.rightMargin: 10

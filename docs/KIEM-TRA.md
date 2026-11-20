@@ -119,6 +119,20 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (khuya, muộn hơn): chữ luôn trắng (macOS 26 chế độ tối)
+
+- **Thanh trên:**
+  - Trước: hình nền sau thanh sáng thì chữ chuyển sang đen.
+  - Giờ chữ luôn trắng. Kính của bốn viên trên thanh tối lại, đậm ít nhất 0,72 (hoặc độ đậm của bảng kính + 0,2). Mục đang chọn vẫn là kính trong.
+  - Thử trong bản giả với hình nền trời gần trắng (#f4f7fb → #9fb8d6), ép `Glass.topBright = true`: chữ trắng đọc được trên viên kính tối.
+- **GTK 3 / 4:** màu nhấn (mục đang chọn trong Tệp, nút chính, công tắc bật…) đổi từ trắng #e9edef chữ đen sang kính xám #4f565d chữ #f3f6f6.
+  - Tương phản 6,8 : 1, trên ngưỡng 4,5 của WCAG AA.
+  - Núm công tắc bật trắng như macOS.
+  - Mục đang chọn ở thanh bên hộp Lưu / Mở là viên kính.
+- **Qt (qt6ct):** Highlight #4f565d / HighlightedText #f3f6f6 (lúc cửa sổ không được chọn: #454b51, 8,1 : 1); Accent cùng màu. Vẫn đủ 22 màu mỗi dòng.
+- **kitty:** chữ bôi đen nền #4f565d chữ trắng; tab đang xem nền #3e454c (8,9 : 1) chữ trắng.
+- **Còn chữ tối ở:** kiểu "Trắng đục" (người dùng tự chọn); con trỏ khối của kitty (`cursor_text_color`, chỉ khi đổi `cursor_shape block`). Nút xoá đỏ của launcher đổi sang biểu tượng trắng.
+
 ### 2026-11-20 (khuya, muộn): bỏ hết mảng trắng đặc, sửa bản giả lấy sai hình nền
 
 - **Màu mới trong Theme** (đều theo Cài đặt → Giao diện → Điểm nhấn):
