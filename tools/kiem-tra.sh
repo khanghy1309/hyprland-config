@@ -130,6 +130,24 @@ check_file() {
             rm -f "$tmpjs" ;;
         *.json)
             if out=$(python3 -I -m json.tool -- "$f" 2>&1 >/dev/null); then ok "$f (json)"; else fail "$f: $out"; fi ;;
+        config/kitty/*.conf)
+            # tên tuỳ chọn so với danh sách của kitty 0.51 (tools/kitty-0.51-options.txt)
+            local bad
+            bad=$(grep -vE '^[[:space:]]*(#|$)' -- "$f" | awk '{print $1}' | sort -u \
+                  | grep -vxE 'map|mouse_map|include|globinclude|envinclude|geninclude|action_alias|kitten_alias' \
+                  | grep -vxF -f <(grep -v '^#' "$ROOT/tools/kitty-0.51-options.txt") || true)
+            if [[ -z $bad ]]; then ok "$f (tên tuỳ chọn kitty 0.51)"; else fail "$f: kitty không có tuỳ chọn: $(echo $bad)"; fi ;;
+        *.fish)
+            if ! command -v fish >/dev/null; then skip "$f (không có fish)"; return; fi
+            if out=$(fish --no-execute -- "$f" 2>&1); then ok "$f (fish --no-execute)"; else fail "$f: $out"; fi ;;
+        *.toml)
+            # python 3.11+ có tomllib
+            if out=$(python3 -I -c 'import tomllib,sys; tomllib.load(open(sys.argv[1],"rb"))' "$f" 2>&1); then ok "$f (toml)"
+            else fail "$f: $out"; fi ;;
+        *.jsonc)
+            # fastfetch: JSON có chú thích //; bỏ dòng chú thích rồi đọc như JSON
+            if out=$(python3 -I -c 'import json,re,sys; json.loads(re.sub(r"(?m)^\s*//.*$","",open(sys.argv[1]).read()))' "$f" 2>&1); then ok "$f (jsonc)"
+            else fail "$f: $out"; fi ;;
         *.desktop)
             # metadata.desktop của SDDM không phải tệp .desktop thật (nhóm [SddmGreeterTheme])
             if ! grep -q '^\[Desktop Entry\]' -- "$f"; then skip "$f (không phải Desktop Entry)"

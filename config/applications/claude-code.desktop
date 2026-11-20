@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Claude Code
+GenericName=Trợ lý lập trình
+Comment=Trợ lý lập trình AI của Anthropic, chạy trong terminal (cần tài khoản Claude trả phí)
+Keywords=claude;ai;code;lập trình;trợ lý;
+Exec=kitty --class claude-code --title "Claude Code" fish -C lg_claude
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
+StartupNotify=false

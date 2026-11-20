@@ -4,7 +4,8 @@
 LG = {
     terminal    = "kitty",
     fileManager = "nautilus",
-    browser     = "firefox",
+    -- Microsoft Edge (AUR); máy cài bản Flathub thì mở bản đó
+    browser     = "command -v microsoft-edge-stable >/dev/null && exec microsoft-edge-stable || exec flatpak run com.microsoft.Edge",
     taskManager = "missioncenter",   -- Ctrl + Shift + Esc
     -- Launcher là một phần của Quickshell (~/.config/quickshell)
     launcher    = "qs ipc call launcher toggle",

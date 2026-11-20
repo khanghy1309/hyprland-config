@@ -47,8 +47,15 @@ PKGS=(
     gnome-keyring
     # hình nền
     awww
-    # terminal, tệp, trình duyệt
-    kitty nautilus firefox
+    # terminal, tệp (trình duyệt Microsoft Edge cài từ AUR ở bước 2)
+    kitty nautilus
+    # bộ đồ nghề cho terminal: fish (gợi ý lệnh theo lịch sử, tô màu khi gõ), dòng nhắc starship,
+    # thông tin máy fastfetch, ls / cat / cd dễ nhìn và thông minh hơn (eza, bat, zoxide),
+    # tìm nhanh (fzf, ripgrep), xem tài nguyên máy (btop), ví dụ dùng lệnh ngắn gọn (tealdeer: lệnh tldr),
+    # trang hướng dẫn (man-db), git, trình soạn thảo nano
+    fish starship fastfetch eza bat zoxide fzf ripgrep btop tealdeer man-db man-pages git nano
+    # phông của Windows Terminal (Cascadia Mono), chọn trong Cài đặt → Giao diện → Terminal
+    ttf-cascadia-code
     # âm thanh, mạng, bluetooth, pin
     pipewire pipewire-pulse wireplumber networkmanager bluez bluez-utils upower
     pavucontrol nm-connection-editor
@@ -127,12 +134,13 @@ fi
 echo
 
 # ───────────────────────── AUR (tuỳ chọn) ─────────────────────────
-bold "2. Gói AUR — tuỳ chọn: hình nền video (mpvpaper), cửa sổ thông tin máy (hyprsysteminfo)"
+bold "2. Gói AUR: trình duyệt Microsoft Edge; tuỳ chọn: hình nền video (mpvpaper), thông tin máy (hyprsysteminfo)"
 AUR=""
 command -v paru >/dev/null 2>&1 && AUR=paru
 command -v yay  >/dev/null 2>&1 && AUR=yay
 if [[ -z "$AUR" ]]; then
     info "Chưa có trình cài gói AUR (yay hoặc paru)."
+    info "Microsoft Edge (trình duyệt của bộ này) có trên AUR; không có yay thì sẽ cài bản Flathub."
     if ask "Cài yay để dùng được gói AUR?"; then
         sudo pacman -S --needed git base-devel
         tmp="$(mktemp -d)"
@@ -144,6 +152,46 @@ if [[ -z "$AUR" ]]; then
         rm -rf "$tmp"
     fi
 fi
+# Microsoft Edge: trình duyệt duy nhất của bộ này. Gói AUR đóng gói lại bản .deb chính thức của
+# Microsoft (tự cập nhật cùng hệ thống); không được thì dùng bản Flathub.
+EDGE_DESKTOP=""
+if pacman -Qq microsoft-edge-stable-bin >/dev/null 2>&1; then
+    EDGE_DESKTOP=microsoft-edge.desktop
+    info "Đã có Microsoft Edge"
+elif [[ -n "$AUR" ]]; then
+    info "Cài Microsoft Edge (microsoft-edge-stable-bin) bằng $AUR"
+    if "$AUR" -S --needed microsoft-edge-stable-bin; then
+        EDGE_DESKTOP=microsoft-edge.desktop
+    else
+        warn "Không cài được Edge từ AUR."
+    fi
+fi
+if [[ -z "$EDGE_DESKTOP" ]] && command -v flatpak >/dev/null 2>&1; then
+    info "Cài Microsoft Edge từ Flathub (com.microsoft.Edge, cho riêng tài khoản của bạn)"
+    if flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null \
+        && flatpak install --user -y --noninteractive flathub com.microsoft.Edge; then
+        EDGE_DESKTOP=com.microsoft.Edge.desktop
+    fi
+fi
+if [[ -n "$EDGE_DESKTOP" ]]; then
+    # Edge chạy thẳng trên Wayland (chữ nét khi phóng to màn hình) và gõ tiếng Việt bằng fcitx5.
+    # Lệnh mở Edge đọc file này, mỗi dòng một cờ; không được có dòng chú thích.
+    EDGE_FLAGS="$CONFIG/microsoft-edge-stable-flags.conf"
+    if [[ ! -f "$EDGE_FLAGS" ]]; then
+        printf '%s\n' --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 > "$EDGE_FLAGS"
+    fi
+    # bản cũ của bộ này cài Firefox; chỉ giữ một trình duyệt
+    OTHER_BROWSERS=()
+    for b in firefox firefox-developer-edition chromium epiphany falkon vivaldi; do
+        pacman -Qq "$b" >/dev/null 2>&1 && OTHER_BROWSERS+=("$b")
+    done
+    if ((${#OTHER_BROWSERS[@]} > 0)) && ask "Gỡ trình duyệt khác (${OTHER_BROWSERS[*]}) để chỉ dùng Edge? Dấu trang, mật khẩu vẫn còn trong thư mục cá nhân"; then
+        sudo pacman -Rns "${OTHER_BROWSERS[@]}" || warn "Chưa gỡ được ${OTHER_BROWSERS[*]}"
+    fi
+else
+    warn "Chưa cài được Microsoft Edge (kiểm tra mạng rồi chạy lại script). Super + B sẽ chưa mở được trình duyệt."
+fi
+
 if [[ -n "$AUR" ]] && ask "Cài mpvpaper bằng $AUR?"; then
     "$AUR" -S --needed mpvpaper || warn "Không cài được mpvpaper; hình nền video sẽ chưa dùng được."
 else
@@ -191,6 +239,46 @@ cp -a "$HERE/config/quickshell/." "$CONFIG/quickshell/"
 bash "$CONFIG/quickshell/shaders/build.sh" || warn "Không dựng lại được shader, dùng bản có sẵn"
 cp -a "$HERE/config/kitty/." "$CONFIG/kitty/"
 info "Đã chép hypr, quickshell, kitty"
+
+# terminal: fish (chỉ thêm một file trong conf.d, config.fish của bạn giữ nguyên), starship, fastfetch, btop
+mkdir -p "$CONFIG/fish/conf.d" "$CONFIG/fastfetch"
+cp "$HERE/config/fish/conf.d/liquid-glass.fish" "$CONFIG/fish/conf.d/"
+# starship và fastfetch: file cũ của bạn (nếu khác) được sao lưu trước khi thay
+copy_conf() {
+    local src="$HERE/config/$1" dst="$CONFIG/$2"
+    [[ -f "$dst" ]] && ! cmp -s "$src" "$dst" && backup_if_exists "$dst"
+    cp "$src" "$dst"
+}
+copy_conf starship/starship.toml starship.toml
+copy_conf fastfetch/config.jsonc fastfetch/config.jsonc
+# btop: nền trong để thấy kính phía sau (btop tự điền phần còn lại khi mở lần đầu)
+if [[ ! -f "$CONFIG/btop/btop.conf" ]]; then
+    mkdir -p "$CONFIG/btop"
+    printf '%s\n' 'color_theme = "Default"' 'theme_background = false' 'truecolor = true' 'rounded_corners = true' > "$CONFIG/btop/btop.conf"
+fi
+# Shell đăng nhập vẫn là bash (script, tài liệu trên mạng đều viết cho bash); kitty tự mở fish.
+# Lệnh cài cho riêng tài khoản (claude...) nằm ở ~/.local/bin: thêm vào PATH của bash.
+if [[ -f "$HOME/.bashrc" ]] && ! grep -q '\.local/bin' "$HOME/.bashrc"; then
+    printf '\n# Liquid Glass: lệnh cài cho riêng tài khoản (claude...)\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$HOME/.bashrc"
+fi
+# ví dụ dùng lệnh cho tldr (tải một lần, cần mạng)
+command -v tldr >/dev/null 2>&1 && { tldr --update >/dev/null 2>&1 || true; }
+info "Terminal: fish, starship, fastfetch (cấu hình ở ~/.config/fish/conf.d/liquid-glass.fish)"
+
+# Claude Code: trợ lý lập trình AI của Anthropic, chạy trong terminal (gõ claude, hoặc mở "Claude Code"
+# trong launcher). Cài bằng bộ cài chính thức vào ~/.local/bin cho riêng tài khoản (không cần sudo),
+# tự cập nhật về sau. Lần đầu mở sẽ hỏi đăng nhập trong trình duyệt: cần tài khoản Claude Pro, Max,
+# Team, Enterprise hoặc Claude Console. Script này không đăng nhập hộ.
+if [[ -x "$HOME/.local/bin/claude" ]] || command -v claude >/dev/null 2>&1; then
+    info "Đã có Claude Code (tự cập nhật; kiểm tra bằng: claude doctor)"
+else
+    info "Cài Claude Code bằng bộ cài chính thức (curl -fsSL https://claude.ai/install.sh | bash)"
+    if curl -fsSL https://claude.ai/install.sh | bash; then
+        info "Đã cài Claude Code. Mở terminal mới rồi gõ: claude"
+    else
+        warn "Chưa cài được Claude Code (kiểm tra mạng). Cài lại sau bằng: curl -fsSL https://claude.ai/install.sh | bash"
+    fi
+fi
 
 # ứng dụng Cài đặt: thêm vào launcher (tìm "Cài đặt")
 mkdir -p "$HOME/.local/share/applications"
@@ -245,7 +333,7 @@ echo
 # Mở ảnh, video, PDF... bằng ứng dụng nào. Đổi lại trong Cài đặt → Ứng dụng mặc định.
 if command -v xdg-mime >/dev/null 2>&1; then
     setdef() { local app="$1"; shift; xdg-mime default "$app" "$@" 2>/dev/null || true; }
-    setdef firefox.desktop text/html x-scheme-handler/http x-scheme-handler/https
+    [[ -n "${EDGE_DESKTOP:-}" ]] && setdef "$EDGE_DESKTOP" text/html application/xhtml+xml x-scheme-handler/http x-scheme-handler/https
     setdef org.gnome.Nautilus.desktop inode/directory
     setdef org.gnome.Loupe.desktop image/png image/jpeg image/webp image/gif image/bmp image/tiff image/avif image/heic image/svg+xml
     # tài liệu văn phòng (Word, Excel, PowerPoint, OpenDocument): LibreOffice

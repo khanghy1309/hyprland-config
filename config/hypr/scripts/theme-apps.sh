@@ -59,7 +59,7 @@ do_gtk() {
 # ── nút trên thanh tiêu đề ──
 # Hyprland bỏ qua yêu cầu thu nhỏ của ứng dụng và (theo lg_rules.lua) cả phóng to, nên hai nút đó
 # bấm không có tác dụng: chỉ để nút đóng (hoặc ẩn hết). Ứng dụng GTK 4 / libadwaita đọc gsettings
-# qua cổng xdg-desktop-portal-gtk; GTK 3, Firefox, Chromium đọc settings.ini. Ghi cả hai cho chắc.
+# qua cổng xdg-desktop-portal-gtk; GTK 3 đọc settings.ini. Ghi cả hai cho chắc.
 do_buttons() {
     local kind="${1:-}" layout
     [[ -z $kind ]] && kind="$(jq -r '.look.titleButtons // "close-right"' "$SETTINGS" 2>/dev/null || echo close-right)"

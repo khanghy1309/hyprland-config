@@ -73,7 +73,7 @@ Singleton {
 
     // ── tắt máy, khởi động lại, đăng xuất êm ──
     // hyprshutdown (của nhóm Hyprland) đóng từng ứng dụng như khi bấm nút đóng, để chúng kịp lưu
-    // (Firefox không báo "khôi phục phiên bị lỗi", tài liệu chưa lưu thì ứng dụng còn kịp hỏi),
+    // (trình duyệt không báo "khôi phục phiên bị lỗi", tài liệu chưa lưu thì ứng dụng còn kịp hỏi),
     // rồi mới thoát Hyprland và chạy lệnh sau cùng. Máy chưa có hyprshutdown thì làm như cũ.
     function graceful(label, post) {
         const tail = post ? ` -p '${post}'` : "";

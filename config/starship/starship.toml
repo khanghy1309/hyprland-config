@@ -1,0 +1,65 @@
+# Dòng nhắc lệnh starship theo Liquid Glass: thư mục, nhánh git, thời gian lệnh chạy lâu.
+# Tài liệu: https://starship.rs/config/  (sửa file này: ~/.config/starship.toml)
+"$schema" = "https://starship.rs/config-schema.json"
+
+add_newline = true
+command_timeout = 800
+format = """
+$username$hostname$directory$git_branch$git_state$git_status$python$nodejs$rust$cmd_duration
+$character"""
+
+[directory]
+style = "bold #9bd3c7"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+home_symbol = "~"
+read_only = " 󰌾"
+read_only_style = "#f28b82"
+
+[git_branch]
+symbol = " "
+style = "#c4b5fd"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "#f4dcb6"
+format = "[$all_status$ahead_behind]($style) "
+
+[git_state]
+style = "#f4dcb6"
+
+[cmd_duration]
+min_time = 3000
+style = "#7f888e"
+format = "[mất $duration]($style) "
+
+[character]
+success_symbol = "[❯](bold #9bd3c7)"
+error_symbol = "[❯](bold #f28b82)"
+vimcmd_symbol = "[❮](bold #c4b5fd)"
+
+# tên người dùng và tên máy chỉ hiện khi đang điều khiển máy khác qua SSH
+[username]
+style_user = "#8ec9ff"
+format = "[$user]($style)@"
+
+[hostname]
+ssh_only = true
+style = "#8ec9ff"
+format = "[$hostname]($style) "
+
+[python]
+symbol = " "
+style = "#f4dcb6"
+format = "[$symbol$version]($style) "
+
+[nodejs]
+symbol = " "
+style = "#9bd3c7"
+format = "[$symbol$version]($style) "
+
+[rust]
+symbol = " "
+style = "#f6a8a1"
+format = "[$symbol$version]($style) "

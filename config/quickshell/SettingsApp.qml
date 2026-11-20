@@ -322,10 +322,41 @@ FloatingWindow {
                 }
                 SegRow {
                     label: "Phông chữ số và mã"
-                    note: "Dùng cho số liệu trên thanh trên, đồng hồ đếm giờ… Terminal kitty đặt riêng trong kitty.conf."
+                    note: "Dùng cho số liệu trên thanh trên, đồng hồ đếm giờ… Phông của terminal chọn ở mục Terminal bên dưới."
                     options: [["Geist Mono", "Geist Mono"], ["JetBrains Mono", "JetBrains Mono"]]
                     current: Settings.look.monoFont
                     onPicked: v => Settings.look.monoFont = v
+                    last: true
+                }
+            }
+
+            Group {
+                title: "Terminal"
+                SegRow {
+                    label: "Phông chữ"
+                    note: "Cascadia Mono là phông của Windows Terminal. Cả ba đều đủ dấu tiếng Việt."
+                    options: [["Geist Mono", "Geist Mono"], ["JetBrains Mono", "JetBrains"], ["Cascadia Mono", "Cascadia"]]
+                    current: Settings.terminal.font
+                    onPicked: v => Settings.terminal.font = v
+                }
+                SliderRow {
+                    label: "Cỡ chữ"
+                    from: 9; to: 16; step: 0.5
+                    value: Settings.terminal.size
+                    format: v => String(v).replace(".", ",")
+                    onMoved: v => Settings.terminal.size = v
+                }
+                SliderRow {
+                    label: "Độ đậm của nền"
+                    note: "Thấp thì trong như kính, cao thì dễ đọc chữ hơn"
+                    from: 0.4; to: 1; step: 0.02
+                    value: Settings.terminal.opacity
+                    format: v => Math.round(v * 100) + "%"
+                    onMoved: v => Settings.terminal.opacity = v
+                }
+                ButtonsRow {
+                    note: "Các cửa sổ terminal đang mở đổi ngay. Chỉnh thêm thì viết vào ~/.config/kitty/user.conf."
+                    buttons: [["Mở terminal", () => Quickshell.execDetached(["kitty", "--directory", Quickshell.env("HOME")])]]
                     last: true
                 }
             }
@@ -828,7 +859,7 @@ FloatingWindow {
 
                 ButtonsRow {
                     buttons: [["Khôi phục mặc định", () => {
-                        Settings.dock.pinned = ["org.gnome.Nautilus", "firefox", "kitty", "liquid-glass-settings"];
+                        Settings.dock.pinned = ["org.gnome.Nautilus", "microsoft-edge", "kitty", "liquid-glass-settings"];
                     }]]
                     note: "Cũng ghim được bằng chuột phải vào biểu tượng trên dock, hoặc Ctrl + P trong launcher. Kéo biểu tượng trên dock để đổi chỗ."
                     last: true

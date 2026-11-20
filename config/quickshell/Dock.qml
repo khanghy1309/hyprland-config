@@ -61,7 +61,12 @@ PanelWindow {
         const c = t.lastIpcObject["class"];
         if (c === "org.quickshell") return t.title === "Cài đặt" ? "liquid-glass-settings" : "";
         const e = DesktopEntries.heuristicLookup(c);
-        return e ? e.id : "class:" + c;
+        if (!e) return "class:" + c;
+        return e.id === "com.microsoft.Edge" ? "microsoft-edge" : e.id;
+    }
+    // Edge cài từ Flathub (khi AUR không được) có tên tệp khác: coi như một
+    function entryOf(id) {
+        return DesktopEntries.byId(id) || (id === "microsoft-edge" ? DesktopEntries.byId("com.microsoft.Edge") : null);
     }
 
     readonly property var apps: {
@@ -75,12 +80,12 @@ PanelWindow {
         const pinned = Settings.dock.pinned;
         const out = [];
         for (const id of pinned) {
-            const e = DesktopEntries.byId(id);
+            const e = entryOf(id);
             if (e) out.push({ id: id, entry: e, wins: groups[id] || [], pinned: true });
         }
         for (const id of order) {
             if (pinned.indexOf(id) >= 0) continue;
-            const e = id.startsWith("class:") ? null : DesktopEntries.byId(id);
+            const e = id.startsWith("class:") ? null : entryOf(id);
             out.push({ id: id, entry: e, wins: groups[id], pinned: false, cls: id.replace(/^class:/, "") });
         }
         return out;

@@ -119,6 +119,27 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (chiều): terminal, Claude Code, Microsoft Edge thay Firefox
+
+- **Tên gói:** đối chiếu với `core.db` / `extra.db` tải từ mirror chính thức hôm nay: cả 123 gói trong `PKGS` đều có. Mới thêm: fish 4.9.3, starship 1.27.0, fastfetch 2.71.0, eza, bat, zoxide, fzf 0.75 (có `fzf --fish`), ripgrep, btop, tealdeer, man-db, man-pages, git, nano, ttf-cascadia-code. Đã bỏ `firefox`.
+- **Microsoft Edge:** gói AUR `microsoft-edge-stable-bin` (lấy bằng `git clone` từ AUR, đọc PKGBUILD).
+  - Tệp `.desktop` là `microsoft-edge.desktop`; lệnh `microsoft-edge-stable`.
+  - Lệnh này đọc `~/.config/microsoft-edge-stable-flags.conf` bằng `$(cat …)` không có ngoặc kép, nên tệp cờ không được có dòng chú thích: script ghi đúng ba dòng cờ, không chú thích.
+  - Bản Flathub (`com.microsoft.Edge`) chỉ dùng khi AUR không được; dock coi hai tên tệp này là một (Dock.qml `entryOf`).
+  - Dock của bản cũ ghim `firefox`: Settings.qml đổi thành `microsoft-edge` khi đọc settings.json.
+  - Chưa tìm được tuỳ chọn chính thức để Edge trên Linux bỏ ba nút tự vẽ của nó; README nói thẳng là nút thu nhỏ của Edge không có tác dụng.
+- **Claude Code:** lệnh cài, chỗ cài (`~/.local/bin/claude`), yêu cầu tài khoản trả phí lấy từ tài liệu chính thức (code.claude.com). Không đăng nhập hộ. `~/.local/bin` vào PATH của fish (`fish_add_path`, cả khi không tương tác) và bash (`~/.bashrc`, chỉ thêm một lần).
+  - Lối tắt `claude-code.desktop`: `desktop-file-validate` qua. Đọc `parseExecString` của Quickshell thì thấy nó coi cả `'` lẫn `"` là dấu mở/đóng chuỗi, nên dòng Exec không lồng ngoặc: gọi hàm fish `lg_claude`.
+  - Đã thử `lg_claude` với fish thật (3.7), có và không có lệnh `claude` giả: chuyển về thư mục nhà, chạy claude; thiếu thì in lệnh cài.
+- **kitty:** mọi tên tuỳ chọn trong `kitty.conf`, `glass-theme.conf` có trong `kitty/options/definition.py` của gói kitty 0.51.0 (tải từ mirror, chỉ đọc mã, không chạy). Giá trị đối chiếu với định nghĩa: `cursor_trail` tính bằng mili giây (đặt 200 để không vẽ vệt khi ứng dụng như Claude Code vẽ lại màn hình liên tục), `tab_bar_margin_height` hai số, `tab_bar_style separator`, `strip_trailing_spaces smart`. Có hàm `copy_or_interrupt` và `paste_from_clipboard`.
+  - `tools/kiem-tra.sh` giờ soát tên tuỳ chọn kitty theo `tools/kitty-0.51-options.txt` (đã thử: thêm `cursor_trial` thì báo lỗi), cú pháp `.fish` bằng `fish --no-execute`, `.toml`, `.jsonc`.
+- **Cài đặt → Giao diện → Terminal:** ghi `~/.config/kitty/lg-settings.conf` (phông, cỡ, độ đậm) rồi gửi SIGUSR1 cho kitty để kitty đọc lại cấu hình. `background_opacity` đổi được khi đọc lại vì `dynamic_background_opacity yes`. Bản giả: nhóm Terminal hiện đúng, không lỗi QML mới.
+  - Geist Mono và Cascadia Mono: đọc bảng mã của tệp phông bằng fontTools, có đủ 104 chữ riêng của tiếng Việt (ă â đ ê ô ơ ư và các chữ có dấu nằm ngoài Latin-1, hoa và thường).
+- **fish:** `fish -n` qua; chạy thật với lệnh giả: alias `ll` giữ `--time-style=+%d/%m/%Y %H:%M` là một đối số, lời chào chỉ hiện ở lần đầu, PATH có `~/.local/bin`.
+- **starship.toml:** qua `config-schema.json` của starship v1.27.0 (đã thử khoá sai thì schema bắt được).
+- **fastfetch:** qua `json_schema.json` của fastfetch 2.71.0; logo `arch_small`, các chỗ `{user-name}`, `{host-name}`, `{pretty-name}`, `{version}` có trong mã nguồn.
+- **Chưa thử trên máy thật:** kitty, fish, Edge (gõ tiếng Việt trong Edge qua text-input-v3), bộ cài Claude Code trên Arch (tài liệu chính thức chỉ liệt kê Ubuntu, Debian, Alpine), Edge bản Flathub.
+
 ### 2026-11-20 (trưa, muộn): văn phòng, in ấn, USB, điểm khôi phục, zram, dọn gói
 
 - **Tên gói:** đối chiếu với cơ sở dữ liệu gói `core.db` / `extra.db` tải từ mirror chính thức của Arch hôm nay.

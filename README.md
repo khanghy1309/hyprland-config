@@ -35,9 +35,9 @@ cd liquid-glass
 
 Script hỏi trước mỗi bước cần `sudo`:
 
-1. Cài khoảng 75 gói từ kho chính thức (gói có rồi thì bỏ qua).
-2. Tuỳ chọn: cài `yay` và `mpvpaper` từ AUR để dùng hình nền video.
-3. Sao lưu cấu hình cũ trong `~/.config/hypr`, `quickshell`, `kitty` sang `~/.config/liquid-glass-backup-<thời gian>/`, rồi chép cấu hình mới vào.
+1. Cài khoảng 120 gói từ kho chính thức (gói có rồi thì bỏ qua).
+2. Cài `yay` (nếu chưa có) và trình duyệt Microsoft Edge từ AUR (không được thì lấy bản Flathub), hỏi có gỡ Firefox / trình duyệt khác không; tuỳ chọn: `mpvpaper` cho hình nền video, `hyprsysteminfo`.
+3. Sao lưu cấu hình cũ trong `~/.config/hypr`, `quickshell`, `kitty` sang `~/.config/liquid-glass-backup-<thời gian>/`, rồi chép cấu hình mới vào; thêm cấu hình fish, starship, fastfetch cho terminal và cài Claude Code bằng bộ cài chính thức (không cần sudo).
 4. Cho ứng dụng GTK, Qt và Flatpak cùng bảng màu với Liquid Glass, đặt màu thư mục, thêm lối tắt ở thanh bên trình quản lý tệp (xem *Ứng dụng và thư mục* bên dưới).
 5. Bật NetworkManager, bluetooth và power-profiles-daemon (cho công tắc tiết kiệm pin).
 6. Máy có card NVIDIA: tự nhận đời card và cài driver hợp (không có card NVIDIA thì bỏ qua, không hỏi gì).
@@ -212,7 +212,7 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 **Công cụ đi kèm** (cài cùng install.sh, chạy sẵn khi đăng nhập):
 - **Giữ nội dung vừa chép** (wl-clip-persist): trên Wayland, chép chữ rồi đóng ứng dụng đó là mất nội dung vừa chép; giờ nội dung vẫn còn để dán, như Windows và Mac.
 - **Tự gắn USB, thẻ nhớ** (udiskie): cắm vào là ổ được gắn và hiện thông báo, không cần mở trình quản lý tệp trước. Rút ra thì bấm nút ⏏ cạnh tên ổ trong thanh bên trình quản lý tệp.
-- **Tắt máy êm** (hyprshutdown, của nhóm Hyprland): Khởi động lại, Tắt máy, Đăng xuất (menu hệ thống, menu nguồn) đóng từng ứng dụng như khi bấm nút đóng rồi mới tắt, nên ứng dụng kịp lưu: Firefox không báo "khôi phục phiên bị lỗi", tài liệu chưa lưu thì ứng dụng còn kịp hỏi. Một màn hình nhỏ hiện các ứng dụng đang đóng.
+- **Tắt máy êm** (hyprshutdown, của nhóm Hyprland): Khởi động lại, Tắt máy, Đăng xuất (menu hệ thống, menu nguồn) đóng từng ứng dụng như khi bấm nút đóng rồi mới tắt, nên ứng dụng kịp lưu: trình duyệt không báo "khôi phục phiên bị lỗi", tài liệu chưa lưu thì ứng dụng còn kịp hỏi. Một màn hình nhỏ hiện các ứng dụng đang đóng.
 - **Thông tin máy** (hyprsysteminfo, của nhóm Hyprland; gói AUR, install.sh hỏi ở bước 2): menu hệ thống → *Giới thiệu máy này* mở cửa sổ CPU, card đồ hoạ, bộ nhớ, có nút chép thông tin chẩn đoán để gửi khi hỏi lỗi. Chưa cài thì mở trang Giới thiệu trong Cài đặt.
 
 **Tính năng riêng của Hyprland** (Hyprland 0.57 có sẵn, chỉ cần bật):
@@ -262,9 +262,9 @@ Lựa chọn lưu ở `~/.config/liquid-glass/settings.json`. Phần của Hyprl
 - **Ứng dụng GTK 3** (GIMP, Inkscape…): theme adw-gtk3 tối cùng màu.
 - **Ứng dụng Qt** (VLC, OBS, qBittorrent…): bảng màu tối Liquid Glass và bo tròn theo cùng kiểu (nút, ô nhập, danh sách, thẻ, thanh trượt, thanh tiến trình, thanh cuộn) qua qt6ct. Menu và danh sách xổ xuống giữ khung ngoài vuông, chỉ bo tròn từng mục, vì Qt không cho các cửa sổ nổi này trong suốt (bo góc ngoài sẽ lộ góc đen). Ứng dụng có theme riêng (như OBS) vẫn dùng theme của nó.
 - **Ứng dụng Flatpak:** đọc được màu Liquid Glass (chỉ đọc), ứng dụng GTK 3 trong Flatpak có theme adw-gtk3 tối; áp cho cả ứng dụng cài sau này.
-- **Nút trên thanh tiêu đề:** trên Hyprland, nút thu nhỏ và phóng to của ứng dụng bấm không có tác dụng (Hyprland bỏ qua hai yêu cầu đó), nên mặc định ứng dụng chỉ còn nút đóng. Chọn ở Cài đặt → Giao diện → *Nút trên thanh tiêu đề ứng dụng*: *Đóng bên phải*, *Đóng bên trái* (như macOS) hoặc *Ẩn hết*; mở lại ứng dụng để thấy. Áp cho ứng dụng GTK 3, GTK 4 / libadwaita, Firefox, Chromium và ứng dụng Flatpak. Thu nhỏ, toàn màn hình: chuột phải vào ứng dụng trên dock hoặc trong Toàn cảnh. Ứng dụng Qt không có thanh tiêu đề riêng trên Hyprland. Ứng dụng Electron tự vẽ nút (VS Code, Discord, Obsidian…): đổi trong cài đặt của từng ứng dụng, ví dụ VS Code đặt `"window.titleBarStyle": "native"`.
+- **Nút trên thanh tiêu đề:** trên Hyprland, nút thu nhỏ và phóng to của ứng dụng bấm không có tác dụng (Hyprland bỏ qua hai yêu cầu đó), nên mặc định ứng dụng chỉ còn nút đóng. Chọn ở Cài đặt → Giao diện → *Nút trên thanh tiêu đề ứng dụng*: *Đóng bên phải*, *Đóng bên trái* (như macOS) hoặc *Ẩn hết*; mở lại ứng dụng để thấy. Áp cho ứng dụng GTK 3, GTK 4 / libadwaita và ứng dụng Flatpak. Thu nhỏ, toàn màn hình: chuột phải vào ứng dụng trên dock hoặc trong Toàn cảnh. Ứng dụng Qt không có thanh tiêu đề riêng trên Hyprland. Microsoft Edge tự vẽ ba nút của nó; bấm thu nhỏ trên Edge không có tác dụng, dùng chuột phải trên dock thay vào. Ứng dụng Electron tự vẽ nút (VS Code, Discord, Obsidian…): đổi trong cài đặt của từng ứng dụng, ví dụ VS Code đặt `"window.titleBarStyle": "native"`.
 - **Màu thư mục:** Cài đặt → Giao diện → *Màu thư mục*, 12 màu (mặc định tím). Đổi là trình quản lý tệp đổi theo ngay.
-- **Menu chuột phải kính lỏng:** menu của ứng dụng GTK (trình quản lý tệp, trình xem ảnh, GIMP…) nền hơi trong, Hyprland làm mờ phía sau, bo 14–16 px, mục được chọn là viên trắng như menu của dock. Menu của ứng dụng Qt vẫn nền đặc khung vuông (Qt không cho menu trong suốt); menu của Firefox, Chrome do trình duyệt tự vẽ.
+- **Menu chuột phải kính lỏng:** menu của ứng dụng GTK (trình quản lý tệp, trình xem ảnh, GIMP…) nền hơi trong, Hyprland làm mờ phía sau, bo 14–16 px, mục được chọn là viên trắng như menu của dock. Menu của ứng dụng Qt vẫn nền đặc khung vuông (Qt không cho menu trong suốt); menu của Edge do trình duyệt tự vẽ.
 - **Hộp Lưu / Mở tệp kính mờ:** dùng chung cho ứng dụng GTK, trình duyệt, ứng dụng Flatpak và cả ứng dụng Qt (qt6ct được đặt dùng hộp chung của hệ thống). Thanh bên trong hơn, danh sách tệp nền đặc cho dễ đọc. Các hộp thoại khác của ứng dụng GTK 3 cũng kính mờ theo.
 - **Chuột phải trên màn hình nền:** menu kính lỏng hiện từ đúng chỗ con trỏ với Mở Terminal, Mở thư mục nhà, Đổi hình nền, Hình nền ngẫu nhiên, Giao diện, Chụp màn hình, Hiện/ẩn dock, Phím tắt.
 
@@ -272,11 +272,37 @@ CSS riêng của bạn: đặt trong `~/.config/gtk-4.0/gtk.css` (hoặc `gtk-3.
 
 Chạy lại tay (sau khi cài thêm Papirus, Flatpak…): `~/.config/hypr/scripts/theme-apps.sh all`.
 
+## Terminal, Claude Code và trình duyệt
+
+**Terminal (kitty, `Super + Enter`):** nền kính trong thấy hình nền phía sau, vệt mờ theo con trỏ khi nó nhảy xa, tab ở trên (chỉ hiện khi mở từ 2 tab). Chép dán như Windows: `Ctrl + C` chép khi đang chọn chữ (không chọn gì thì vẫn là dừng lệnh), `Ctrl + V` dán. Bấm vào đường link là mở trong Edge. Phông (Geist Mono, JetBrains Mono, hoặc Cascadia Mono của Windows Terminal), cỡ chữ, độ đậm của nền: Cài đặt → Giao diện → *Terminal*, terminal đang mở đổi ngay.
+
+Các phần cài sẵn cho terminal:
+
+| Phần | Làm gì |
+|---|---|
+| `fish` | shell của terminal: gợi ý lệnh màu xám theo lịch sử (bấm `→` để nhận), tô màu khi gõ (lệnh sai hiện đỏ), gợi ý cả tuỳ chọn của lệnh khi bấm `Tab`. Shell đăng nhập vẫn là bash nên script và hướng dẫn trên mạng vẫn chạy như cũ |
+| `starship` | dòng nhắc: thư mục đang ở, nhánh git và trạng thái, phiên bản Python / Node / Rust khi ở trong dự án, lệnh chạy lâu thì báo đã mất bao lâu, mũi tên đỏ khi lệnh trước báo lỗi |
+| `fastfetch` | thông tin máy (hệ điều hành, CPU, đồ hoạ, bộ nhớ, ổ đĩa, pin) ở terminal đầu tiên sau khi đăng nhập, kèm vài mẹo |
+| `eza` | `ls`, `ll`, `la`, `tree` có biểu tượng, màu, trạng thái git, ngày kiểu Việt Nam |
+| `bat` | `cat` tô màu theo loại tệp; trang `man` cũng có màu |
+| `zoxide` | `cd` nhớ thư mục hay vào: `cd tai` nhảy thẳng tới thư mục có "tai" trong tên đã từng vào; `cdi` để chọn trong danh sách |
+| `fzf` | `Ctrl + R` tìm lại lệnh cũ, `Ctrl + T` chèn đường dẫn tệp, `Alt + C` chuyển thư mục, đều tìm gần đúng |
+| `ripgrep` (`rg`) | tìm chữ trong cả thư mục, rất nhanh |
+| `btop` | xem CPU, RAM, mạng, ổ đĩa, tiến trình ngay trong terminal |
+| `tealdeer` (`tldr`) | ví dụ dùng lệnh ngắn gọn: `tldr tar` |
+| `git`, `nano`, `man` | quản lý mã, soạn tệp ngay trong terminal (`nano tệp.txt`, `Ctrl + O` lưu, `Ctrl + X` thoát), trang hướng dẫn |
+
+Muốn shell đăng nhập cũng là fish: `chsh -s /usr/bin/fish` (không bắt buộc).
+
+**Claude Code:** trợ lý lập trình AI của Anthropic chạy trong terminal, cài bằng bộ cài chính thức vào `~/.local/bin` và tự cập nhật. Mở *Claude Code* trong launcher, hoặc gõ `claude` trong terminal (nên `cd` vào thư mục dự án trước). Lần đầu nó mở trình duyệt để đăng nhập: cần tài khoản Claude Pro, Max, Team, Enterprise hoặc Claude Console (tài khoản miễn phí không dùng được). Kiểm tra cài đặt: `claude doctor`. Hướng dẫn: [code.claude.com/docs](https://code.claude.com/docs/en/overview).
+
+**Microsoft Edge** là trình duyệt duy nhất (`Super + B`, ghim trên dock, mở mọi đường link). Cài từ AUR (gói `microsoft-edge-stable-bin`, đóng lại bản chính thức của Microsoft, cập nhật cùng hệ thống); máy không dùng được AUR thì cài bản Flathub. Edge chạy thẳng trên Wayland và gõ được tiếng Việt bằng fcitx5 nhờ `~/.config/microsoft-edge-stable-flags.conf` (mỗi dòng một cờ, không được viết dòng chú thích). Khi cài, script hỏi có gỡ Firefox hay trình duyệt khác đang có không.
+
 ## Cho người quen Windows
 
 - **Alt + Tab**, **Alt + F4**, **Ctrl + Shift + Esc** (Mission Center: xem CPU, RAM, ứng dụng nào đang chạy, tắt ứng dụng bị treo) dùng như trên Windows. `Super + Shift + S` cũng là chụp màn hình như Windows.
 - **Thu nhỏ** (`Super + H`): cửa sổ biến khỏi màn hình nhưng vẫn chạy; biểu tượng trên dock vẫn có chấm. Bấm biểu tượng đó, hoặc chọn trong Alt + Tab, để hiện lại.
-- **Ứng dụng có sẵn:** Firefox, Tệp (Nautilus), xem ảnh (Loupe), xem video và nghe nhạc (Celluloid), đọc PDF (Papers), soạn văn bản (Text Editor), máy tính bỏ túi, giải nén zip/rar/7z (File Roller), Mission Center.
+- **Ứng dụng có sẵn:** Microsoft Edge (trình duyệt duy nhất; đăng nhập tài khoản Microsoft để đồng bộ dấu trang, mật khẩu từ máy Windows), Claude Code, Tệp (Nautilus), xem ảnh (Loupe), xem video và nghe nhạc (Celluloid), đọc PDF (Papers), soạn văn bản (Text Editor), máy tính bỏ túi, giải nén zip/rar/7z (File Roller), Mission Center.
 - **USB, điện thoại, máy ảnh** cắm vào là hiện trong Tệp (điện thoại Android: chọn chế độ "Truyền tệp" trên điện thoại).
 - **Tài liệu Word/Excel** từ máy Windows hiển thị đúng phông nhờ bộ phông Liberation (thay cho Arial, Times New Roman).
 - **Cài phần mềm:** mở *Phần mềm* trong launcher (GNOME Software, lấy ứng dụng từ Flathub, như Microsoft Store).
@@ -354,7 +380,7 @@ Windows 10 và 11 dùng phông **Segoe UI**. Phông này thuộc bản quyền c
 - **Kính của cửa sổ, chi tiết hơn:** `~/.config/hypr/lg_look.lua`, phần `blur` và `acrylic` (độ khúc xạ, tách màu ở mép...).
 - **Màu, phông của thanh trên, đảo động, các bảng:** `~/.config/quickshell/Theme.qml`.
 - **Nơi lưu ghi chú nhanh:** `~/.config/quickshell/Config.qml`.
-- **Độ trong của terminal:** `background_opacity` trong `~/.config/kitty/kitty.conf`.
+- **Terminal:** phông, cỡ chữ, độ đậm của nền ở Cài đặt → Giao diện → *Terminal*; phần còn lại viết vào `~/.config/kitty/user.conf` (nạp sau cùng, không bị ghi đè). Shell fish: `~/.config/fish/config.fish`; dòng nhắc: `~/.config/starship.toml`.
 - **Ứng dụng mặc định** (terminal, trình duyệt, trình quản lý tệp): `~/.config/hypr/lg_programs.lua`.
 
 Sửa file nào thì Hyprland và Quickshell tự tải lại, không cần đăng xuất.
@@ -481,8 +507,12 @@ config/
     emoji.tsv         danh sách emoji cho launcher
   applications/
     liquid-glass-settings.desktop   mục "Cài đặt" trong launcher
+    claude-code.desktop             mục "Claude Code" trong launcher
   kitty/
-    kitty.conf, glass-theme.conf
+    kitty.conf, glass-theme.conf    terminal; Cài đặt ghi thêm lg-settings.conf
+  fish/conf.d/liquid-glass.fish     shell fish: màu, ls/cat/cd, fzf, starship, lời chào
+  starship/starship.toml            dòng nhắc lệnh (chép thành ~/.config/starship.toml)
+  fastfetch/config.jsonc            thông tin máy hiện ở terminal đầu tiên
 sddm/liquid-glass/   theme màn hình đăng nhập (Main.qml, GlassBox.qml...)
 nvidia/setup-nvidia.sh   nhận card NVIDIA và cài đúng driver
 fonts/               Geist, Geist Mono, Open Sans, Be Vietnam Pro, Onest (giấy phép SIL OFL)

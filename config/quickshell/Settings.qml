@@ -29,6 +29,7 @@ Singleton {
     property alias power: adapter.power
     property alias windows: adapter.windows
     property alias hotCorners: adapter.hotCorners
+    property alias terminal: adapter.terminal
 
     property bool ready: false
 
@@ -37,7 +38,16 @@ Singleton {
         path: root.dir + "/settings.json"
         watchChanges: true
         onFileChanged: reload()
-        onLoaded: { root.ready = true; root.writeLua(); root.writeIdle(); }
+        onLoaded: {
+            // bản cũ ghim Firefox; giờ trình duyệt duy nhất là Microsoft Edge
+            const p = adapter.dock.pinned.slice(), i = p.indexOf("firefox");
+            if (i >= 0) {
+                if (p.indexOf("microsoft-edge") < 0) p[i] = "microsoft-edge"; else p.splice(i, 1);
+                adapter.dock.pinned = p;
+            }
+            root.ready = true; root.writeLua(); root.writeIdle(); root.writeKitty();
+            if (i >= 0) saveTimer.restart();
+        }
         onLoadFailed: {
             // chưa có file: tạo với giá trị mặc định
             mkdir.running = true;
@@ -131,7 +141,13 @@ Singleton {
                 property int iconSize: 48
                 property bool magnify: true           // phóng to biểu tượng khi rê chuột
                 // id của tệp .desktop, theo thứ tự trên dock
-                property list<string> pinned: ["org.gnome.Nautilus", "firefox", "kitty", "liquid-glass-settings"]
+                property list<string> pinned: ["org.gnome.Nautilus", "microsoft-edge", "kitty", "liquid-glass-settings"]
+            }
+            // terminal kitty → ~/.config/kitty/lg-settings.conf (kitty.conf đọc file này)
+            property JsonObject terminal: JsonObject {
+                property string font: "Geist Mono"    // Geist Mono | JetBrains Mono | Cascadia Mono (như Windows Terminal)
+                property real size: 11.5
+                property real opacity: 0.62           // 0,4 rất trong … 1 đặc
             }
         }
     }
@@ -139,14 +155,14 @@ Singleton {
     Process {
         id: mkdir
         command: ["mkdir", "-p", root.dir]
-        onExited: { file.writeAdapter(); root.writeLua(); root.writeIdle(); }
+        onExited: { file.writeAdapter(); root.writeLua(); root.writeIdle(); root.writeKitty(); }
     }
 
     // gom các thay đổi liên tiếp (kéo thanh trượt) thành một lần ghi
     Timer {
         id: saveTimer
         interval: 350
-        onTriggered: { file.writeAdapter(); root.writeLua(); root.writeIdle(); }
+        onTriggered: { file.writeAdapter(); root.writeLua(); root.writeIdle(); root.writeKitty(); }
     }
 
     // ── Lua cho Hyprland ──
@@ -234,6 +250,25 @@ Singleton {
         Quickshell.execDetached(["sh", "-c", "pkill -x hypridle; sleep 0.3; setsid -f hypridle >/dev/null 2>&1"]);
     }
 
+    // ── terminal kitty (Cài đặt → Giao diện → Terminal) → ~/.config/kitty/lg-settings.conf ──
+    readonly property string kittyPath: (Quickshell.env("XDG_CONFIG_HOME") || home + "/.config") + "/kitty/lg-settings.conf"
+    readonly property string kittyText: {
+        const T = terminal;
+        const op = Math.max(0.3, Math.min(1, T.opacity));
+        return "# Do ứng dụng Cài đặt (Super + ,) → Giao diện → Terminal tự ghi. Sửa tay sẽ bị ghi đè;\n"
+             + "# chỉnh riêng thì dùng user.conf cùng thư mục.\n"
+             + "font_family " + T.font + "\n"
+             + "font_size " + (Math.round(T.size * 10) / 10) + "\n"
+             + "background_opacity " + (Math.round(op * 100) / 100) + "\n";
+    }
+    FileView { id: kittyFile; path: root.kittyPath; printErrors: false }
+    function writeKitty() {
+        if (kittyFile.text() === kittyText) return;
+        kittyFile.setText(kittyText);
+        // kitty đọc lại cấu hình khi nhận SIGUSR1: các cửa sổ đang mở đổi ngay
+        Quickshell.execDetached(["pkill", "-USR1", "-x", "kitty"]);
+    }
+
     // ── góc nóng: các việc chọn được (HotCorners.qml làm), [giá trị, nhãn] theo thứ tự trong Cài đặt ──
     readonly property var hotCornerActions: [
         ["none",      "Không làm gì"],
@@ -246,12 +281,12 @@ Singleton {
         ["screenOff", "Tắt màn hình"]
     ]
 
-    // ── phông chữ cho ứng dụng GTK (Tệp, Firefox...) đổi theo ──
+    // ── phông chữ cho ứng dụng GTK (Tệp, Ổ đĩa...) đổi theo ──
     readonly property string uiFont: look.font
     // màu thư mục: dựng lại bộ biểu tượng (scripts/theme-apps.sh), trình quản lý tệp đổi theo ngay
     readonly property string folderColor: look.folderColor
     onFolderColorChanged: if (ready) Quickshell.execDetached([home + "/.config/hypr/scripts/theme-apps.sh", "folders", folderColor])
-    // nút trên thanh tiêu đề: ghi cho GTK 3 / GTK 4 / Firefox (scripts/theme-apps.sh buttons)
+    // nút trên thanh tiêu đề: ghi cho GTK 3 / GTK 4 (scripts/theme-apps.sh buttons)
     readonly property string titleButtons: look.titleButtons
     onTitleButtonsChanged: if (ready) Quickshell.execDetached([home + "/.config/hypr/scripts/theme-apps.sh", "buttons", titleButtons])
 
