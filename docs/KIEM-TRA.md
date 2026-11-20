@@ -119,6 +119,18 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (sau): nút trên thanh tiêu đề
+
+- Đã xác nhận trong mã nguồn Hyprland 0.57: yêu cầu thu nhỏ (`xdg_toplevel.set_minimized`) không được đọc tới, và `lg_rules.lua` chặn yêu cầu phóng to. Vì vậy hai nút đó trên thanh tiêu đề ứng dụng bấm không có tác dụng.
+- Thêm: `theme-apps.sh buttons close-right|close-left|none` ghi `gtk-decoration-layout` vào `gtk-3.0/settings.ini` và `gtk-4.0/settings.ini`, kèm gsettings `org.gnome.desktop.wm.preferences button-layout`. Cài đặt → Giao diện có lựa chọn này; mặc định chỉ để nút đóng.
+- Đã thử trong một HOME tạm:
+  - giữ nguyên các khoá khác đã có trong `settings.ini`;
+  - đọc đúng lựa chọn từ `settings.json`;
+  - tệp mới không có dòng trống ở đầu.
+- Đã xem bằng mắt `gtk3-widget-factory` (GTK 3) với bốn cách: mặc định (thu nhỏ, phóng to, đóng), `:close`, `close:`, `:`. Kết quả đúng như chọn.
+- Chưa xem được GTK 4 trong máy kiểm tra (Nautilus không hiện trên Xvfb). GTK 4 đọc cùng khoá `gtk-decoration-layout`, và trên Wayland đọc gsettings qua xdg-desktop-portal-gtk.
+- Sửa lỗi cũ: `theme-apps.sh` đọc `~/.config/quickshell/settings.json`, trong khi Cài đặt ghi `~/.config/liquid-glass/settings.json`. Hậu quả: `theme-apps.sh all` (chạy lại install.sh) luôn đặt màu thư mục tím, bỏ qua màu đã chọn.
+
 ### 2026-11-20: dùng được hoàn toàn bằng chuột
 
 Đã rà từng phím tắt trong `lg_keybinds.lua` và thêm cách bấm chuột cho những việc trước đó chỉ làm được bằng phím. Bảng đối chiếu nằm trong README, mục *Không cần nhớ phím tắt*.

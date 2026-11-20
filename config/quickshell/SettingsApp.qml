@@ -177,6 +177,13 @@ FloatingWindow {
                     current: Settings.look.material
                     onPicked: v => Settings.look.material = v
                 }
+                SegRow {
+                    label: "Nút trên thanh tiêu đề ứng dụng"
+                    note: "Trên Hyprland nút thu nhỏ và phóng to của ứng dụng không làm gì, nên chỉ để nút đóng. Thu nhỏ, toàn màn hình: chuột phải vào ứng dụng trên dock hoặc trong Toàn cảnh. Mở lại ứng dụng để thấy."
+                    options: [["close-right", "Đóng bên phải"], ["close-left", "Đóng bên trái"], ["none", "Ẩn hết"]]
+                    current: Settings.look.titleButtons
+                    onPicked: v => Settings.look.titleButtons = v
+                }
                 // màu thư mục trong trình quản lý tệp và hộp chọn tệp (bộ biểu tượng Papirus)
                 RowBase {
                     id: fcRow

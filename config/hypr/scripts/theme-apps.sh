@@ -8,6 +8,7 @@
 #   theme-apps.sh folders <màu>    màu thư mục: blue (mặc định của Papirus), violet, grey, bluegrey,
 #                                  nordic, pink, teal, indigo, green, yellow, orange, red, black
 #   theme-apps.sh bookmarks        lối tắt ở thanh bên trình quản lý tệp (chỉ tạo khi chưa có)
+#   theme-apps.sh buttons <kiểu>   nút trên thanh tiêu đề ứng dụng: close-right (mặc định), close-left, none
 #
 # Không cần sudo. Mọi thứ nằm trong thư mục nhà; tệp của bạn có sẵn thì được giữ (chỉ thêm một dòng
 # @import vào gtk.css, có sao lưu). Chạy lại bao nhiêu lần cũng được.
@@ -18,7 +19,8 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 THEME_SRC="$HERE/../theme"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
-SETTINGS="$CONFIG/quickshell/settings.json"
+# lựa chọn của ứng dụng Cài đặt (xem config/quickshell/Settings.qml)
+SETTINGS="$CONFIG/liquid-glass/settings.json"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 
 info() { printf '  • %s\n' "$*"; }
@@ -54,6 +56,25 @@ do_gtk() {
     info "GTK: bảng màu Liquid Glass, thanh bên Nautilus kính mờ (mở lại ứng dụng để thấy)"
 }
 
+# ── nút trên thanh tiêu đề ──
+# Hyprland bỏ qua yêu cầu thu nhỏ của ứng dụng và (theo lg_rules.lua) cả phóng to, nên hai nút đó
+# bấm không có tác dụng: chỉ để nút đóng (hoặc ẩn hết). Ứng dụng GTK 4 / libadwaita đọc gsettings
+# qua cổng xdg-desktop-portal-gtk; GTK 3, Firefox, Chromium đọc settings.ini. Ghi cả hai cho chắc.
+do_buttons() {
+    local kind="${1:-}" layout
+    [[ -z $kind ]] && kind="$(jq -r '.look.titleButtons // "close-right"' "$SETTINGS" 2>/dev/null || echo close-right)"
+    case $kind in
+        close-left) layout="close:" ;;
+        none)       layout=":" ;;
+        *)          kind="close-right"; layout=":close" ;;
+    esac
+    ini_set "$CONFIG/gtk-3.0/settings.ini" Settings gtk-decoration-layout "$layout"
+    ini_set "$CONFIG/gtk-4.0/settings.ini" Settings gtk-decoration-layout "$layout"
+    command -v gsettings >/dev/null 2>&1 \
+        && gsettings set org.gnome.desktop.wm.preferences button-layout "$layout" 2>/dev/null
+    info "Thanh tiêu đề: $(case $kind in close-left) echo "chỉ nút đóng, bên trái" ;; none) echo "không có nút" ;; *) echo "chỉ nút đóng, bên phải" ;; esac) (mở lại ứng dụng để thấy)"
+}
+
 # ── Qt ──
 # đặt khoá=giá trị trong một mục [section] của tệp ini (tạo nếu chưa có)
 ini_set() {
@@ -71,7 +92,7 @@ ini_set() {
         insec && index($0, k "=") == 1 { if (!done) { print k "=" v; done = 1 } ; next }
         { print }
         END {
-            if (!seen) { print ""; print s; print k "=" v }
+            if (!seen) { if (NR > 0) print ""; print s; print k "=" v }
             else if (insec && !done) print k "=" v
         }' "$file" > "$tmp" && cat "$tmp" > "$file"
     rm -f "$tmp"
@@ -249,12 +270,13 @@ EOF
 }
 
 case "${1:-all}" in
-    all) do_gtk; do_qt; do_flatpak; do_folders ""; do_bookmarks ;;
+    all) do_gtk; do_buttons ""; do_qt; do_flatpak; do_folders ""; do_bookmarks ;;
     gtk) do_gtk ;;
     qt) do_qt ;;
     flatpak) do_flatpak ;;
     folders) do_folders "${2:-}" ;;
     bookmarks) do_bookmarks ;;
-    *) echo "Dùng: $0 all|gtk|qt|flatpak|folders <màu>|bookmarks" >&2; exit 2 ;;
+    buttons) do_buttons "${2:-}" ;;
+    *) echo "Dùng: $0 all|gtk|qt|flatpak|folders <màu>|bookmarks|buttons <kiểu>" >&2; exit 2 ;;
 esac
 exit 0

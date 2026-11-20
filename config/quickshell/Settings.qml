@@ -64,6 +64,9 @@ Singleton {
                 property string material: "liquid"   // liquid | rim | flat  (xem Glass.qml)
                 property bool refractVideo: false    // khúc xạ cả khi hình nền là video (dùng một khung hình tĩnh)
                 property string folderColor: "violet" // màu thư mục (Papirus): blue | violet | grey | nordic | pink ...
+                // nút trên thanh tiêu đề của ứng dụng: Hyprland không có thu nhỏ / phóng to kiểu cửa sổ
+                // thường, nên mặc định chỉ để nút đóng. close-right | close-left | none
+                property string titleButtons: "close-right"
             }
             property JsonObject input: JsonObject {
                 property bool naturalScroll: true
@@ -243,6 +246,9 @@ Singleton {
     // màu thư mục: dựng lại bộ biểu tượng (scripts/theme-apps.sh), trình quản lý tệp đổi theo ngay
     readonly property string folderColor: look.folderColor
     onFolderColorChanged: if (ready) Quickshell.execDetached([home + "/.config/hypr/scripts/theme-apps.sh", "folders", folderColor])
+    // nút trên thanh tiêu đề: ghi cho GTK 3 / GTK 4 / Firefox (scripts/theme-apps.sh buttons)
+    readonly property string titleButtons: look.titleButtons
+    onTitleButtonsChanged: if (ready) Quickshell.execDetached([home + "/.config/hypr/scripts/theme-apps.sh", "buttons", titleButtons])
 
     onUiFontChanged: if (ready) Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "font-name", uiFont + " 11"])
 

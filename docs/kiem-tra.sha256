@@ -1,8 +1,8 @@
 # Mốc kiểm tra của repo (tools/kiem-tra.sh ghi). Không sửa tay.
-# lúc: 2026-11-20 10:36 +0700
-# commit gốc: 89b7b93
+# lúc: 2026-11-20 10:55 +0700
+# commit gốc: e275f34
 d573008f5adf0504005552d750fcb0ae228300804a1014d67f98423a54fc1407  .gitignore
-e34e4fa3e13646114e0c1c7aae996bd12cb3140bd43702ef7f637252350c68df  README.md
+6c9a6cf4109960147134ceef1466b4fe022f837bfc3e4a3906787470566f9343  README.md
 60cb32063bcdc2feee6421bcba37906dcd5c9b20325826d2c4d29c9e77cb9cfd  THIRD_PARTY_NOTICES.md
 2346e3b601220a7b0d1b1099fc7db25f701466d99f721733240ba5a5478f3539  config/applications/liquid-glass-settings.desktop
 241f0469431aaecdf182c8ba02d950743abaf43c2569d523b83a0b3632b1c783  config/hypr/hypridle.conf
@@ -20,7 +20,7 @@ ed3b8e5caa995d23371f2f15722a84da8218a0801084c59059e186bb55f22e95  config/hypr/lg
 108e24f73ab68a522bea6d2a5341a551648a88b8e73ee625955cd4849532e81e  config/hypr/scripts/battery.sh
 f4f92dd3b198377f79b9eb6d961f07379bf05ec70844c31e509628e9d8b13995  config/hypr/scripts/capture.sh
 1cb3db328a2f0b6383e1c598f8a21ee919498e96f159331714625a7801b3041a  config/hypr/scripts/gamemode.sh
-1e67ff920e1bbf2cf49ac4450cb4ddc747141159e935a1d3c45470edab8fd16f  config/hypr/scripts/theme-apps.sh
+5469d4a8870cb80d5215ee287d2b762a1d926b4218f96c0008a497bf9ecb7b34  config/hypr/scripts/theme-apps.sh
 2757f041ab63f3c323ae1311f0b957affe3c62df00d907eef8786a7ffcd9adb2  config/hypr/scripts/vndate.sh
 374bbae9123015859e8d06e3b239d7e991224053d042de9a7cdc1e6bf2cf325f  config/hypr/scripts/wallpaper.sh
 c4bf058da2df5a7163016d601d985772aa4f96d0b0878de1c8f4f6a32bd469fc  config/hypr/theme/gtk3.css
@@ -70,8 +70,8 @@ d40f863e6db6fcc7d3fda1a847aa674d35005391a55dc1f74abd862b98fe3afa  config/quicksh
 0624ccae0e14f03e2afaab160a87ef849586e8d2de4079901baa817fabb62aa1  config/quickshell/PowerMenu.qml
 032a567445fabec40864d6f521518a6e9c664937e073c9ba0bf20d22ba6424b6  config/quickshell/Recorder.qml
 216c8d1371482d8020d38e1f8fd37176b33816ec63dab471b2b18c70c460be73  config/quickshell/SafeShot.qml
-cbcb3af1a8bcdf59b5142b313e0c08c8c891d02b4ca7ff9e21b6b02f1b369ef5  config/quickshell/Settings.qml
-3fbdfdb9f82d8e93b71a16662fe46b88004b08218f3a260bc3803cf386c2ac31  config/quickshell/SettingsApp.qml
+a755b9dee8f6bd16661a165825d9b6fcf48edb88283e60efec03b7dc1bacad30  config/quickshell/Settings.qml
+95d80b62acc20b5a1d0fc16907112cbf2669bbbb885e06d4e3d027fd2c15dcf3  config/quickshell/SettingsApp.qml
 3542da923ff2354271aa7f3af574cfbbd6e69173291afe05a84c952d9c124bb0  config/quickshell/Spring.qml
 05865d3749fc386ea744bfe5b2f14f2ec7187998234e9ef5c18d10f42fe10bed  config/quickshell/Switcher.qml
 282740c8c3a040555a530e94e983bb4eb7ad182d7e2e948cc35aa11a510803e5  config/quickshell/SysStats.qml
