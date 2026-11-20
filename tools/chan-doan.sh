@@ -45,7 +45,9 @@ full "sddm.conf.d" sh -c 'cat /etc/sddm.conf /etc/sddm.conf.d/*.conf 2>/dev/null
 hlog=$(ls -t "$RUN"/hypr/*/hyprland.log "$HOME"/.local/share/hyprland/hyprland.log 2>/dev/null | head -n 1)
 if [[ -n $hlog ]]; then
     sum "Nhật ký Hyprland: $hlog"
-    herr=$(grep -aiE '\[ERR\]|\[CRITICAL\]|error|lua:|stack traceback|failed' "$hlog" | grep -viE 'xdg-desktop-portal|no such file.*\.face' | tail -n 10)
+    herr=$(grep -aiE '\[ERR\]|\[CRITICAL\]|error|lua:|stack traceback|failed' "$hlog" \
+           | grep -viE 'xdg-desktop-portal|no such file.*\.face|extensions:|seatd|libseat|wayland backend|wl_display_connect|erasing' \
+           | cut -c1-170 | tail -n 10)
     [[ -n $herr ]] && { sum "Lỗi của Hyprland:"; sum "$herr"; } || sum "Hyprland: không thấy dòng lỗi"
     full "hyprland.log (300 dòng cuối)" tail -n 300 "$hlog"
 else
@@ -55,9 +57,33 @@ crash=$(ls -t "$HOME"/.cache/hyprland/hyprlandCrashReport*.txt 2>/dev/null | hea
 [[ -n $crash ]] && { sum "CÓ báo cáo Hyprland bị sập: $crash"; full "crash report" head -n 60 "$crash"; }
 
 # 5. Quickshell (thanh trên, dock, hình nền kính)
-qerr=$(timeout 5 qs log 2>/dev/null | grep -aiE 'error|warn.*(qml|shader)|failed|cannot' | tail -n 8)
-[[ -n $qerr ]] && { sum "Lỗi của Quickshell:"; sum "$qerr"; }
-full "qs log" timeout 5 qs log
+LACK=()
+for n in Hyprland:hyprland qs:quickshell awww:awww kitty:kitty fish:fish hypridle:hypridle hyprlock:hyprlock \
+         fcitx5:fcitx5 jq:jq wl-paste:wl-clipboard cliphist:cliphist; do
+    command -v "${n%%:*}" >/dev/null 2>&1 || LACK+=("${n#*:}")
+done
+((${#LACK[@]})) && sum "CÒN THIẾU GÓI: ${LACK[*]}   → sudo pacman -Syu --needed ${LACK[*]}"
+pacerr=$(grep -aE '\[ALPM\] (installed|upgraded)|error' /var/log/pacman.log 2>/dev/null | tail -n 400 | grep -ac 'installed')
+sum "pacman: ${pacerr:-0} gói mới cài gần đây; lần cài cuối: $(grep -a '\[ALPM\] installed' /var/log/pacman.log 2>/dev/null | tail -n 1 | cut -c2-17)"
+qerr=$(timeout 5 qs log -n --any-display --no-color 2>/dev/null | grep -aiE 'error|warn|failed|cannot' | cut -c1-170 | tail -n 8)
+[[ -n $qerr ]] && { sum "Lỗi của Quickshell (lần chạy trước):"; sum "$qerr"; }
+full "qs log" timeout 5 qs log -n --any-display --no-color
+
+# Hyprland đang chạy (trên màn hình kia) mà thanh trên không có: thử bật thanh trên và hình nền
+# 12 giây ngay trên phiên đó để thấy lỗi thật (nhìn sang màn hình kia bằng Ctrl + Alt + F1/F2 sau đó)
+sig=$(ls -t "$RUN"/hypr 2>/dev/null | head -n 1)
+wd=$(cd "$RUN" 2>/dev/null && ls wayland-[0-9] 2>/dev/null | head -n 1)
+if [[ -n $sig && -n $wd ]] && command -v qs >/dev/null 2>&1 && ! pgrep -x qs >/dev/null 2>&1 && ! pgrep -x quickshell >/dev/null 2>&1; then
+    sum "Thanh trên không chạy. Thử bật 12 giây trên phiên Hyprland ($wd):"
+    run=$(WAYLAND_DISPLAY=$wd HYPRLAND_INSTANCE_SIGNATURE=$sig XDG_RUNTIME_DIR=$RUN timeout 12 qs --no-color 2>&1)
+    full "thử chạy qs" printf '%s\n' "$run"
+    out=$(grep -aiE 'error|warn|failed|cannot|qml' <<< "$run" | grep -viE 'binding loop' | cut -c1-170 | tail -n 10)
+    sum "${out:-  (không có dòng lỗi; qs chạy được, có thể lúc đăng nhập nó chưa được bật)}"
+    wr=$(WAYLAND_DISPLAY=$wd HYPRLAND_INSTANCE_SIGNATURE=$sig XDG_RUNTIME_DIR=$RUN timeout 8 bash "$HOME/.config/hypr/scripts/wallpaper.sh" restore 2>&1 | tail -n 3)
+    sum "Thử đặt hình nền: ${wr:-xong, không báo lỗi}"
+elif pgrep -x qs >/dev/null 2>&1 || pgrep -x quickshell >/dev/null 2>&1; then
+    sum "Thanh trên (qs) đang chạy."
+fi
 
 # 6. cấu hình
 for f in hypr/hyprland.lua hypr/lg_look.lua quickshell/shell.qml kitty/kitty.conf; do

@@ -1,6 +1,6 @@
 # Mốc kiểm tra của repo (tools/kiem-tra.sh ghi). Không sửa tay.
-# lúc: 2026-11-20 21:32 +0700
-# commit gốc: c7fc4a1
+# lúc: 2026-11-20 21:37 +0700
+# commit gốc: cff97a3
 d573008f5adf0504005552d750fcb0ae228300804a1014d67f98423a54fc1407  .gitignore
 7cbab0756ac5bced2159b351771fe35492b4bfd401ce287e5ed66d478b8ec2be  README.md
 60cb32063bcdc2feee6421bcba37906dcd5c9b20325826d2c4d29c9e77cb9cfd  THIRD_PARTY_NOTICES.md
@@ -274,7 +274,7 @@ f01ec88fee43e32295aeedf84ce07f398d586773f97120da078ca9b335e97e0a  plymouth/src/r
 ff6895c9daa680559ce1fe68630f30cf248f9b058b88c9155732fa3ae89a3f55  sddm/liquid-glass/background.png
 d4e7ed99d401c8fa401789ce104ffa70d247ee339884da6662a2cd2abe8286a9  sddm/liquid-glass/metadata.desktop
 88f8ed148fd999fc76fda496659971d7167f672fe907feff9537f6bb3f1bdaac  sddm/liquid-glass/theme.conf
-238703bf0139993bcd115deb1afd4aab8d51406b32b27017d2b43f5726829aaf  tools/chan-doan.sh
+145cb7505505469a127d67edd00d99a1aacbee849fd90a960dd6e49afc0b6762  tools/chan-doan.sh
 af179339e657bdf5687f383607989d006f8df4d45d623edfdae28f26cd783948  tools/hyprland-0.57-options.txt
 8184f321fb5193e3ba2cfdf82100bd135a23b18e32ab4ac151b02a63ae29ebf1  tools/kiem-tra-hypr.lua
 9dd734ab159c15bc34be84e6313c9ef183341d8202953c0edf1514182940b743  tools/kiem-tra.sh
