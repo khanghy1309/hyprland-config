@@ -19,6 +19,16 @@ end
 
 status is-interactive; or return
 
+# kitty mở fish qua sh (xem kitty.conf) nên tự gắn shell integration của kitty
+# (nhảy giữa các lệnh, Ctrl + Shift + G xem kết quả lệnh vừa chạy…); cách làm theo tài liệu của kitty
+# (LG_KSI do kitty.conf đặt: chỉ khi fish được mở qua sh, kitty mở fish trực tiếp thì kitty tự gắn)
+if set -q LG_KSI; and set -q KITTY_INSTALLATION_DIR
+    set -e LG_KSI
+    set --global KITTY_SHELL_INTEGRATION enabled
+    source "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_conf.d/kitty-shell-integration.fish"
+    set --prepend fish_complete_path "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_completions.d"
+end
+
 # ── màu khi gõ lệnh, cùng bảng màu kính với kitty ──
 set -g fish_color_normal f3f6f6
 set -g fish_color_command 9bd3c7

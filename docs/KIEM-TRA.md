@@ -119,6 +119,23 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (tối, máy thật đầu tiên): màn hình tối chỉ có con trỏ chuột
+
+- **Máy:** laptop MSI, Intel Raptor Lake-P (i915) + NVIDIA AD107M (nvidia-open, nvidia-prime, nvidia_drm.modeset=Y). Hyprland 0.57.2, SDDM 0.21.0 đang chạy.
+- **Triệu chứng:** đăng nhập xong chỉ thấy nền xám tối và con trỏ chuột.
+- **`tools/chan-doan.sh` (mới, chạy từ TTY) cho thấy:**
+  - `quickshell` và `fish` không được cài, hình nền chưa từng được đặt.
+  - Hyprland không báo lỗi cấu hình. Các dòng ERR của aquamarine về seatd / wayland backend là bình thường: nó thử từng cách mở màn hình.
+  - Không có `qs` thì không có thanh trên, dock, launcher. Không có fish thì kitty (`shell fish`) không mở được, nên Super + Enter cũng không ra gì.
+  - Hyprland, kitty, SDDM có sẵn từ archinstall. Vậy bước 1 của install.sh (cài gói) đã không chạy hoặc bị từ chối.
+- **Nguyên nhân có thể có, và cách sửa trong install.sh:**
+  - **Câu hỏi "Cài bằng sudo pacman? [y/N]" mặc định là Không.** Người mới bấm Enter là bỏ qua cả bước. Giờ dùng `ask_y` ([Y/n], Enter là đồng ý) cho bước này.
+  - **`pacman -S` trên hệ thống chưa cập nhật** (cập nhật một phần, Arch không hỗ trợ) dễ bị từ chối cả loạt. Giờ chạy `pacman -Syu` trước, rồi mới lọc theo kho và cài.
+  - **Cả loạt bị từ chối:** cài từng gói với `--noconfirm`, in dòng lỗi của từng gói hỏng và lệnh để cài tay. Đã thử bằng pacman giả: cả loạt lỗi, một gói xung đột (pipewire-jack với jack2), một tên không có trong kho; kết quả báo đúng từng gói.
+  - **Cuối script kiểm tra 11 lệnh bắt buộc:** Hyprland, qs, awww, kitty, fish, hypridle, hyprlock, fcitx5, jq, wl-paste, cliphist. Thiếu thì in chữ đỏ "CHƯA CÀI ĐỦ" kèm lệnh cài.
+- **kitty chạy cả khi thiếu fish:** `shell sh -c 'command -v fish … && LG_KSI=1 exec fish || exec bash'`.
+  - Vì kitty không thấy fish ở lệnh chính nên không tự gắn shell integration. `liquid-glass.fish` gắn tay đúng như mục "Manual shell integration" trong tài liệu của kitty 0.51, chỉ khi có `LG_KSI`, để không gắn hai lần khi kitty mở fish trực tiếp (lối tắt Claude Code).
+
 ### 2026-11-20 (khuya, muộn hơn): chữ luôn trắng (macOS 26 chế độ tối)
 
 - **Thanh trên:**

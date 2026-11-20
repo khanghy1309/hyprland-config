@@ -1,13 +1,13 @@
 # Mốc kiểm tra của repo (tools/kiem-tra.sh ghi). Không sửa tay.
-# lúc: 2026-11-20 19:32 +0700
-# commit gốc: 04c2f78
+# lúc: 2026-11-20 21:32 +0700
+# commit gốc: c7fc4a1
 d573008f5adf0504005552d750fcb0ae228300804a1014d67f98423a54fc1407  .gitignore
 7cbab0756ac5bced2159b351771fe35492b4bfd401ce287e5ed66d478b8ec2be  README.md
 60cb32063bcdc2feee6421bcba37906dcd5c9b20325826d2c4d29c9e77cb9cfd  THIRD_PARTY_NOTICES.md
 c345a57d995bed37283a4f9f3d087ae0e9a6fd5565b493b58f0f6f2a443b8855  config/applications/claude-code.desktop
 2346e3b601220a7b0d1b1099fc7db25f701466d99f721733240ba5a5478f3539  config/applications/liquid-glass-settings.desktop
 0b62b831b81e9a16945e8827ce7dee317ca1162a585c1c28b4f085e443a96131  config/fastfetch/config.jsonc
-e258369c9ba2df67db8c8daef2c14c37a7ca1fbe8580db71ffc9c2410ce1ed46  config/fish/conf.d/liquid-glass.fish
+34e281bfd644a0df0d7f822b26575c25bd3f0d5ad3e5f10c94f8993655721710  config/fish/conf.d/liquid-glass.fish
 241f0469431aaecdf182c8ba02d950743abaf43c2569d523b83a0b3632b1c783  config/hypr/hypridle.conf
 7ace53cf0c6f9bf502ccd9744df065f6409d99ff47b910504cd4668d23d0ce16  config/hypr/hyprland.lua
 42b592dc527cc6f9c6ae8a766e1ab8f4e7763aadd678f9fa39d0c73886962c68  config/hypr/hyprlock.conf
@@ -39,7 +39,7 @@ f279e786e4f690e0468336e7b8e3f1ad13bd5190965939f8f006bc5db57667a9  config/hypr/th
 e728fc97790b4cb9d3868ed3e12d173edc7463865e95d3602f774cbb5f248cc2  config/hypr/theme/qt/dash.svg
 e81a01fdaf543c28e8c26455db5740138b221957545aefd8f9a86a4cb9d74c4c  config/hypr/theme/qt/dot.svg
 c3f25538677b5749444b19fd8fd22f62fe3ea7e1b5b8641ef5961671e57f8732  config/kitty/glass-theme.conf
-c4522d9afd061301f315948fc4eff3a2f99cf40c1221991e4e00dbb9393db2b0  config/kitty/kitty.conf
+042cd2c503ad4b3f4b7b63e4800c66f577cc2a7ccfb191d9f9447036a4c4b64f  config/kitty/kitty.conf
 da29df86080a616f6ffb2a4e575e4b76487723535eacf43738c9d4a87464bfd1  config/quickshell/Bar.qml
 08732fe1917d25af50c714dac1b0af4e204ce66a673648f05afba4cddbac41ff  config/quickshell/Capture.qml
 482fcc0b9b54e1687f7bd005ccb9cfd63b27267026c70fe649ea1372ff8a88df  config/quickshell/CaptureGate.js
@@ -113,7 +113,7 @@ a464348abe41a6392f18d04c0ac2ad3c26619357ff5fdd76aff3059116f45e62  fonts/geist/Ge
 fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602  fonts/open-sans/OFL.txt
 fe269381e992f32e135801740998544d6235061e37c93ec067ad2be3edd5b17b  fonts/open-sans/OpenSans-Italic[wdth,wght].ttf
 36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878  fonts/open-sans/OpenSans[wdth,wght].ttf
-e278a3acd8b3a54d7cf43952f4aaa3f5f5e17fcaef2bae985149aeaf80a72136  install.sh
+0ab8eaab0de0bbbd171a8de6ebc46d95545039b2b35372d4e8803b5df8a85820  install.sh
 b65d6b4c8b30b10b2a3558a96ca6463dd5fbdb8fedf658a5ea9e5effec993dd5  nvidia/setup-nvidia.sh
 68998e1ca6af51469ff76e7bf9c1b30d4065255abe047e9236639629b8274fa5  plymouth/install-plymouth.sh
 1f1d8b276e42b163cce0b53edc2cb79d9e3cc9f888067580120aa3500159f5d8  plymouth/liquid-glass/box.png
@@ -274,6 +274,7 @@ f01ec88fee43e32295aeedf84ce07f398d586773f97120da078ca9b335e97e0a  plymouth/src/r
 ff6895c9daa680559ce1fe68630f30cf248f9b058b88c9155732fa3ae89a3f55  sddm/liquid-glass/background.png
 d4e7ed99d401c8fa401789ce104ffa70d247ee339884da6662a2cd2abe8286a9  sddm/liquid-glass/metadata.desktop
 88f8ed148fd999fc76fda496659971d7167f672fe907feff9537f6bb3f1bdaac  sddm/liquid-glass/theme.conf
+238703bf0139993bcd115deb1afd4aab8d51406b32b27017d2b43f5726829aaf  tools/chan-doan.sh
 af179339e657bdf5687f383607989d006f8df4d45d623edfdae28f26cd783948  tools/hyprland-0.57-options.txt
 8184f321fb5193e3ba2cfdf82100bd135a23b18e32ab4ac151b02a63ae29ebf1  tools/kiem-tra-hypr.lua
 9dd734ab159c15bc34be84e6313c9ef183341d8202953c0edf1514182940b743  tools/kiem-tra.sh

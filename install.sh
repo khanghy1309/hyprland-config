@@ -23,6 +23,8 @@ bold()  { printf '\033[1m%s\033[0m\n' "$*"; }
 info()  { printf '  • %s\n' "$*"; }
 warn()  { printf '\033[33m  ! %s\033[0m\n' "$*"; }
 ask()   { local a; read -r -p "  ? $1 [y/N] " a; [[ "${a,,}" == y* ]]; }
+# bước bắt buộc: Enter là đồng ý
+ask_y() { local a; read -r -p "  ? $1 [Y/n] " a; [[ -z "$a" || "${a,,}" == y* ]]; }
 
 # ───────────────────────── kiểm tra ─────────────────────────
 if [[ $EUID -eq 0 ]]; then
@@ -111,27 +113,45 @@ PKGS=(
 )
 
 bold "1. Cài gói từ kho chính thức"
-info "${#PKGS[@]} gói, gói nào có rồi sẽ được bỏ qua"
-# Một tên gói không còn trong kho (bị đổi tên, bị gỡ) sẽ làm pacman từ chối cài TẤT CẢ.
-# Lọc trước: gói nào kho không có thì báo ra và bỏ qua, phần còn lại vẫn cài.
-mapfile -t AVAILABLE < <(pacman -Slq 2>/dev/null | sort -u)
-if ((${#AVAILABLE[@]} > 0)); then
-    WANT=() MISSING=()
-    for p in "${PKGS[@]}"; do
-        if printf '%s\n' "${AVAILABLE[@]}" | grep -qxF -- "$p"; then WANT+=("$p"); else MISSING+=("$p"); fi
-    done
-    if ((${#MISSING[@]} > 0)); then
-        warn "Kho không có các gói này (có thể đã đổi tên), bỏ qua: ${MISSING[*]}"
-        warn "Phần dùng tới chúng sẽ không chạy cho tới khi bạn cài gói thay thế."
+info "${#PKGS[@]} gói, gói nào có rồi sẽ được bỏ qua. Bước này bắt buộc: thiếu gói là màn hình đen."
+if ask_y "Cập nhật máy và cài bằng sudo pacman?"; then
+    # Arch không hỗ trợ cập nhật một phần: cài gói mới lên hệ thống chưa cập nhật dễ vỡ phụ thuộc
+    # (pacman từ chối cả loạt). Nên cập nhật cả máy trước, rồi mới lọc và cài.
+    sudo pacman -Syu || warn "Cập nhật máy chưa xong; vẫn thử cài các gói."
+    # Một tên gói không còn trong kho (bị đổi tên, bị gỡ) sẽ làm pacman từ chối cài TẤT CẢ.
+    # Lọc trước: gói nào kho không có thì báo ra và bỏ qua, phần còn lại vẫn cài.
+    mapfile -t AVAILABLE < <(pacman -Slq 2>/dev/null | sort -u)
+    WANT=("${PKGS[@]}") MISSING=()
+    if ((${#AVAILABLE[@]} > 0)); then
+        WANT=()
+        for p in "${PKGS[@]}"; do
+            if printf '%s\n' "${AVAILABLE[@]}" | grep -qxF -- "$p"; then WANT+=("$p"); else MISSING+=("$p"); fi
+        done
+        if ((${#MISSING[@]} > 0)); then
+            warn "Kho không có các gói này (có thể đã đổi tên), bỏ qua: ${MISSING[*]}"
+            warn "Phần dùng tới chúng sẽ không chạy cho tới khi bạn cài gói thay thế."
+        fi
+    fi
+    if ! sudo pacman -S --needed "${WANT[@]}"; then
+        # cả loạt bị từ chối (xung đột gói, bấm nhầm n…): cài từng gói để biết đúng gói nào lỗi
+        warn "pacman chưa cài được cả loạt. Cài từng gói để tìm gói gây lỗi…"
+        FAILED=()
+        for p in "${WANT[@]}"; do
+            pacman -Q "$p" >/dev/null 2>&1 && continue
+            if ! err="$(sudo pacman -S --needed --noconfirm "$p" 2>&1 >/dev/null)"; then
+                FAILED+=("$p")
+                warn "  $p: $(grep -m1 -iE 'error|lỗi|conflict|xung đột' <<< "$err" || tail -n 1 <<< "$err")"
+            fi
+        done
+        if ((${#FAILED[@]} > 0)); then
+            warn "Chưa cài được: ${FAILED[*]}"
+            warn "Thường là xung đột với một gói đang có. Cài tay để xem pacman hỏi gì:  sudo pacman -S ${FAILED[*]}"
+        else
+            info "Đã cài xong từng gói."
+        fi
     fi
 else
-    # chưa tải danh sách gói về máy (máy mới cài): cứ đưa hết cho pacman
-    WANT=("${PKGS[@]}")
-fi
-if ask "Cài bằng sudo pacman?"; then
-    sudo pacman -S --needed "${WANT[@]}" || warn "pacman báo lỗi, một số gói chưa được cài. Xem thông báo phía trên rồi chạy lại script."
-else
-    warn "Bỏ qua. Các phần cần gói còn thiếu sẽ không chạy."
+    warn "Bỏ qua. Các phần cần gói còn thiếu sẽ không chạy (thanh trên, hình nền… sẽ không hiện)."
 fi
 echo
 
@@ -453,6 +473,19 @@ if ask "Cài màn hình khởi động? (sẽ hỏi trước khi sửa mkinitcpi
     bash "$HERE/plymouth/install-plymouth.sh" || warn "Phần màn hình khởi động chưa xong; chạy lại: ./plymouth/install-plymouth.sh"
 fi
 echo
+
+# ───────────────────────── kiểm tra lần cuối ─────────────────────────
+# Thiếu những lệnh này thì sau khi đăng nhập chỉ thấy màn hình tối và con trỏ chuột
+NEED=(Hyprland:hyprland qs:quickshell awww:awww kitty:kitty fish:fish hypridle:hypridle hyprlock:hyprlock
+      fcitx5:fcitx5 jq:jq wl-paste:wl-clipboard cliphist:cliphist)
+LACK=()
+for n in "${NEED[@]}"; do command -v "${n%%:*}" >/dev/null 2>&1 || LACK+=("${n#*:}"); done
+if ((${#LACK[@]} > 0)); then
+    printf '\n\033[1;31m  ✗ CHƯA CÀI ĐỦ: %s\033[0m\n' "${LACK[*]}"
+    warn "Thiếu các gói này thì đăng nhập vào sẽ chỉ thấy màn hình tối. Cài rồi đăng nhập lại:"
+    warn "  sudo pacman -Syu --needed ${LACK[*]}"
+    echo
+fi
 
 bold "Xong cả 5 đợt."
 cat <<'EOF'
