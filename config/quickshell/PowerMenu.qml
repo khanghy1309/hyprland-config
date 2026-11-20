@@ -116,8 +116,9 @@ PanelWindow {
                 width: 176
                 height: 200
                 radius: 40
-                color: isSel ? Theme.accent : Theme.panelStrong
-                glow: tileHover.hovered && !isSel ? 1 : 0
+                // ô đang chọn: kính sáng hơn, viền sáng rõ (Cài đặt chọn "Trắng đục" thì trắng như trước)
+                color: isSel ? (Theme.glassSel ? Qt.rgba(1, 1, 1, 0.30) : Theme.accent) : Theme.panelStrong
+                glow: isSel && Theme.glassSel ? 1 : tileHover.hovered && !isSel ? 1 : 0
                 glowPos: tileHover.point.position
                 HoverHandler { id: tileHover }
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
@@ -130,7 +131,7 @@ PanelWindow {
                         path: tile.modelData.path
                         size: 46
                         stroke: 1.5
-                        color: tile.isSel ? Theme.ink : Theme.fg
+                        color: tile.isSel ? Theme.selFg : Theme.fg
                     }
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -138,7 +139,7 @@ PanelWindow {
                         font.family: Theme.font
                         font.pixelSize: 16
                         font.weight: Font.DemiBold
-                        color: tile.isSel ? Theme.ink : Theme.fg
+                        color: tile.isSel ? Theme.selFg : Theme.fg
                     }
                 }
 

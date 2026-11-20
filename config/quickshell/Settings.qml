@@ -65,6 +65,7 @@ Singleton {
                 property string glass: "acrylic"     // acrylic | blur | off
                 property int blurSize: 8
                 property real panelAlpha: 0.5        // độ đậm của kính Quickshell (0,25 … 0,75)
+                property string selStyle: "glass"    // mục đang chọn / rê chuột: "glass" viên kính trong | "white" viên trắng đục
                 property bool shadow: true
                 property bool borders: true
                 property bool animations: true
@@ -289,6 +290,9 @@ Singleton {
     // nút trên thanh tiêu đề: ghi cho GTK 3 / GTK 4 (scripts/theme-apps.sh buttons)
     readonly property string titleButtons: look.titleButtons
     onTitleButtonsChanged: if (ready) Quickshell.execDetached([home + "/.config/hypr/scripts/theme-apps.sh", "buttons", titleButtons])
+    // kiểu mục đang chọn: menu của ứng dụng GTK đổi theo (mở lại ứng dụng để thấy)
+    readonly property string selStyle: look.selStyle
+    onSelStyleChanged: if (ready) Quickshell.execDetached([home + "/.config/hypr/scripts/theme-apps.sh", "gtk", selStyle])
 
     onUiFontChanged: if (ready) Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "font-name", uiFont + " 11"])
 

@@ -235,8 +235,9 @@ PanelWindow {
         height: 56
         radius: 16
         opacity: enabled ? 1 : 0.35
-        color: on ? Theme.accent : cm.containsMouse ? Theme.chip : "transparent"
+        color: on && !Theme.glassSel ? Theme.accent : !on && cm.containsMouse ? Theme.chip : "transparent"
         Behavior on color { ColorAnimation { duration: Theme.fast } }
+        GlassHighlight { anchors.fill: parent; on: c.on && Theme.glassSel; radius: 16 }
 
         Column {
             anchors.centerIn: parent
@@ -245,7 +246,7 @@ PanelWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 path: c.path
                 size: 20
-                color: c.on ? Theme.ink : Theme.fg
+                color: c.on ? Theme.selFg : Theme.fg
                 filled: c.label === "Quay video"
             }
             Text {
@@ -255,7 +256,7 @@ PanelWindow {
                 font.family: Theme.font
                 font.pixelSize: 12
                 font.weight: Font.Medium
-                color: c.on ? Theme.ink : Theme.fg
+                color: c.on ? Theme.selFg : Theme.fg
             }
         }
         Text {
@@ -266,7 +267,7 @@ PanelWindow {
             text: c.hint
             font.family: Theme.mono
             font.pixelSize: 9
-            color: c.on ? Theme.inkDim : Theme.dim
+            color: c.on ? Theme.selDim : Theme.dim
         }
         MouseArea {
             id: cm

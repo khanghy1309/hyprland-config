@@ -72,6 +72,8 @@ FloatingWindow {
             contentHeight: sideCol.implicitHeight + 44
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+        // trang đang mở: viên kính trượt theo
+        GlassHighlight { id: navSel; radius: 12 }
         Column {
             id: sideCol
             x: 14
@@ -95,23 +97,25 @@ FloatingWindow {
                     id: item
                     required property var modelData
                     readonly property bool on: win.page === modelData.id
+                    onOnChanged: if (on) navSel.follow = item
+                    Component.onCompleted: if (on) navSel.follow = item
                     width: parent.width
                     height: 38
                     radius: 12
-                    color: on ? Theme.accent : im.containsMouse ? Theme.chip : "transparent"
+                    color: !on && im.containsMouse ? Theme.chip : "transparent"
                     Behavior on color { ColorAnimation { duration: Theme.fast } }
                     Row {
                         x: 12
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 12
-                        Icon { anchors.verticalCenter: parent.verticalCenter; path: item.modelData.path; size: 18; color: item.on ? Theme.ink : Theme.fg }
+                        Icon { anchors.verticalCenter: parent.verticalCenter; path: item.modelData.path; size: 18; color: item.on ? Theme.selFg : Theme.fg }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: item.modelData.label
                             font.family: Theme.font
                             font.pixelSize: 14
                             font.weight: Font.Medium
-                            color: item.on ? Theme.ink : Theme.fg
+                            color: item.on ? Theme.selFg : Theme.fg
                         }
                     }
                     MouseArea {
@@ -246,11 +250,18 @@ FloatingWindow {
                 }
                 SliderRow {
                     label: "Độ đậm của bảng kính"
-                    note: "Thanh trên, đảo động, launcher, các bảng trượt"
+                    note: "Thanh trên, đảo động, launcher, các bảng trượt; menu chuột phải trong hơn một chút"
                     from: 0.25; to: 0.75; step: 0.05
                     value: Settings.look.panelAlpha
                     format: v => Math.round(v * 100) + "%"
                     onMoved: v => Settings.look.panelAlpha = v
+                }
+                SegRow {
+                    label: "Mục đang chọn"
+                    note: "Viên đánh dấu mục đang chọn, đang rê chuột trong menu, launcher, Cài đặt"
+                    options: [["glass", "Kính trong"], ["white", "Trắng đục"]]
+                    current: Settings.look.selStyle
+                    onPicked: v => Settings.look.selStyle = v
                     last: true
                 }
             }
@@ -2510,8 +2521,9 @@ FloatingWindow {
                         width: ct.implicitWidth + 24
                         height: 30
                         radius: 10
-                        color: on ? Theme.accent : chipMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Theme.chip
+                        color: on && Theme.glassSel ? "transparent" : on ? Theme.accent : chipMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Theme.chip
                         Behavior on color { ColorAnimation { duration: Theme.fast } }
+                        GlassHighlight { anchors.fill: parent; on: chip.on && Theme.glassSel; radius: 10 }
                         Text {
                             id: ct
                             anchors.centerIn: parent
@@ -2519,7 +2531,7 @@ FloatingWindow {
                             font.family: Theme.font
                             font.pixelSize: 12
                             font.weight: Font.Medium
-                            color: chip.on ? Theme.ink : Theme.fg
+                            color: chip.on ? Theme.selFg : Theme.fg
                         }
                         MouseArea {
                             id: chipMouse
@@ -2558,6 +2570,7 @@ FloatingWindow {
             height: 34
             radius: 11
             color: Theme.chip
+            GlassHighlight { id: segSel; radius: 9 }
             Row {
                 id: segRow
                 x: 3
@@ -2568,11 +2581,12 @@ FloatingWindow {
                         id: seg
                         required property var modelData
                         readonly property bool on: sg.current === modelData[0]
+                        onOnChanged: if (on) segSel.follow = seg; else if (segSel.follow === seg) segSel.follow = null
+                        Component.onCompleted: if (on) segSel.follow = seg
                         width: st.implicitWidth + 22
                         height: 28
                         radius: 9
-                        color: on ? Theme.accent : "transparent"
-                        Behavior on color { ColorAnimation { duration: Theme.fast } }
+                        color: "transparent"
                         Text {
                             id: st
                             anchors.centerIn: parent
@@ -2580,7 +2594,7 @@ FloatingWindow {
                             font.family: Theme.font
                             font.pixelSize: 12
                             font.weight: Font.Medium
-                            color: seg.on ? Theme.ink : Theme.fg
+                            color: seg.on ? Theme.selFg : Theme.fg
                         }
                         MouseArea {
                             anchors.fill: parent
@@ -2811,6 +2825,7 @@ FloatingWindow {
                     color: "#23272c"
                     border.width: 1
                     border.color: Theme.rim
+                    GlassHighlight { id: optSel; radius: 9 }
                     Column {
                         id: optCol
                         x: 4; y: 4
@@ -2824,14 +2839,17 @@ FloatingWindow {
                                 width: optCol.width
                                 height: 28
                                 radius: 9
-                                color: optArea.containsMouse ? Theme.accent : "transparent"
+                                color: "transparent"
+                                readonly property bool hot: optArea.containsMouse
+                                onHotChanged: if (hot) optSel.follow = opt; else if (optSel.follow === opt) optSel.follow = null
+                                Component.onDestruction: if (optSel.follow === opt) optSel.follow = null
                                 Icon {
                                     visible: opt.sel
                                     x: 8
                                     anchors.verticalCenter: parent.verticalCenter
                                     path: Icons.check
                                     size: 14
-                                    color: optArea.containsMouse ? Theme.ink : Theme.fg
+                                    color: opt.hot ? Theme.selFg : Theme.fg
                                 }
                                 Text {
                                     x: 30
@@ -2839,7 +2857,7 @@ FloatingWindow {
                                     text: opt.modelData[1]
                                     font.family: Theme.font
                                     font.pixelSize: 13
-                                    color: optArea.containsMouse ? Theme.ink : Theme.fg
+                                    color: opt.hot ? Theme.selFg : Theme.fg
                                 }
                                 MouseArea {
                                     id: optArea

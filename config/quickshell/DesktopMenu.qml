@@ -95,8 +95,10 @@ Scope {
                 GlassPill {
                     id: card
                     tone: "strong"
-                    // đậm hơn kính thường một chút: menu hay mở trên vùng hình nền sáng, chữ vẫn phải rõ
-                    color: Qt.rgba(0.09, 0.10, 0.12, 0.70)
+                    // kính trong: Hyprland làm mờ phía sau; độ đậm theo Cài đặt → Giao diện → Độ đậm của các bảng kính
+                    color: Theme.menuBg
+                    // mục chuột đang chỉ vào: viên kính chọn trượt theo nó
+                    property Item hotRow: null
                     radius: 18
                     width: 248
                     height: list.implicitHeight + 12
@@ -114,6 +116,8 @@ Scope {
                     focus: pop.mine
                     Keys.onEscapePressed: root.close()
 
+                    GlassHighlight { follow: card.hotRow; radius: 12 }
+
                     Column {
                         id: list
                         x: 6
@@ -124,6 +128,9 @@ Scope {
                             delegate: Item {
                                 id: row
                                 required property var modelData
+                                readonly property bool hot: !modelData.sep && rowArea.containsMouse
+                                onHotChanged: if (hot) card.hotRow = row; else if (card.hotRow === row) card.hotRow = null
+                                Component.onDestruction: if (card.hotRow === row) card.hotRow = null
                                 width: list.width
                                 height: modelData.sep ? 11 : 36
 
@@ -138,15 +145,14 @@ Scope {
                                     visible: !row.modelData.sep
                                     anchors.fill: parent
                                     radius: 12
-                                    color: rowArea.containsMouse ? Theme.accent : "transparent"
-                                    Behavior on color { ColorAnimation { duration: Theme.fast } }
+                                    color: "transparent"
 
                                     Icon {
                                         x: 12
                                         anchors.verticalCenter: parent.verticalCenter
                                         path: row.modelData.icon || ""
                                         size: 17
-                                        color: rowArea.containsMouse ? Theme.ink : Theme.fg
+                                        color: row.hot ? Theme.selFg : Theme.fg
                                     }
                                     Text {
                                         x: 40
@@ -157,7 +163,7 @@ Scope {
                                         font.family: Theme.font
                                         font.pixelSize: 14
                                         font.weight: Font.Medium
-                                        color: rowArea.containsMouse ? Theme.ink : Theme.fg
+                                        color: row.hot ? Theme.selFg : Theme.fg
                                     }
                                     MouseArea {
                                         id: rowArea

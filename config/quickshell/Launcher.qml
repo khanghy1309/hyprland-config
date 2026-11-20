@@ -34,6 +34,8 @@ PanelWindow {
 
     property string query: ""
     property int selected: 0
+    // hàng kết quả đang chọn: viên kính chọn trượt theo nó
+    property Item selRow: null
     property var fileResults: []
     property var clipEntries: []
     readonly property int maxRows: 8
@@ -299,6 +301,8 @@ PanelWindow {
         // chặn click xuyên xuống nền
         MouseArea { anchors.fill: parent }
 
+        GlassHighlight { follow: root.selRow; radius: 16 }
+
         Column {
             id: column
             x: 14
@@ -405,11 +409,13 @@ PanelWindow {
                     required property var modelData
                     required property int index
                     readonly property bool isSel: index === root.selected
+                    onIsSelChanged: if (isSel) root.selRow = row
+                    Component.onCompleted: if (isSel) root.selRow = row
 
                     width: column.width
                     height: 52
                     radius: 16
-                    color: isSel ? Theme.accent : rowMouse.containsMouse ? Theme.chip : "transparent"
+                    color: !isSel && rowMouse.containsMouse ? Theme.chip : "transparent"
                     Behavior on color { ColorAnimation { duration: Theme.fast } }
 
                     Rectangle {
@@ -449,7 +455,7 @@ PanelWindow {
                         font.family: Theme.font
                         font.pixelSize: 16
                         font.weight: Font.Medium
-                        color: row.isSel ? Theme.ink : Theme.fg
+                        color: row.isSel ? Theme.selFg : Theme.fg
                     }
 
                     Text {
@@ -462,7 +468,7 @@ PanelWindow {
                         text: row.modelData.sub
                         font.family: Theme.mono
                         font.pixelSize: 12
-                        color: row.isSel ? Theme.inkDim : Theme.dim
+                        color: row.isSel ? Theme.selDim : Theme.dim
                     }
 
                     // mục bộ nhớ tạm: nút xoá khi rê chuột (như Shift + Delete)
@@ -522,8 +528,9 @@ PanelWindow {
                             width: chipRow.implicitWidth + 20
                             height: 30
                             radius: 15
-                            color: on ? Theme.accent : chipArea.containsMouse ? Theme.chip : "transparent"
+                            color: !on && chipArea.containsMouse ? Theme.chip : "transparent"
                             Behavior on color { ColorAnimation { duration: Theme.fast } }
+                            GlassHighlight { anchors.fill: parent; on: chip.on; radius: 15 }
                             Row {
                                 id: chipRow
                                 anchors.centerIn: parent
@@ -532,7 +539,7 @@ PanelWindow {
                                     anchors.verticalCenter: parent.verticalCenter
                                     path: chip.modelData[2]
                                     size: 14
-                                    color: chip.on ? Theme.ink : Theme.fg
+                                    color: chip.on ? Theme.selFg : Theme.fg
                                 }
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
@@ -540,7 +547,7 @@ PanelWindow {
                                     font.family: Theme.font
                                     font.pixelSize: 13
                                     font.weight: Font.Medium
-                                    color: chip.on ? Theme.ink : Theme.fg
+                                    color: chip.on ? Theme.selFg : Theme.fg
                                 }
                                 Text {
                                     visible: chip.pre !== ""
@@ -549,7 +556,7 @@ PanelWindow {
                                     font.family: Theme.mono
                                     font.pixelSize: 11
                                     font.weight: Font.Bold
-                                    color: chip.on ? Theme.inkDim : Theme.dim
+                                    color: chip.on ? Theme.selDim : Theme.dim
                                 }
                             }
                             MouseArea {

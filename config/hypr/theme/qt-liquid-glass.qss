@@ -180,11 +180,14 @@ QMenu {
 QMenu::item {
     padding: 6px 28px 6px 12px;
     border-radius: 8px;
+    border: 1px solid transparent;   /* để mục đang chọn có viền mà chữ không bị xô */
     background: transparent;
 }
+/* mục đang rê chuột: viên kính sáng hơn nền menu (menu của Qt không trong suốt được, xem README) */
 QMenu::item:selected {
-    background-color: palette(highlight);
-    color: palette(highlighted-text);
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    color: palette(text);
 }
 QMenu::item:disabled { color: palette(placeholder-text); }
 QMenu::separator { height: 1px; margin: 5px 8px; background: rgba(255, 255, 255, 0.10); }

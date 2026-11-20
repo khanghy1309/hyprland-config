@@ -215,9 +215,10 @@ Item {
                                 height: 38
                                 radius: 12
                                 visible: !!day.modelData.n && (day.modelData.today || day.isPicked)
-                                color: day.modelData.today ? Theme.accent : "transparent"
+                                color: day.modelData.today && !Theme.glassSel ? Theme.accent : "transparent"
                                 border.width: day.isPicked && !day.modelData.today ? 1.5 : 0
                                 border.color: Theme.fg
+                                GlassHighlight { anchors.fill: parent; on: day.modelData.today && Theme.glassSel; radius: 12 }
                             }
                             Column {
                                 anchors.centerIn: parent
@@ -229,7 +230,7 @@ Item {
                                     font.pixelSize: 13
                                     font.weight: day.modelData.today ? Font.Bold : Font.Medium
                                     // ngày nghỉ lễ: màu đỏ nhạt
-                                    color: day.modelData.today ? Theme.ink
+                                    color: day.modelData.today ? Theme.selFg
                                          : day.modelData.off ? "#ff8a80"
                                          : day.modelData.weekend ? Theme.dim : Theme.fg
                                 }
@@ -239,7 +240,7 @@ Item {
                                     font.family: Theme.font
                                     font.pixelSize: 9
                                     font.weight: day.modelData.firstLunar ? Font.DemiBold : Font.Normal
-                                    color: day.modelData.today ? Theme.inkDim : Theme.dim
+                                    color: day.modelData.today ? Theme.selDim : Theme.dim
                                     opacity: day.modelData.today ? 1 : 0.85
                                 }
                             }
@@ -253,7 +254,7 @@ Item {
                                 width: 4
                                 height: 4
                                 radius: 2
-                                color: day.modelData.today ? Theme.ink : "#ffcc80"
+                                color: day.modelData.today && !Theme.glassSel ? Theme.ink : "#ffcc80"
                             }
                             MouseArea {
                                 anchors.fill: parent

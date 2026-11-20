@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -139,6 +140,7 @@ PanelWindow {
     }
 
     Column {
+        id: content
         anchors.centerIn: parent
         spacing: 26
         opacity: root.visible ? 1 : 0
@@ -333,14 +335,15 @@ PanelWindow {
                             width: 20
                             height: 20
                             radius: 10
-                            color: card.isActive ? Theme.accent : Theme.chip
+                            color: card.isActive && !Theme.glassSel ? Theme.accent : Theme.chip
+                            GlassHighlight { anchors.fill: parent; on: card.isActive && Theme.glassSel; radius: 10 }
                             Text {
                                 anchors.centerIn: parent
                                 text: card.wsId
                                 font.family: Theme.mono
                                 font.pixelSize: 11
                                 font.weight: Font.Bold
-                                color: card.isActive ? Theme.ink : Theme.fg
+                                color: card.isActive ? Theme.selFg : Theme.fg
                             }
                         }
                         Text {
@@ -383,11 +386,49 @@ PanelWindow {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: root.closeMenu()
     }
+    // Menu nằm chung lớp với ảnh các cửa sổ nên Hyprland không làm mờ được phần ngay dưới nó:
+    // tự làm mờ phần ảnh cửa sổ phía sau menu (MultiEffect), để menu vẫn là kính trong như ở chỗ khác
+    Item {
+        id: menuBack
+        visible: winMenu.visible
+        x: winMenu.x
+        y: winMenu.y
+        width: winMenu.width
+        height: winMenu.height
+        ShaderEffectSource {
+            id: menuSrc
+            anchors.fill: parent
+            visible: false
+            sourceItem: menuBack.visible ? content : null
+            sourceRect: {
+                const p = content.mapFromItem(root, winMenu.x, winMenu.y);
+                return Qt.rect(p.x, p.y, winMenu.width, winMenu.height);
+            }
+        }
+        Rectangle {
+            id: menuMask
+            anchors.fill: parent
+            radius: winMenu.radius
+            visible: false
+            layer.enabled: true
+        }
+        MultiEffect {
+            anchors.fill: parent
+            source: menuSrc
+            blurEnabled: true
+            blur: 1
+            blurMax: 48
+            saturation: 0.1
+            maskEnabled: true
+            maskSource: menuMask
+            maskThresholdMin: 0.5
+            maskSpreadAtMin: 1
+        }
+    }
     GlassMenuCard {
         id: winMenu
         visible: false
-        // nằm chung lớp với ảnh các cửa sổ nên Hyprland không làm mờ được phần dưới: dùng nền gần đặc
-        color: Qt.rgba(0.09, 0.10, 0.12, 0.95)
+        color: Theme.menuBg
         property real ax: 0
         property real ay: 0
         // mở về phía còn chỗ

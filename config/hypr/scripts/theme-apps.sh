@@ -2,7 +2,8 @@
 # Cho ứng dụng (GTK, Qt, Flatpak) và thư mục cùng một giao diện với Liquid Glass.
 #
 #   theme-apps.sh all              làm hết các phần dưới (install.sh gọi lệnh này)
-#   theme-apps.sh gtk              bảng màu cho ứng dụng GTK 3 / GTK 4, thanh bên Nautilus kính mờ
+#   theme-apps.sh gtk [glass|white] bảng màu cho ứng dụng GTK 3 / GTK 4, thanh bên Nautilus kính mờ;
+#                                  kiểu mục đang chọn trong menu (mặc định đọc từ settings.json)
 #   theme-apps.sh qt               bảng màu tối cho ứng dụng Qt 6 (qt6ct)
 #   theme-apps.sh flatpak          cho ứng dụng Flatpak đọc theme, cài theme adw-gtk3 bản Flatpak
 #   theme-apps.sh folders <màu>    màu thư mục: blue (mặc định của Papirus), violet, grey, bluegrey,
@@ -44,9 +45,30 @@ link_css() {
         { printf '%s\n' "$line"; cat "$css.bak-liquid-glass-$STAMP"; } > "$css"
     fi
 }
+# Cài đặt → Giao diện → Mục đang chọn = "Trắng đục": thêm luật viên trắng chữ tối vào cuối CSS
+# (mặc định "Kính trong" đã viết sẵn trong gtk3.css / gtk4.css)
+white_sel() {
+    local kind="${1:-}"
+    [[ -z $kind ]] && kind="$(jq -r '.look.selStyle // "glass"' "$SETTINGS" 2>/dev/null || echo glass)"
+    [[ $kind == white ]] || return 0
+    cat >> "$CONFIG/gtk-4.0/liquid-glass.css" <<'CSS'
+
+/* Mục đang chọn: Trắng đục (Cài đặt → Giao diện) */
+popover.menu modelbutton:hover,
+popover.menu modelbutton:selected { background-color: #e9edef; background-image: none; box-shadow: none; color: #14181b; }
+CSS
+    cat >> "$CONFIG/gtk-3.0/liquid-glass.css" <<'CSS'
+
+/* Mục đang chọn: Trắng đục (Cài đặt → Giao diện) */
+menu menuitem:hover, .menu menuitem:hover, .context-menu menuitem:hover { background-color: #e9edef; background-image: none; box-shadow: none; color: #14181b; }
+menu menuitem:hover label, .menu menuitem:hover label, .context-menu menuitem:hover label,
+menu menuitem:hover accelerator { color: #14181b; }
+CSS
+}
 do_gtk() {
     link_css "$CONFIG/gtk-4.0" "$THEME_SRC/gtk4.css"
     link_css "$CONFIG/gtk-3.0" "$THEME_SRC/gtk3.css"
+    white_sel "${1:-}"
     if command -v gsettings >/dev/null 2>&1; then
         gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null
         gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark' 2>/dev/null
@@ -271,7 +293,7 @@ EOF
 
 case "${1:-all}" in
     all) do_gtk; do_buttons ""; do_qt; do_flatpak; do_folders ""; do_bookmarks ;;
-    gtk) do_gtk ;;
+    gtk) do_gtk "${2:-}" ;;
     qt) do_qt ;;
     flatpak) do_flatpak ;;
     folders) do_folders "${2:-}" ;;

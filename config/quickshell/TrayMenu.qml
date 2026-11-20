@@ -52,7 +52,9 @@ PanelWindow {
     GlassPill {
         id: card
         tone: "strong"
-        color: Qt.rgba(0.09, 0.10, 0.12, 0.70)
+        color: Theme.menuBg
+        // mục chuột đang chỉ vào: viên kính chọn trượt theo nó
+        property Item hotRow: null
         radius: 16
         width: 264
         smoothWidth: false
@@ -78,6 +80,8 @@ PanelWindow {
             contentHeight: list.implicitHeight
             clip: contentHeight > height
             boundsBehavior: Flickable.StopAtBounds
+
+            GlassHighlight { follow: card.hotRow }
 
             Column {
                 id: list
@@ -132,6 +136,8 @@ PanelWindow {
                         readonly property bool checkable: modelData.buttonType !== QsMenuButtonType.None
                         readonly property bool checked: modelData.checkState === Qt.Checked
                         readonly property bool hot: on && rowArea.containsMouse
+                        onHotChanged: if (hot) card.hotRow = row; else if (card.hotRow === row) card.hotRow = null
+                        Component.onDestruction: if (card.hotRow === row) card.hotRow = null
                         width: list.width
                         height: sep ? 11 : 34
 
@@ -146,8 +152,7 @@ PanelWindow {
                             visible: !row.sep
                             anchors.fill: parent
                             radius: 11
-                            color: row.hot ? Theme.accent : "transparent"
-                            Behavior on color { ColorAnimation { duration: Theme.fast } }
+                            color: "transparent"
 
                             // dấu chọn (ô đánh dấu, nút radio)
                             Icon {
@@ -156,7 +161,7 @@ PanelWindow {
                                 anchors.verticalCenter: parent.verticalCenter
                                 path: Icons.check
                                 size: 15
-                                color: row.hot ? Theme.ink : Theme.fg
+                                color: row.hot ? Theme.selFg : Theme.fg
                             }
                             Image {
                                 id: entryIcon
@@ -179,7 +184,7 @@ PanelWindow {
                                 font.family: Theme.font
                                 font.pixelSize: 14
                                 font.weight: Font.Medium
-                                color: row.hot ? Theme.ink : row.on ? Theme.fg : Theme.dim
+                                color: row.hot ? Theme.selFg : row.on ? Theme.fg : Theme.dim
                                 opacity: row.on ? 1 : 0.55
                             }
                             Icon {
@@ -189,7 +194,7 @@ PanelWindow {
                                 anchors.verticalCenter: parent.verticalCenter
                                 path: Icons.chevronRight
                                 size: 14
-                                color: row.hot ? Theme.ink : Theme.dim
+                                color: row.hot ? Theme.selFg : Theme.dim
                             }
                             MouseArea {
                                 id: rowArea

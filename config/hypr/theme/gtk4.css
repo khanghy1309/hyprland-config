@@ -79,18 +79,20 @@ window.view overlay-split-view > widget.content-pane {
 
 /* ── menu chuột phải và các bảng bật lên: kính lỏng ──
  * Mỗi bảng bật lên là một lớp riêng; Hyprland làm mờ phía sau nó (decoration:blur:popups trong
- * lg_look.lua). Nền hơi trong, bo 16 px, mục được chọn là viên trắng như menu của dock.
+ * lg_look.lua). Nền trong, bo 16 px, mục đang rê chuột là viên kính trong có vệt sáng ở mép trên
+ * như menu của Quickshell (Cài đặt → Giao diện → Mục đang chọn = Trắng đục thì theme-apps.sh thêm
+ * luật viên trắng ở cuối tệp).
  * Bóng đổ để nhạt (dưới ngưỡng làm mờ 0,2) để phần mờ không loang ra ngoài mép menu. */
 popover > contents,
 popover.menu > contents {
-    background-color: rgba(30, 32, 36, 0.72);
+    background-color: rgba(30, 32, 36, 0.52);
     border-radius: 16px;
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.10),
                 0 0 0 1px rgba(255, 255, 255, 0.09),
                 0 6px 20px rgba(0, 0, 0, 0.18);
 }
 popover > arrow {
-    background-color: rgba(30, 32, 36, 0.72);
+    background-color: rgba(30, 32, 36, 0.52);
     border-color: rgba(255, 255, 255, 0.09);
 }
 popover.menu modelbutton,
@@ -99,8 +101,10 @@ popover.menu > contents row {
 }
 popover.menu modelbutton:hover,
 popover.menu modelbutton:selected {
-    background-color: #e9edef;
-    color: #14181b;
+    background-color: rgba(255, 255, 255, 0.16);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.40), inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+    color: #f3f6f6;
 }
 popover.menu separator {
     background-color: rgba(255, 255, 255, 0.10);

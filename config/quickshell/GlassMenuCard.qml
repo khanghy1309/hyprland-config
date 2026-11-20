@@ -12,6 +12,8 @@ GlassPill {
     property var entries: []
     property string title: ""
     signal done()
+    // mục chuột đang chỉ vào: viên kính chọn trượt theo nó
+    property Item hotRow: null
 
     property var stack: []      // [{ title, entries }] của các menu con đang mở
     readonly property var current: stack.length ? stack[stack.length - 1].entries : entries
@@ -31,8 +33,8 @@ GlassPill {
     }
 
     tone: "strong"
-    // đậm hơn kính thường một chút: menu hay mở trên vùng sáng, chữ vẫn phải rõ
-    color: Qt.rgba(0.09, 0.10, 0.12, 0.70)
+    // kính trong: Hyprland làm mờ phía sau; độ đậm theo Cài đặt → Giao diện → Độ đậm của các bảng kính
+    color: Theme.menuBg
     radius: 16
     width: 256
     smoothWidth: false
@@ -41,6 +43,11 @@ GlassPill {
     // Esc: ra khỏi menu con, hoặc đóng menu
     Keys.onEscapePressed: stack.length ? back() : done()
     Keys.onLeftPressed: if (stack.length) back()
+
+    GlassHighlight {
+        follow: card.hotRow
+        danger: !!card.hotRow && card.hotRow.modelData.danger === true
+    }
 
     Column {
         id: list
@@ -95,6 +102,8 @@ GlassPill {
                 readonly property bool sep: modelData.sep === true
                 readonly property bool usable: !sep && modelData.enabled !== false
                 readonly property bool hot: usable && rowArea.containsMouse
+                onHotChanged: if (hot) card.hotRow = row; else if (card.hotRow === row) card.hotRow = null
+                Component.onDestruction: if (card.hotRow === row) card.hotRow = null
                 width: list.width
                 height: sep ? 11 : 34
 
@@ -109,8 +118,7 @@ GlassPill {
                     visible: !row.sep
                     anchors.fill: parent
                     radius: 11
-                    color: row.hot ? (row.modelData.danger ? "#ff8a80" : Theme.accent) : "transparent"
-                    Behavior on color { ColorAnimation { duration: Theme.fast } }
+                    color: "transparent"
 
                     Icon {
                         visible: !!row.modelData.icon || row.modelData.checked === true
@@ -118,7 +126,7 @@ GlassPill {
                         anchors.verticalCenter: parent.verticalCenter
                         path: row.modelData.checked === true ? Icons.check : (row.modelData.icon || "")
                         size: 16
-                        color: row.hot ? Theme.ink : Theme.fg
+                        color: row.hot ? Theme.selFg : Theme.fg
                         opacity: row.usable ? 1 : 0.45
                     }
                     Text {
@@ -130,7 +138,7 @@ GlassPill {
                         font.family: Theme.font
                         font.pixelSize: 14
                         font.weight: Font.Medium
-                        color: row.hot ? Theme.ink : Theme.fg
+                        color: row.hot ? Theme.selFg : Theme.fg
                         opacity: row.usable ? 1 : 0.45
                     }
                     Icon {
@@ -140,7 +148,7 @@ GlassPill {
                         anchors.verticalCenter: parent.verticalCenter
                         path: Icons.chevronRight
                         size: 14
-                        color: row.hot ? Theme.ink : Theme.dim
+                        color: row.hot ? Theme.selFg : Theme.dim
                     }
                     MouseArea {
                         id: rowArea

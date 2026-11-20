@@ -100,7 +100,8 @@ Rectangle {
                     width: actText.implicitWidth + 24
                     height: 30
                     radius: 15
-                    color: actMouse.containsMouse ? Theme.accent : Theme.chip
+                    color: actMouse.containsMouse && !Theme.glassSel ? Theme.accent : Theme.chip
+                    GlassHighlight { anchors.fill: parent; on: actMouse.containsMouse && Theme.glassSel; radius: 15 }
                     Text {
                         id: actText
                         anchors.centerIn: parent
@@ -108,7 +109,7 @@ Rectangle {
                         font.family: Theme.font
                         font.pixelSize: 13
                         font.weight: Font.DemiBold
-                        color: actMouse.containsMouse ? Theme.ink : Theme.fg
+                        color: actMouse.containsMouse ? Theme.selFg : Theme.fg
                     }
                     MouseArea {
                         id: actMouse

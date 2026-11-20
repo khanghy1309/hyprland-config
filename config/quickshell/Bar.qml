@@ -36,8 +36,13 @@ PanelWindow {
     // nền sáng: chữ tối, nút đang chọn tối chữ sáng (như macOS 26 tự đổi màu chữ theo nền)
     readonly property color fg: bright ? Theme.ink : Theme.fg
     readonly property color dim: bright ? Theme.inkDim : Theme.dim
-    readonly property color selBg: bright ? Theme.ink : Theme.accent
-    readonly property color selFg: bright ? Theme.accent : Theme.ink
+    // mục đang chọn trên thanh: viên kính trong (tối hơn một chút khi dải hình nền sau thanh sáng),
+    // hoặc viên trắng / đen đặc nếu Cài đặt chọn "Trắng đục"
+    readonly property color selBg: Theme.glassSel ? (bright ? Qt.rgba(0, 0, 0, 0.16) : Qt.rgba(1, 1, 1, 0.22))
+                                                  : bright ? Theme.ink : Theme.accent
+    readonly property color selFg: Theme.glassSel ? fg : bright ? Theme.accent : Theme.ink
+    readonly property color selRim: bright ? Qt.rgba(0, 0, 0, 0.22) : Theme.selRim
+    readonly property int selBorder: Theme.glassSel ? 1 : 0
     Canvas {
         id: probe
         width: 64
@@ -136,6 +141,8 @@ PanelWindow {
             anchors.margins: 4
             radius: height / 2
             color: barMenu.owner === sysPill ? bar.selBg : sysArea.containsMouse ? Theme.chip : "transparent"
+            border.width: barMenu.owner === sysPill ? bar.selBorder : 0
+            border.color: bar.selRim
             Behavior on color { ColorAnimation { duration: Theme.fast } }
         }
         Icon {
@@ -180,6 +187,8 @@ PanelWindow {
                     height: 28
                     radius: 14
                     color: isActive ? bar.selBg : wsMouse.containsMouse ? Theme.chip : "transparent"
+                    border.width: isActive ? bar.selBorder : 0
+                    border.color: bar.selRim
 
                     Behavior on width { NumberAnimation { duration: Theme.normal; easing.type: Easing.OutCubic } }
                     Behavior on color { ColorAnimation { duration: Theme.fast } }
@@ -324,6 +333,8 @@ PanelWindow {
                         radius: 9
                         color: trayMenu.item === tray.modelData ? bar.selBg
                              : trayArea.containsMouse ? Theme.chip : "transparent"
+                        border.width: trayMenu.item === tray.modelData ? bar.selBorder : 0
+                        border.color: bar.selRim
                         Behavior on color { ColorAnimation { duration: Theme.fast } }
                     }
                     Image {

@@ -119,6 +119,25 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (khuya): mục đang chọn kiểu kính, menu trong hơn
+
+- **`GlassHighlight.qml` mới:** viên kính trong (nền trắng 20%, sáng hơn ở trên, viền sáng 1 px, vệt sáng mép trên). Có hai cách dùng: đặt trong một mục, hoặc trượt theo mục đang chọn bằng lò xo.
+  - Lần đầu viết theo `Connections` với x / y / width của mục: các nút chọn kiểu phân đoạn không hiện viên kính. Nguyên nhân: lúc gán, mục rộng 0 và Row chưa xếp xong; mapToItem không báo khi cha của mục di chuyển (in ra `_r = (3, 0, 0, 28)` mãi không đổi).
+  - Sửa: tính toạ độ trong một biểu thức có đọc x / y / cỡ của mục, của cha và ông của mục, nên tự tính lại khi bố cục xếp xong.
+- **Chỗ đổi:**
+  - Viên kính trượt: menu hệ thống / cửa sổ (GlassMenuCard), menu khay, menu chuột phải, launcher, thanh bên Cài đặt, nút chọn kiểu phân đoạn, hộp chọn việc góc nóng.
+  - Viên kính tại chỗ: chip của launcher và Cài đặt, nút hành động của thông báo, số workspace trong Toàn cảnh, ngày hôm nay trong lịch, bảng chụp màn hình, menu nguồn (GlassPill sáng hơn và có ánh sáng viền).
+  - Thanh trên: workspace đang dùng, nút menu hệ thống, khay đang mở menu. Dải hình nền sáng thì dùng kính tối.
+  - Công tắc, thanh trượt, tiến trình, nút chính vẫn trắng.
+- **Menu:** nền `Theme.menuBg` = đậm của bảng kính − 0,14 (mặc định 0,36, trước 0,70). Menu trong Toàn cảnh nằm chung lớp với ảnh cửa sổ nên Hyprland không làm mờ được: tự làm mờ bằng MultiEffect (ShaderEffectSource của lưới ảnh, mặt nạ bo góc). Bản giả cho thấy ảnh phía sau mờ đúng chỗ menu.
+- **Cài đặt → Giao diện → Mục đang chọn:** Kính trong / Trắng đục. Đã thử bản giả với "white": launcher, menu chuột phải trở lại viên trắng chữ tối như cũ.
+- **GTK:**
+  - `gtk3.css` / `gtk4.css`: nền menu 0,52–0,54 (trên ngưỡng làm mờ popups 0,2), mục đang rê chuột là viên kính.
+  - `theme-apps.sh gtk white` thêm luật viên trắng vào cuối `liquid-glass.css`. Đã thử trong HOME tạm: "white" có thêm luật, "glass" thì không.
+  - Qt: mục đang chọn của QMenu là viên sáng hơn nền, có viền (ô thường có viền trong suốt để chữ không xô).
+- **Ảnh ghép thử:** ghép trên hai hình nền bằng `compose.py` (làm mờ như Hyprland): menu chuột phải trên vùng hồng sáng, menu hệ thống, menu khay, launcher, Cài đặt, menu nguồn, bảng chụp, Toàn cảnh, bảng widget. Chữ đều đọc được.
+- **Chưa thử trên máy thật:** độ mờ thật của Hyprland sau menu GTK / Quickshell; MultiEffect trên card đồ hoạ của máy.
+
 ### 2026-11-20 (tối, muộn): soát toàn bộ hiệu ứng chuyển động
 
 - **Hyprland (`lg_look.lua`), đối chiếu mã nguồn 0.57.0:**
