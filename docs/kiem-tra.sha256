@@ -1,8 +1,8 @@
 # Mốc kiểm tra của repo (tools/kiem-tra.sh ghi). Không sửa tay.
-# lúc: 2026-11-20 21:39 +0700
-# commit gốc: 89cf906
+# lúc: 2026-11-20 21:46 +0700
+# commit gốc: 1eebfcd
 d573008f5adf0504005552d750fcb0ae228300804a1014d67f98423a54fc1407  .gitignore
-7cbab0756ac5bced2159b351771fe35492b4bfd401ce287e5ed66d478b8ec2be  README.md
+5400faf15588c40a15eb70623aaa3064c6554d2a907d65ee64b8897f0aeccfb1  README.md
 60cb32063bcdc2feee6421bcba37906dcd5c9b20325826d2c4d29c9e77cb9cfd  THIRD_PARTY_NOTICES.md
 c345a57d995bed37283a4f9f3d087ae0e9a6fd5565b493b58f0f6f2a443b8855  config/applications/claude-code.desktop
 2346e3b601220a7b0d1b1099fc7db25f701466d99f721733240ba5a5478f3539  config/applications/liquid-glass-settings.desktop
@@ -275,6 +275,7 @@ ff6895c9daa680559ce1fe68630f30cf248f9b058b88c9155732fa3ae89a3f55  sddm/liquid-gl
 d4e7ed99d401c8fa401789ce104ffa70d247ee339884da6662a2cd2abe8286a9  sddm/liquid-glass/metadata.desktop
 88f8ed148fd999fc76fda496659971d7167f672fe907feff9537f6bb3f1bdaac  sddm/liquid-glass/theme.conf
 145cb7505505469a127d67edd00d99a1aacbee849fd90a960dd6e49afc0b6762  tools/chan-doan.sh
+4c276b63b6d417d2adb9f2567595b4e923c71b0fbf193a425267e90d201821f7  tools/go-cai-dat.sh
 af179339e657bdf5687f383607989d006f8df4d45d623edfdae28f26cd783948  tools/hyprland-0.57-options.txt
 8184f321fb5193e3ba2cfdf82100bd135a23b18e32ab4ac151b02a63ae29ebf1  tools/kiem-tra-hypr.lua
 9dd734ab159c15bc34be84e6313c9ef183341d8202953c0edf1514182940b743  tools/kiem-tra.sh

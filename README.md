@@ -393,6 +393,10 @@ Sửa file nào thì Hyprland và Quickshell tự tải lại, không cần đă
 
 ## Sự cố thường gặp
 
+**Đăng nhập xong chỉ thấy màn hình tối và con trỏ chuột.** Thường là chưa cài đủ gói (bước 1 của install.sh bị bỏ qua hoặc pacman báo lỗi). Bấm `Ctrl + Alt + F3`, đăng nhập, rồi chạy `bash ~/hyprland-config/tools/chan-doan.sh`: nó liệt kê gói còn thiếu và lỗi của Hyprland, thanh trên, màn hình đăng nhập. Cài gói còn thiếu: `cd ~/hyprland-config && ./install.sh --goi`, rồi `reboot`.
+
+**Muốn gỡ Liquid Glass, trả máy về như trước:** `bash ~/hyprland-config/tools/go-cai-dat.sh` (chạy được từ màn hình chữ). Cấu hình được dời vào `~/liquid-glass-da-go-<thời gian>/` chứ không xoá; theme đăng nhập, phông, các thiết lập hệ thống và màn hình khởi động thì hỏi từng phần. Không gỡ gói phần mềm, không đụng driver NVIDIA. Đăng nhập lại, Hyprland tự tạo cấu hình mặc định (`Super + Q` mở terminal, `Super + M` thoát).
+
 **Bật tường lửa xong, một ứng dụng không kết nối được với máy khác trong mạng** (game mạng LAN, chia sẻ tệp, truyền lên TV). Tường lửa chặn kết nối đi vào. Xem ứng dụng cần cổng nào rồi mở riêng cổng đó, ví dụ `sudo ufw allow 1714:1764/tcp`; hoặc tạm tắt ở Cài đặt → Bảo mật và sao lưu để thử xem có phải do tường lửa không.
 
 **Góc màn hình hiện thông báo lỗi đỏ.** Đó là lỗi trong cấu hình Hyprland, thông báo ghi tên file và dòng. Gửi nguyên văn thông báo cho mình để sửa. Trong lúc chờ, các phím tắt cơ bản vẫn dùng được.

@@ -119,6 +119,22 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (tối): công cụ gỡ cài đặt
+
+- **`tools/go-cai-dat.sh`:**
+  - Dời cấu hình của Liquid Glass vào `~/liquid-glass-da-go-<thời gian>/`, không xoá. Gồm: hypr, quickshell, kitty, liquid-glass, tệp fish conf.d, cờ của Edge, lối tắt .desktop, tệp trạng thái / bộ nhớ đệm, CSS GTK cùng dòng @import, màu Qt.
+  - starship / fastfetch chỉ dời khi giống hệt bản của bộ này.
+  - Có thể trả lại bản sao lưu đầu tiên (trước khi cài).
+  - Phần cho cả máy hỏi từng phần: theme SDDM, phông, các tệp có tên liquid-glass của setup-system.sh, tệp mkinitcpio / grub đã sao lưu.
+  - Không gỡ gói, không đụng driver NVIDIA.
+- **Đã thử với HOME và /etc giả, trả lời có hết:**
+  - Đã dời đúng các tệp.
+  - Giữ `fastfetch/config.jsonc` người dùng tự sửa và một tệp .desktop không phải của bộ này.
+  - `gtk.css` chỉ mất dòng @import, giữ CSS riêng.
+  - Đã bỏ theme SDDM, phông, hook Timeshift.
+  - Không chạy khi dùng sudo / root.
+- **Hyprland 0.57 khi không có tệp cấu hình:** tự tạo cấu hình mặc định (`generateDefaultConfig`) và báo "SUPER+Q -> kitty, SUPER+M -> exit Hyprland" (ConfigManager.cpp). Script in đúng hai phím đó.
+
 ### 2026-11-20 (tối, máy thật đầu tiên): màn hình tối chỉ có con trỏ chuột
 
 - **Máy:** laptop MSI, Intel Raptor Lake-P (i915) + NVIDIA AD107M (nvidia-open, nvidia-prime, nvidia_drm.modeset=Y). Hyprland 0.57.2, SDDM 0.21.0 đang chạy.
