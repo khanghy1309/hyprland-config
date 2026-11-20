@@ -163,10 +163,11 @@ FloatingWindow {
 
             Group {
                 title: "Kính"
-                SegRow {
+                ChipRow {
                     label: "Kính của cửa sổ"
-                    note: "Acrylic có mép cong khúc xạ như macOS. Máy yếu hoặc thấy giật thì chọn Mờ thường."
-                    options: [["acrylic", "Acrylic"], ["blur", "Mờ thường"], ["off", "Tắt"]]
+                    note: "Acrylic: mép cong khúc xạ như macOS. Lăng kính: tách màu cầu vồng ở mép. Kính nhám: hạt li ti như kính mờ đá. Cực quang: dải màu chuyển động chậm phía sau (tốn máy hơn). Sương óng ánh: lớp sương ánh màu nhẹ. Máy yếu hoặc thấy giật thì chọn Mờ thường."
+                    options: [["acrylic", "Acrylic"], ["prism", "Lăng kính"], ["frost", "Kính nhám"], ["aurora", "Cực quang"],
+                              ["haze", "Sương óng ánh"], ["blur", "Mờ thường"], ["off", "Tắt"]]
                     current: Settings.look.glass
                     onPicked: v => Settings.look.glass = v
                 }
@@ -321,6 +322,20 @@ FloatingWindow {
                     label: "Hiệu ứng chuyển động"
                     on: Settings.look.animations
                     onToggled: Settings.look.animations = !Settings.look.animations
+                }
+                SwitchRow {
+                    label: "Cửa sổ dẻo"
+                    note: "Kéo hoặc đổi cỡ cửa sổ thì nó rung rinh như thạch rồi đứng lại (mới trong Hyprland 0.57)."
+                    enabled: Settings.look.animations
+                    on: Settings.look.wobble
+                    onToggled: Settings.look.wobble = !Settings.look.wobble
+                }
+                SwitchRow {
+                    label: "Mờ khi chuyển động"
+                    note: "Cửa sổ đang di chuyển có vệt mờ theo sau, nhìn mượt hơn. Tốn máy hơn một chút."
+                    enabled: Settings.look.animations
+                    on: Settings.look.motionBlur
+                    onToggled: Settings.look.motionBlur = !Settings.look.motionBlur
                 }
                 SegRow {
                     label: "Tốc độ"
@@ -633,7 +648,20 @@ FloatingWindow {
             }
 
             Group {
-                title: "Đặt cửa sổ"
+                title: "Cửa sổ"
+                SegRow {
+                    label: "Bố cục cửa sổ"
+                    note: "Xếp ô: cửa sổ mới chia đôi chỗ trống. Cuộn ngang: mỗi cửa sổ một cột rộng nửa màn hình, xếp thành dải dài; vuốt 3 ngón ngang để lướt qua (lúc đó đổi workspace bằng thanh trên hoặc Toàn cảnh)."
+                    options: [["dwindle", "Xếp ô"], ["scrolling", "Cuộn ngang"]]
+                    current: Settings.windows.layout
+                    onPicked: v => Settings.windows.layout = v
+                }
+                SwitchRow {
+                    label: "Terminal nhường chỗ"
+                    note: "Mở một ứng dụng có cửa sổ từ terminal (ví dụ gõ loupe ảnh.png) thì terminal tạm ẩn, ứng dụng hiện đúng chỗ đó; đóng ứng dụng là terminal hiện lại."
+                    on: Settings.windows.swallow
+                    onToggled: Settings.windows.swallow = !Settings.windows.swallow
+                }
                 SwitchRow {
                     label: "Kéo cửa sổ chạm mép màn hình để đặt"
                     note: "Chạm mép trái hoặc phải: nửa màn hình. Chạm mép trên: lấp đầy. Kéo vào một góc: một phần tư màn hình. Kéo cửa sổ đã đặt ra chỗ khác là nó trở lại cỡ cũ."
@@ -1028,6 +1056,12 @@ FloatingWindow {
                     label: "4 ngón trái / phải: bảng widget và trung tâm điều khiển"
                     on: Settings.gestures.panels
                     onToggled: Settings.gestures.panels = !Settings.gestures.panels
+                }
+                SwitchRow {
+                    label: "Chụm / mở 3 ngón: kính lúp"
+                    note: "Mở 3 ngón ra là phóng to quanh con trỏ, chụm lại là thu về. Cũng chỉnh được ở ô Kính lúp trong trung tâm điều khiển."
+                    on: Settings.gestures.zoom
+                    onToggled: Settings.gestures.zoom = !Settings.gestures.zoom
                     last: true
                 }
             }
@@ -2186,6 +2220,87 @@ FloatingWindow {
             font.pixelSize: 13
             font.weight: Font.Medium
             color: Theme.dim
+        }
+    }
+
+    // như SegRow nhưng nhiều lựa chọn: các nút xếp xuống dưới chữ, tự xuống dòng
+    component ChipRow: Item {
+        id: cr
+        property string label
+        property string note: ""
+        property bool last: false
+        property var options: []      // [[giá trị, nhãn], …]
+        property var current
+        signal picked(var value)
+        width: parent ? parent.width : 0
+        height: crCol.implicitHeight + 28
+        opacity: enabled ? 1 : 0.4
+        Column {
+            id: crCol
+            x: 18
+            y: 14
+            width: cr.width - 36
+            spacing: 2
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                text: cr.label
+                font.family: Theme.font
+                font.pixelSize: 14
+                color: Theme.fg
+            }
+            Text {
+                visible: cr.note.length > 0
+                width: parent.width
+                wrapMode: Text.WordWrap
+                text: cr.note
+                font.family: Theme.font
+                font.pixelSize: 12
+                color: Theme.dim
+            }
+            Item { width: 1; height: 8 }
+            Flow {
+                width: parent.width
+                spacing: 6
+                Repeater {
+                    model: cr.options
+                    delegate: Rectangle {
+                        id: chip
+                        required property var modelData
+                        readonly property bool on: cr.current === modelData[0]
+                        width: ct.implicitWidth + 24
+                        height: 30
+                        radius: 10
+                        color: on ? Theme.accent : chipMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Theme.chip
+                        Behavior on color { ColorAnimation { duration: Theme.fast } }
+                        Text {
+                            id: ct
+                            anchors.centerIn: parent
+                            text: chip.modelData[1]
+                            font.family: Theme.font
+                            font.pixelSize: 12
+                            font.weight: Font.Medium
+                            color: chip.on ? Theme.ink : Theme.fg
+                        }
+                        MouseArea {
+                            id: chipMouse
+                            anchors.fill: parent
+                            enabled: cr.enabled
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: cr.picked(chip.modelData[0])
+                        }
+                    }
+                }
+            }
+        }
+        Rectangle {
+            visible: !cr.last
+            x: 18
+            anchors.bottom: parent.bottom
+            width: parent.width - 18
+            height: 1
+            color: Theme.line
         }
     }
 

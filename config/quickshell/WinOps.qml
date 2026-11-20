@@ -93,6 +93,28 @@ Singleton {
             ] });
         list.push({ label: o.floating ? "Xếp vào lưới" : "Cho nổi tự do", icon: Icons.floating,
                     run: () => { pre(); toggleFloat(w); } });
+        // nhóm tab: nhiều cửa sổ chung một khung, thanh tab kính ở trên (lg_look.lua → group)
+        const grouped = (o.grouped || []).length > 0;
+        if (Hyprland.usingLua) {
+            if (grouped) {
+                list.push({ label: "Tab kế tiếp", icon: Icons.chevronRight,
+                            run: () => { pre(); lua(`hl.dsp.group.next({ ${sel(w)} })`, ""); } });
+                list.push({ label: "Tách khỏi nhóm tab", icon: Icons.moveTo,
+                            run: () => { pre(); lua(`hl.dsp.window.move({ out_of_group = true, ${sel(w)} })`, ""); } });
+                list.push({ label: "Bỏ nhóm tab", icon: Icons.grid,
+                            run: () => { pre(); lua(`hl.dsp.group.toggle({ ${sel(w)} })`, ""); } });
+            } else {
+                list.push({ label: "Gộp thành nhóm tab", icon: Icons.grid,
+                            run: () => { pre(); focus(w); lua(`hl.dsp.group.toggle({ ${sel(w)} })`, ""); } });
+                // gộp với cửa sổ bên cạnh: cửa sổ đó chưa có nhóm thì tạo nhóm mới cho cả hai
+                const into = (label, dir) => ({ label: label, run: () => {
+                    pre(); focus(w); lua(`hl.dsp.window.move({ into_or_create_group = "${dir}", ${sel(w)} })`, ""); } });
+                list.push({ label: "Gộp tab với cửa sổ cạnh", icon: Icons.moveTo, sub: [
+                    into("Cửa sổ bên trái", "left"), into("Cửa sổ bên phải", "right"),
+                    into("Cửa sổ phía trên", "up"), into("Cửa sổ phía dưới", "down")
+                ] });
+            }
+        }
         list.push({ label: "Ghim trên mọi workspace", icon: Icons.pin, checked: !!o.pinned,
                     run: () => { pre(); togglePin(w); } });
         list.push({ label: "Chuyển sang workspace", icon: Icons.moveTo, sub: () => {

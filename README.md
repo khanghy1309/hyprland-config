@@ -197,9 +197,19 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 
 **Góc nóng** (như Hot Corners của macOS): đưa chuột vào sát một góc màn hình là làm việc đã chọn cho góc đó: Toàn cảnh, Bảng widget, Trung tâm điều khiển, Launcher, Chụp màn hình, Khóa màn hình, Tắt màn hình. Mặc định chỉ góc trên trái mở Toàn cảnh. Chọn việc cho từng góc ở Cài đặt → Màn hình nền và Dock → *Góc nóng*. Con trỏ phải dừng ở góc khoảng 0,1 giây mới tính, nên lướt chuột qua không mở nhầm. Góc nóng tự tắt khi có cửa sổ toàn màn hình (xem phim, chơi game) hoặc khi bật Chơi game.
 
+**Tính năng riêng của Hyprland** (Hyprland 0.57 có sẵn, chỉ cần bật):
+- **Kiểu kính của cửa sổ** (Cài đặt → Giao diện → *Kính của cửa sổ*): Acrylic (mặc định, mép cong khúc xạ), Lăng kính (tách màu cầu vồng ở mép), Kính nhám (hạt li ti), Cực quang (dải màu chuyển động chậm phía sau, tốn máy hơn), Sương óng ánh, Mờ thường, Tắt.
+- **Cửa sổ dẻo** (Cài đặt → Giao diện): kéo hoặc đổi cỡ cửa sổ thì nó rung rinh như thạch rồi đứng lại.
+- **Mờ khi chuyển động** (Cài đặt → Giao diện): cửa sổ đang di chuyển có vệt mờ theo sau.
+- **Bố cục cuộn ngang** (Cài đặt → Màn hình nền và Dock → *Bố cục cửa sổ*, hoặc ô *Cuộn ngang* trong trung tâm điều khiển): mỗi cửa sổ là một cột rộng nửa màn hình, xếp thành dải dài như niri. Vuốt 3 ngón ngang để lướt qua dải; lúc đó đổi workspace bằng thanh trên hoặc Toàn cảnh. Chỉ một cửa sổ thì nó chiếm cả màn hình.
+- **Kính lúp**: phóng to quanh con trỏ, như Zoom trợ năng của macOS. Mở 3 ngón trên touchpad để phóng theo tay, chụm lại để thu về; hoặc bấm ô *Kính lúp* trong trung tâm điều khiển để đi qua các mức 1,5× → 2× → 3× → tắt.
+- **Terminal nhường chỗ** (Cài đặt → Màn hình nền và Dock): mở một ứng dụng có cửa sổ từ terminal (ví dụ `loupe ảnh.png`) thì terminal tạm ẩn, ứng dụng hiện đúng chỗ đó; đóng ứng dụng thì terminal hiện lại.
+- **Nhóm tab**: nhiều cửa sổ chung một khung, có thanh tab kính ở trên (bấm tab để chuyển, bấm chuột giữa để đóng). Tạo nhóm: chuột phải vào cửa sổ trong Toàn cảnh hoặc trên dock → *Tuỳ chọn cửa sổ* → *Gộp tab với cửa sổ cạnh*; hoặc *Gộp thành nhóm tab* rồi kéo cửa sổ khác thả vào thanh tab. Cùng menu đó có *Tab kế tiếp*, *Tách khỏi nhóm tab*, *Bỏ nhóm tab*.
+- **Chia sẻ một workspace khi họp online**: lúc chia sẻ màn hình trên Meet, Zoom, Discord…, hộp chọn của Hyprland có thêm lựa chọn chỉ chia sẻ một workspace (thay vì cả màn hình hay một cửa sổ). Không cần bật gì.
+
 **Cài đặt** (`Super + ,`, hoặc gõ "cài đặt" trong launcher): một cửa sổ kính, đổi gì là áp dụng ngay, không có nút Lưu.
-- *Màn hình nền và Dock:* hiện / tự ẩn dock, phóng to biểu tượng, hiệu ứng thu nhỏ, kích thước biểu tượng, đặt cửa sổ khi kéo chạm mép, góc nóng (một màn hình thu nhỏ, mỗi góc một nút chọn việc), ứng dụng ghim.
-- *Giao diện:* nút trên thanh tiêu đề ứng dụng, phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kính của cửa sổ (acrylic / mờ thường / tắt), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, màu thư mục, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
+- *Màn hình nền và Dock:* hiện / tự ẩn dock, phóng to biểu tượng, kích thước biểu tượng, bố cục cửa sổ (xếp ô / cuộn ngang), terminal nhường chỗ, đặt cửa sổ khi kéo chạm mép, góc nóng (một màn hình thu nhỏ, mỗi góc một nút chọn việc), ứng dụng ghim.
+- *Giao diện:* kiểu kính của cửa sổ, cửa sổ dẻo, mờ khi chuyển động, nút trên thanh tiêu đề ứng dụng, phông chữ (Geist mặc định, Inter, Be Vietnam Pro, Onest; đều đủ dấu tiếng Việt), kính của cửa sổ (acrylic / mờ thường / tắt), kính của thanh trên, dock và các bảng (xem *Kính lỏng* bên dưới), độ mờ, độ đậm của các bảng kính, màu thư mục, bo góc, khoảng cách giữa cửa sổ, viền sáng, bóng đổ, tốc độ chuyển động, nhiệt độ ánh sáng đêm, thời gian hiện thông báo.
 - *Hình nền:* bấm vào ảnh để đổi. Video và GIF có nhãn ở góc. Chọn lúc nào video tạm dừng (khi có cửa sổ toàn màn hình, khi có bất kỳ cửa sổ nào, hoặc không bao giờ), có dùng ảnh tĩnh khi chạy pin không, và hiệu ứng khi đổi ảnh.
 - *Touchpad và bàn phím:* cuộn tự nhiên, chạm để bấm, tắt touchpad khi gõ, tốc độ cuộn và con trỏ, bật/tắt từng cử chỉ, tốc độ lặp phím (có ô gõ thử).
 - *Wi-Fi:* bật/tắt, danh sách mạng xung quanh, bấm để kết nối (mạng có khoá thì hiện ô mật khẩu ngay bên dưới), quên mạng, ngắt kết nối.

@@ -2,7 +2,17 @@
 -- Tham khảo: https://wiki.hypr.land/configuring/core/config-options/
 -- Các giá trị LG_opt(...) chỉnh được trong ứng dụng Cài đặt (Super + ,).
 
-local glass    = LG_opt("look", "glass", "acrylic")      -- "acrylic" | "blur" | "off"
+local glass    = LG_opt("look", "glass", "acrylic")      -- kiểu kính: xem VARIANTS dưới, hoặc "off"
+-- Kiểu kính của cửa sổ (biến thể blur của Hyprland 0.57). Kiểu có chuyển động (cực quang) tốn máy hơn.
+local VARIANTS = {
+    blur    = 0,   -- mờ thường (kawase)
+    frost   = 1,   -- kính mờ đá: hạt li ti như kính nhám
+    prism   = 6,   -- lăng kính: tách màu cầu vồng ở mép
+    acrylic = 8,   -- acrylic: mép cong khúc xạ, gần "liquid glass" nhất (mặc định)
+    aurora  = 9,   -- cực quang: dải màu chuyển động chậm phía sau kính
+    haze    = 10,  -- sương óng ánh
+}
+local layout   = LG_opt("windows", "layout", "dwindle")  -- "dwindle" (xếp ô) | "scrolling" (cuộn ngang)
 local borders  = LG_opt("look", "borders", true)
 local animMul  = LG_opt("look", "animScale", 1)          -- >1 chậm hơn, <1 nhanh hơn
 local function sp(x) return x * animMul end
@@ -21,7 +31,7 @@ hl.config({
 
         resize_on_border = true,
         allow_tearing    = false,
-        layout           = "dwindle",
+        layout           = (layout == "scrolling") and "scrolling" or "dwindle",
     },
 
     decoration = {
@@ -41,6 +51,15 @@ hl.config({
             color_inactive = 0x33000000,
         },
 
+        -- Cửa sổ dẻo: kéo hoặc đổi cỡ thì rung rinh như thạch (mới trong Hyprland 0.57)
+        wobble = {
+            enabled = LG_opt("look", "wobble", false),
+        },
+        -- Mờ khi chuyển động: vệt mờ theo cửa sổ đang di chuyển
+        motion_blur = {
+            enabled = LG_opt("look", "motionBlur", false),
+        },
+
         -- Ánh sáng mép trong của cửa sổ, rất nhẹ
         glow = {
             enabled      = borders,
@@ -52,10 +71,8 @@ hl.config({
 
         blur = {
             enabled  = glass ~= "off",
-            -- Kiểu blur. 0 = kawase (thường), 8 = acrylic: có mép cong khúc xạ
-            -- và tách màu nhẹ ở viền, gần với "liquid glass" nhất.
-            -- Máy yếu hoặc thấy giật: đổi về 0.
-            variant  = glass == "acrylic" and 8 or 0,
+            -- Kiểu kính (bảng VARIANTS ở đầu tệp). Máy yếu hoặc thấy giật: chọn Mờ thường.
+            variant  = VARIANTS[glass] or 0,
             size     = LG_opt("look", "blurSize", 8),
             passes   = 3,
             vibrancy = 0.2,
@@ -82,6 +99,10 @@ hl.config({
         disable_hyprland_logo   = true,
         disable_splash_rendering = true,
         focus_on_activate       = true,
+        -- Terminal tự ẩn khi mở ứng dụng có cửa sổ từ nó, đóng ứng dụng thì terminal hiện lại
+        -- (Cài đặt → Màn hình nền và Dock → Terminal nhường chỗ)
+        enable_swallow          = LG_opt("windows", "swallow", false),
+        swallow_regex           = "^(kitty|org.wezfurlong.wezterm|Alacritty|foot)$",
         -- màn hình đang tắt (tự tắt, hoặc góc nóng "Tắt màn hình") thì rê chuột / bấm phím là sáng lại
         mouse_move_enables_dpms = true,
         key_press_enables_dpms  = true,
@@ -89,6 +110,50 @@ hl.config({
 
     dwindle = {
         preserve_split = true,
+    },
+
+    -- Bố cục cuộn ngang (Cài đặt → Màn hình nền và Dock → Bố cục cửa sổ): cửa sổ xếp thành một
+    -- dải dài, mỗi cửa sổ là một cột rộng nửa màn hình; vuốt 3 ngón ngang để lướt (lg_input.lua).
+    -- Chỉ một cửa sổ thì nó chiếm cả màn hình.
+    scrolling = {
+        column_width             = 0.5,
+        fullscreen_on_one_column = true,
+        focus_fit_method         = 1,    -- cửa sổ được chọn cuộn vừa vào màn hình
+        follow_focus             = 1,
+    },
+
+    -- Nhóm tab: nhiều cửa sổ chung một khung, có thanh tab kính phía trên
+    -- (chuột phải vào cửa sổ trong Toàn cảnh hoặc trên dock → Tuỳ chọn cửa sổ → Gộp thành nhóm tab;
+    -- kéo một cửa sổ thả vào thanh tab để thêm vào nhóm)
+    group = {
+        drag_into_group = 2,            -- chỉ khi thả vào thanh tab, kéo ngang qua cửa sổ không bị gộp nhầm
+        col = {
+            border_active   = "rgba(ffffff55)",
+            border_inactive = "rgba(ffffff1a)",
+        },
+        groupbar = {
+            enabled          = true,
+            blur             = true,
+            font_family      = LG_opt("look", "font", "Geist"),
+            font_size        = 12,
+            font_weight_active   = "semibold",
+            font_weight_inactive = "normal",
+            height           = 22,
+            indicator_height = 0,
+            gradients        = true,
+            rounding         = 9,
+            gradient_rounding = 9,
+            gaps_in          = 4,
+            gaps_out         = 4,
+            keep_upper_gap   = false,
+            middle_click_close = true,
+            col = {
+                active   = "rgba(ffffff38)",
+                inactive = "rgba(ffffff10)",
+            },
+            text_color          = "rgba(f3f6f6ff)",
+            text_color_inactive = "rgba(f3f6f6a0)",
+        },
     },
 
     layers = {

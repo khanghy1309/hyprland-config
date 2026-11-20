@@ -158,6 +158,15 @@ cmd_check() {
         [[ -f $f ]] || { fail "$f: không có tệp này"; continue; }
         check_file "$f"
     done
+    # cấu hình Hyprland: kiểm tên tuỳ chọn bằng một Hyprland giả (tools/kiem-tra-hypr.lua)
+    if printf '%s\n' "${list[@]}" | grep -q '^config/hypr/.*\.lua$'; then
+        if command -v lua >/dev/null || command -v lua5.4 >/dev/null; then
+            local LUA; LUA=$(command -v lua || command -v lua5.4)
+            if out=$(cd config/hypr && "$LUA" ../../tools/kiem-tra-hypr.lua ../../tools/hyprland-0.57-options.txt 2>&1); then
+                ok "config/hypr: tên tuỳ chọn Hyprland ($(head -n1 <<<"$out" | cut -d';' -f1))"
+            else fail "config/hypr: tên tuỳ chọn Hyprland:"; printf '%s\n' "$out" | sed 's/^/      /'; fi
+        else skip "config/hypr: tên tuỳ chọn (không có lua)"; fi
+    fi
     echo
     if ((FAIL)); then echo "${R}$FAIL lỗi.${N}"; return 1; fi
     echo "${G}Không có lỗi tự động.${N} Còn phần xem bằng mắt / chạy thử: docs/KIEM-TRA.md."

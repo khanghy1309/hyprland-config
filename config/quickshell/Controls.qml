@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
@@ -68,6 +69,25 @@ Singleton {
     readonly property bool powerSaver: PowerProfiles.profile === PowerProfile.PowerSaver
     function togglePowerSaver() {
         PowerProfiles.profile = powerSaver ? PowerProfile.Balanced : PowerProfile.PowerSaver;
+    }
+
+    // ── kính lúp: phóng to quanh con trỏ (cursor:zoom_factor của Hyprland) ──
+    // Bấm ô Kính lúp để đi qua các mức. Chụm / mở 3 ngón trên touchpad cũng phóng to theo tay
+    // (lg_input.lua); mức đó không hiện ở đây. Đổi Cài đặt (Hyprland tải lại cấu hình) thì về 1.
+    readonly property var zoomSteps: [1, 1.5, 2, 3]
+    property real zoom: 1
+    function setZoom(v) {
+        zoom = v;
+        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ cursor = { zoom_factor = ${v} } })`]);
+    }
+    function cycleZoom() {
+        const i = zoomSteps.indexOf(zoom);
+        setZoom(zoomSteps[(i + 1) % zoomSteps.length]);
+    }
+    // Hyprland tải lại cấu hình (đổi Cài đặt) thì kính lúp về 1: đặt lại mức đang chọn
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) { if (event.name === "configreloaded" && root.zoom > 1) root.setZoom(root.zoom); }
     }
 
     // ── ánh sáng đêm (hyprsunset) ──

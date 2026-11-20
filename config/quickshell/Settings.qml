@@ -67,6 +67,8 @@ Singleton {
                 // nút trên thanh tiêu đề của ứng dụng: Hyprland không có thu nhỏ / phóng to kiểu cửa sổ
                 // thường, nên mặc định chỉ để nút đóng. close-right | close-left | none
                 property string titleButtons: "close-right"
+                property bool wobble: false          // cửa sổ dẻo khi kéo (Hyprland 0.57)
+                property bool motionBlur: false      // vệt mờ khi cửa sổ di chuyển
             }
             property JsonObject input: JsonObject {
                 property bool naturalScroll: true
@@ -82,6 +84,7 @@ Singleton {
                 property bool overview: true
                 property bool dropdown: true
                 property bool panels: true
+                property bool zoom: true              // chụm 3 ngón: kính lúp
             }
             property JsonObject wallpaper: JsonObject {
                 property string pauseMode: "full"    // full | max | active | hidden | never
@@ -111,6 +114,8 @@ Singleton {
             }
             property JsonObject windows: JsonObject {
                 property bool snapDrag: true          // kéo cửa sổ chạm mép màn hình để đặt (lg_snap.lua)
+                property string layout: "dwindle"     // dwindle (xếp ô) | scrolling (cuộn ngang)
+                property bool swallow: false          // terminal nhường chỗ cho ứng dụng mở từ nó
             }
             // góc nóng: đưa chuột vào góc màn hình để làm một việc (HotCorners.qml)
             // none | overview | widgets | control | launcher | lock | screenOff
@@ -163,12 +168,13 @@ Singleton {
         const data = {
             look: { rounding: L.rounding, gapsIn: L.gapsIn, gapsOut: L.gapsOut, glass: L.glass,
                     blurSize: L.blurSize, shadow: L.shadow, borders: L.borders,
-                    animations: L.animations, animScale: L.animScale },
+                    animations: L.animations, animScale: L.animScale, font: L.font,
+                    wobble: L.wobble, motionBlur: L.motionBlur },
             input: { naturalScroll: I.naturalScroll, tapToClick: I.tapToClick,
                      disableWhileTyping: I.disableWhileTyping, scrollFactor: I.scrollFactor,
                      sensitivity: I.sensitivity, repeatRate: I.repeatRate, repeatDelay: I.repeatDelay },
-            gestures: { workspace: G.workspace, overview: G.overview, dropdown: G.dropdown, panels: G.panels },
-            windows: { snapDrag: windows.snapDrag },
+            gestures: { workspace: G.workspace, overview: G.overview, dropdown: G.dropdown, panels: G.panels, zoom: G.zoom },
+            windows: { snapDrag: windows.snapDrag, layout: windows.layout, swallow: windows.swallow },
             // từng màn hình: { mode, scale, position, disabled }; xem lg_monitors.lua
             monitors: display.monitors || {}
         };

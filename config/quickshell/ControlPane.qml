@@ -85,6 +85,22 @@ GlassPill {
             }
             Tile {
                 width: parent.cellW
+                label: "Kính lúp"
+                iconPath: Icons.search
+                on: Controls.zoom > 1
+                sub: Controls.zoom > 1 ? String(Controls.zoom).replace(".", ",") + "×" : "Tắt"
+                onClicked: Controls.cycleZoom()
+            }
+            Tile {
+                width: parent.cellW
+                label: "Cuộn ngang"
+                iconPath: Icons.layout
+                on: Settings.windows.layout === "scrolling"
+                sub: Settings.windows.layout === "scrolling" ? "Bật" : "Xếp ô"
+                onClicked: Settings.windows.layout = Settings.windows.layout === "scrolling" ? "dwindle" : "scrolling"
+            }
+            Tile {
+                width: parent.cellW
                 label: "Chụp màn hình"
                 iconPath: Icons.camera
                 on: false

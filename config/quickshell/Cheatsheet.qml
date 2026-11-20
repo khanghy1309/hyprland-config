@@ -91,7 +91,8 @@ PanelWindow {
             [["3 ngón", "↑"], "Toàn cảnh"],
             [["3 ngón", "↓"], "Terminal thả xuống"],
             [["4 ngón", "→"], "Bảng widget"],
-            [["4 ngón", "←"], "Trung tâm điều khiển"]
+            [["4 ngón", "←"], "Trung tâm điều khiển"],
+            [["3 ngón", "chụm / mở"], "Kính lúp"]
         ] },
         { title: "Khác", items: [
             [["Super", "Shift", "W"], "Hình nền ngẫu nhiên"],

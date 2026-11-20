@@ -29,7 +29,7 @@ Một tệp **có trong mốc và mã khớp** nghĩa là nó đã được soá
 | Loại tệp | Công cụ | Ghi chú |
 |---|---|---|
 | `*.sh` và script có dòng `#!…sh` | `bash -n`, rồi `shellcheck -x -S warning` | Mức warning trở lên là phải sửa. |
-| `*.lua` (cấu hình Hyprland) | `luac -p` | Chỉ kiểm cú pháp. Tên tuỳ chọn thì xem phần kiểm tra bằng tay. |
+| `*.lua` (cấu hình Hyprland) | `luac -p`, rồi `tools/kiem-tra-hypr.lua` | Cú pháp, rồi chạy `hyprland.lua` với một `hl` giả: mọi khoá trong `hl.config` phải có trong `tools/hyprland-0.57-options.txt` (lấy từ mã nguồn Hyprland 0.57); hướng và việc của cử chỉ cũng được kiểm. Lên bản Hyprland mới thì lấy lại danh sách. |
 | `*.frag`, `*.vert` | `qsb` dịch thử | Đổi shader thì phải chạy `config/quickshell/shaders/build.sh` để dựng lại `.qsb`. `tools/kiem-tra.sh` cảnh báo khi shader đổi mà `.qsb` chưa đổi. |
 | `*.qml` | `qmllint`, nếu máy có | Quickshell nạp module lúc chạy nên qmllint không biết kiểu của nó, vì vậy tắt các cảnh báo về import và kiểu. Máy dựng repo này không có qmllint, nên QML được kiểm tra bằng bản giả (xem bên dưới). |
 | `*.js` | `node --check` | Bỏ các dòng `.pragma` / `.import` của QML trước khi kiểm. |
@@ -118,6 +118,26 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 - Lệnh `>` trong trình mở ứng dụng chạy thẳng `sh -c` với nội dung người dùng gõ. Đây là tính năng, không phải lỗ hổng.
 
 ## Nhật ký kiểm tra
+
+### 2026-11-20 (trưa): tám tính năng riêng của Hyprland 0.57
+
+**Thêm**
+- Kiểu kính của cửa sổ (biến thể blur), cửa sổ dẻo (`decoration.wobble`), mờ khi chuyển động (`decoration.motion_blur`).
+- Bố cục cuộn ngang (`general.layout = "scrolling"`): vuốt 3 ngón ngang dùng `scroll_move` thay cho đổi workspace.
+- Kính lúp: chụm 3 ngón (`cursor_zoom`, kiểu `live`) và ô trong trung tâm điều khiển. Ô này đổi mức bằng `hyprctl eval 'hl.config({ cursor = { zoom_factor = … } })'` và đặt lại mức sau sự kiện `configreloaded`.
+- Terminal nhường chỗ (`misc.enable_swallow` cùng `swallow_regex`).
+- Nhóm tab: thanh tab kính (`group.groupbar`); menu cửa sổ dùng `hl.dsp.group.toggle` / `next` và `hl.dsp.window.move` với `out_of_group`, `into_or_create_group`.
+- Chia sẻ workspace là của XDPH 0.57, không cần cấu hình.
+
+**Đối chiếu với mã nguồn Hyprland 0.57:** tên và kiểu của mọi tuỳ chọn trên, các giá trị biến thể blur (0 kawase, 1 frost, 6 prism, 8 acrylic, 9 aurora, 10 haze), các việc và hướng của cử chỉ (`pinch`, `scroll_move`, `cursor_zoom` với `mode = "live"`), tham số của các lệnh nhóm. `hl.config` gọi lúc chạy vẫn đặt giá trị và lên lịch làm mới.
+
+**Công cụ mới:** `tools/kiem-tra-hypr.lua` với danh sách 398 tuỳ chọn, đã gắn vào `tools/kiem-tra.sh chay`.
+- Đã thử: cố ý gõ sai `enable_swalow` thì công cụ báo lỗi.
+- Cấu hình hiện tại: 89 khoá, không khoá nào sai, với cả cấu hình mặc định lẫn cấu hình bật hết các tính năng mới.
+
+**Bản giả:** trang Giao diện (hàng nút kiểu kính), Màn hình nền và Dock, Touchpad, trung tâm điều khiển (ô Kính lúp, Cuộn ngang), menu cửa sổ có mục nhóm tab. Không lỗi.
+
+**Chưa thử trên máy thật:** cảm giác của cửa sổ dẻo và cuộn ngang, kính lúp khi chụm 3 ngón, thanh tab nhóm trông thế nào.
 
 ### 2026-11-20 (sau): nút trên thanh tiêu đề
 
