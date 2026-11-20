@@ -197,6 +197,12 @@ Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 
 **Góc nóng** (như Hot Corners của macOS): đưa chuột vào sát một góc màn hình là làm việc đã chọn cho góc đó: Toàn cảnh, Bảng widget, Trung tâm điều khiển, Launcher, Chụp màn hình, Khóa màn hình, Tắt màn hình. Mặc định chỉ góc trên trái mở Toàn cảnh. Chọn việc cho từng góc ở Cài đặt → Màn hình nền và Dock → *Góc nóng*. Con trỏ phải dừng ở góc khoảng 0,1 giây mới tính, nên lướt chuột qua không mở nhầm. Góc nóng tự tắt khi có cửa sổ toàn màn hình (xem phim, chơi game) hoặc khi bật Chơi game.
 
+**Công cụ đi kèm** (cài cùng install.sh, chạy sẵn khi đăng nhập):
+- **Giữ nội dung vừa chép** (wl-clip-persist): trên Wayland, chép chữ rồi đóng ứng dụng đó là mất nội dung vừa chép; giờ nội dung vẫn còn để dán, như Windows và Mac.
+- **Tự gắn USB, thẻ nhớ** (udiskie): cắm vào là ổ được gắn và hiện thông báo, không cần mở trình quản lý tệp trước. Rút ra thì bấm nút ⏏ cạnh tên ổ trong thanh bên trình quản lý tệp.
+- **Tắt máy êm** (hyprshutdown, của nhóm Hyprland): Khởi động lại, Tắt máy, Đăng xuất (menu hệ thống, menu nguồn) đóng từng ứng dụng như khi bấm nút đóng rồi mới tắt, nên ứng dụng kịp lưu: Firefox không báo "khôi phục phiên bị lỗi", tài liệu chưa lưu thì ứng dụng còn kịp hỏi. Một màn hình nhỏ hiện các ứng dụng đang đóng.
+- **Thông tin máy** (hyprsysteminfo, của nhóm Hyprland; gói AUR, install.sh hỏi ở bước 2): menu hệ thống → *Giới thiệu máy này* mở cửa sổ CPU, card đồ hoạ, bộ nhớ, có nút chép thông tin chẩn đoán để gửi khi hỏi lỗi. Chưa cài thì mở trang Giới thiệu trong Cài đặt.
+
 **Tính năng riêng của Hyprland** (Hyprland 0.57 có sẵn, chỉ cần bật):
 - **Kiểu kính của cửa sổ** (Cài đặt → Giao diện → *Kính của cửa sổ*): Acrylic (mặc định, mép cong khúc xạ), Lăng kính (tách màu cầu vồng ở mép), Kính nhám (hạt li ti), Cực quang (dải màu chuyển động chậm phía sau, tốn máy hơn), Sương óng ánh, Mờ thường, Tắt.
 - **Cửa sổ dẻo** (Cài đặt → Giao diện): kéo hoặc đổi cỡ cửa sổ thì nó rung rinh như thạch rồi đứng lại.

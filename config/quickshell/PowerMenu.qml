@@ -33,15 +33,15 @@ PanelWindow {
         { label: "Khóa",          key: "L", path: "M6 11h12v10H6zM9 11V7a3 3 0 0 1 6 0v4",
           cmd: ["sh", "-c", "pidof hyprlock || hyprlock"] },
         { label: "Đăng xuất",     key: "E", path: "M10 4H5v16h5M14 8l4 4-4 4M18 12H9",
-          cmd: ["hyprctl", "dispatch", "hl.dsp.exit()"] },
+          cmd: Controls.logoutCmd },
         { label: "Ngủ",           key: "U", path: Icons.moon,
           cmd: ["systemctl", "suspend"] },
         { label: "Ngủ đông",      key: "H", path: "M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9",
           cmd: ["systemctl", "hibernate"] },
         { label: "Khởi động lại", key: "R", path: "M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5",
-          cmd: ["systemctl", "reboot"] },
+          cmd: Controls.rebootCmd },
         { label: "Tắt máy",       key: "S", path: "M12 3v9M6.4 6.4a8 8 0 1 0 11.2 0",
-          cmd: ["systemctl", "poweroff"] }
+          cmd: Controls.poweroffCmd }
     ]
 
     function open() { selected = 0; visible = true; keyCatcher.forceActiveFocus(); }

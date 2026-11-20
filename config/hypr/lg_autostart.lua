@@ -20,6 +20,12 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
 
+    -- Giữ nội dung vừa chép khi đóng ứng dụng đã chép nó (Wayland vốn làm mất, Windows và Mac thì không)
+    hl.exec_cmd("wl-clip-persist --clipboard regular")
+
+    -- Cắm USB, thẻ nhớ: tự gắn ổ và báo một thông báo (bấm vào để mở thư mục)
+    hl.exec_cmd("udiskie --automount --notify --no-tray")
+
     -- Mở sẵn terminal thả xuống (ẩn), để Super + ` hiện ngay
     hl.exec_cmd(LG.terminal .. " --class dropdown")
 end)

@@ -119,6 +119,17 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (trưa, sau): bốn công cụ đi kèm
+
+- **wl-clip-persist**: chạy khi đăng nhập với `--clipboard regular`, theo README của công cụ. Không dùng `both`, để không đụng vùng chọn chuột giữa.
+- **udiskie**: chạy khi đăng nhập với `--automount --notify --no-tray`, theo `udiskie/cli.py`. Thông báo đi qua máy chủ thông báo của Quickshell. Cài thêm `udisks2`.
+- **hyprshutdown**: Khởi động lại, Tắt máy, Đăng xuất trong `Bar.qml` và `PowerMenu.qml` đều gọi lệnh chung `Controls.rebootCmd` / `poweroffCmd` / `logoutCmd`.
+  - Tuỳ chọn đối chiếu với `src/main.cpp`: `-t` cho dòng chữ, `-p` cho lệnh chạy sau cùng. Mặc định chạy nền.
+  - Máy chưa có hyprshutdown thì chạy lệnh cũ. Đã thử cả hai trường hợp với lệnh giả trong PATH: tham số đúng, chữ có dấu còn nguyên.
+- **hyprsysteminfo** (AUR, install.sh hỏi): cửa sổ có class `hyprsysteminfo`, theo `src/main.cpp`; đã thêm luật cho nó nổi giữa màn hình. Mục *Giới thiệu máy này* mở công cụ này, chưa cài thì mở trang Giới thiệu; trang Giới thiệu có nút, tự tắt khi chưa cài.
+- Kiểm tra tự động: không lỗi. Bản giả (trang Giới thiệu, menu hệ thống, menu nguồn, trung tâm điều khiển): không lỗi.
+- **Chưa thử trên máy thật:** màn hình của hyprshutdown, udiskie khi cắm USB thật, wl-clip-persist với ảnh.
+
 ### 2026-11-20 (trưa): tám tính năng riêng của Hyprland 0.57
 
 **Thêm**

@@ -105,7 +105,7 @@ PanelWindow {
         return { label: label + "…", icon: icon, sub: [{ label: question, icon: icon, danger: true, run: run }] };
     }
     readonly property var systemEntries: [
-        { label: "Giới thiệu máy này", icon: Icons.info, run: () => bar.ipc(["settings", "page", "about"]) },
+        { label: "Giới thiệu máy này", icon: Icons.info, run: () => Quickshell.execDetached(Controls.aboutCmd) },
         { label: "Cài đặt hệ thống…", icon: Icons.gear, run: () => bar.ipc(["settings", "open"]) },
         { label: Updates.count > 0 ? "Cập nhật phần mềm (" + Updates.count + ")" : "Kiểm tra cập nhật",
           icon: Icons.download, run: () => Updates.count > 0 ? Updates.run() : Updates.check() },
@@ -116,11 +116,11 @@ PanelWindow {
         { label: "Buộc thoát ứng dụng…", icon: Icons.close, run: () => Quickshell.execDetached(["missioncenter"]) },
         { sep: true },
         { label: "Ngủ", icon: Icons.moon, run: () => Quickshell.execDetached(["systemctl", "suspend"]) },
-        bar.confirm("Khởi động lại", Icons.restart, "Khởi động lại ngay", () => Quickshell.execDetached(["systemctl", "reboot"])),
-        bar.confirm("Tắt máy", Icons.power, "Tắt máy ngay", () => Quickshell.execDetached(["systemctl", "poweroff"])),
+        bar.confirm("Khởi động lại", Icons.restart, "Khởi động lại ngay", () => Quickshell.execDetached(Controls.rebootCmd)),
+        bar.confirm("Tắt máy", Icons.power, "Tắt máy ngay", () => Quickshell.execDetached(Controls.poweroffCmd)),
         { sep: true },
         { label: "Khóa màn hình", icon: Icons.lock, run: () => Quickshell.execDetached(["sh", "-c", "pidof hyprlock || hyprlock"]) },
-        bar.confirm("Đăng xuất", Icons.logout, "Đăng xuất ngay", () => Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.exit()"]))
+        bar.confirm("Đăng xuất", Icons.logout, "Đăng xuất ngay", () => Quickshell.execDetached(Controls.logoutCmd))
     ]
 
     GlassPill {

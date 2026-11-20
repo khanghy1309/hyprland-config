@@ -96,6 +96,14 @@ hl.window_rule({
     animation = "popin 85%",
 })
 
+-- Thông tin máy (hyprsysteminfo, của nhóm Hyprland): cửa sổ cỡ cố định, nổi giữa màn hình
+hl.window_rule({
+    name   = "float-system-info",
+    match  = { class = "^hyprsysteminfo$" },
+    float  = true,
+    center = true,
+})
+
 -- Máy tính bỏ túi: nổi, nhỏ gọn
 hl.window_rule({
     name  = "float-calculator",

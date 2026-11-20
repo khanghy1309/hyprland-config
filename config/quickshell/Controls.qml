@@ -71,6 +71,21 @@ Singleton {
         PowerProfiles.profile = powerSaver ? PowerProfile.Balanced : PowerProfile.PowerSaver;
     }
 
+    // ── tắt máy, khởi động lại, đăng xuất êm ──
+    // hyprshutdown (của nhóm Hyprland) đóng từng ứng dụng như khi bấm nút đóng, để chúng kịp lưu
+    // (Firefox không báo "khôi phục phiên bị lỗi", tài liệu chưa lưu thì ứng dụng còn kịp hỏi),
+    // rồi mới thoát Hyprland và chạy lệnh sau cùng. Máy chưa có hyprshutdown thì làm như cũ.
+    function graceful(label, post) {
+        const tail = post ? ` -p '${post}'` : "";
+        const fallback = post || "hyprctl dispatch 'hl.dsp.exit()'";
+        return ["sh", "-c", `if command -v hyprshutdown >/dev/null 2>&1; then exec hyprshutdown -t '${label}'${tail}; else ${fallback}; fi`];
+    }
+    readonly property var logoutCmd: graceful("Đang đăng xuất…", "")
+    readonly property var rebootCmd: graceful("Đang khởi động lại…", "systemctl reboot")
+    readonly property var poweroffCmd: graceful("Đang tắt máy…", "systemctl poweroff")
+    // thông tin máy: hyprsysteminfo nếu có (gói AUR), không thì trang Giới thiệu của Cài đặt
+    readonly property var aboutCmd: ["sh", "-c", "command -v hyprsysteminfo >/dev/null 2>&1 && exec hyprsysteminfo || qs ipc call settings page about"]
+
     // ── kính lúp: phóng to quanh con trỏ (cursor:zoom_factor của Hyprland) ──
     // Bấm ô Kính lúp để đi qua các mức. Chụm / mở 3 ngón trên touchpad cũng phóng to theo tay
     // (lg_input.lua); mức đó không hiện ở đây. Đổi Cài đặt (Hyprland tải lại cấu hình) thì về 1.

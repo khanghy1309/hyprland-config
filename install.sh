@@ -54,6 +54,12 @@ PKGS=(
     pavucontrol nm-connection-editor
     # chụp màn hình, bộ nhớ tạm, lấy màu
     grim slurp wl-clipboard cliphist hyprpicker
+    # giữ nội dung vừa chép khi đóng ứng dụng đã chép nó (Wayland vốn làm mất)
+    wl-clip-persist
+    # cắm USB là tự gắn ổ và báo thông báo
+    udisks2 udiskie
+    # tắt máy / khởi động lại / đăng xuất êm: đóng từng ứng dụng cho chúng kịp lưu rồi mới thoát
+    hyprshutdown
     # phím Fn và nhạc
     brightnessctl playerctl
     # đảo động và trung tâm điều khiển: sóng âm, ánh sáng đêm, tiết kiệm pin
@@ -111,7 +117,7 @@ fi
 echo
 
 # ───────────────────────── AUR (tuỳ chọn) ─────────────────────────
-bold "2. Hình nền video (mpvpaper, từ AUR) — tuỳ chọn"
+bold "2. Gói AUR — tuỳ chọn: hình nền video (mpvpaper), cửa sổ thông tin máy (hyprsysteminfo)"
 AUR=""
 command -v paru >/dev/null 2>&1 && AUR=paru
 command -v yay  >/dev/null 2>&1 && AUR=yay
@@ -132,6 +138,10 @@ if [[ -n "$AUR" ]] && ask "Cài mpvpaper bằng $AUR?"; then
     "$AUR" -S --needed mpvpaper || warn "Không cài được mpvpaper; hình nền video sẽ chưa dùng được."
 else
     info "Bỏ qua. Ảnh tĩnh và ảnh GIF vẫn dùng được; video cần mpvpaper."
+fi
+# cửa sổ thông tin máy của nhóm Hyprland: menu hệ thống → Giới thiệu máy này
+if [[ -n "$AUR" ]] && ask "Cài hyprsysteminfo (cửa sổ thông tin máy) bằng $AUR?"; then
+    "$AUR" -S --needed hyprsysteminfo || warn "Không cài được hyprsysteminfo; Giới thiệu máy này sẽ mở trang Giới thiệu trong Cài đặt."
 fi
 echo
 

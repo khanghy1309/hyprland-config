@@ -2033,9 +2033,11 @@ FloatingWindow {
                     "printf '%s\\n' \"$(uname -n)\" \"$(uname -r)\" "
                     + "\"$(hyprctl version -j 2>/dev/null | jq -r '.tag // .version // empty')\" "
                     + "\"$(qs --version 2>/dev/null | head -n1)\" "
-                    + "\"$(. /etc/os-release 2>/dev/null; echo \"$PRETTY_NAME\")\""]
+                    + "\"$(. /etc/os-release 2>/dev/null; echo \"$PRETTY_NAME\")\" "
+                    + "\"$(command -v hyprsysteminfo >/dev/null 2>&1 && echo yes)\""]
                 stdout: StdioCollector { onStreamFinished: ab.info = text.split("\n") }
             }
+            readonly property bool hasSysInfo: info[5] === "yes"
 
             PageTitle { text: "Giới thiệu" }
 
@@ -2045,7 +2047,15 @@ FloatingWindow {
                 InfoRow { label: "Hệ điều hành"; value: ab.info[4] || "" }
                 InfoRow { label: "Kernel"; value: ab.info[1] || "" }
                 InfoRow { label: "Hyprland"; value: ab.info[2] || "" }
-                InfoRow { label: "Quickshell"; value: ab.info[3] || ""; last: true }
+                InfoRow { label: "Quickshell"; value: ab.info[3] || "" }
+                // cửa sổ thông tin máy của nhóm Hyprland (gói AUR hyprsysteminfo): CPU, GPU, RAM, chép thông tin chẩn đoán
+                ButtonsRow {
+                    buttons: [["Thông tin chi tiết", () => Quickshell.execDetached(["hyprsysteminfo"])]]
+                    note: ab.hasSysInfo ? "CPU, card đồ hoạ, bộ nhớ; có nút chép thông tin để gửi khi hỏi lỗi."
+                                        : "Cần gói hyprsysteminfo (AUR): yay -S hyprsysteminfo"
+                    enabled: ab.hasSysInfo
+                    last: true
+                }
             }
 
             Group {
