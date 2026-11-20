@@ -71,6 +71,26 @@ Sau đó đăng xuất, chọn phiên **Hyprland** ở màn hình đăng nhập.
 
 ## Dùng hằng ngày
 
+### Không cần nhớ phím tắt
+
+Mọi việc đều bấm được bằng chuột hoặc touchpad, như trên Mac; phím tắt ở bảng dưới chỉ là đường tắt cho ai quen.
+
+| Muốn | Bấm vào |
+|---|---|
+| Cài đặt, cập nhật, ngủ, khởi động lại, tắt máy, khóa, đăng xuất, buộc thoát ứng dụng | Nút giọt nước ở góc trái thanh trên (menu hệ thống, như menu quả táo). Khởi động lại, tắt máy, đăng xuất hỏi lại một bước trước khi làm |
+| Mở ứng dụng | Biểu tượng trên dock, hoặc nút **Ứng dụng** (ô lưới) ở cuối dock, cạnh thùng rác |
+| Tìm tệp, xem lịch sử bộ nhớ tạm, emoji, máy tính | Mở launcher (nút Ứng dụng trên dock) rồi bấm hàng nút *Ứng dụng · Tệp · Bộ nhớ tạm · Emoji · Máy tính · Lệnh* ở dưới. Mục bộ nhớ tạm có nút × để xoá khi rê chuột |
+| Thu nhỏ, toàn màn hình, đặt cửa sổ sang trái / phải / lấp đầy, cho nổi, ghim, chuyển workspace, đóng | Chuột phải vào cửa sổ trong **Toàn cảnh**, hoặc chuột phải vào ứng dụng trên dock → *Tuỳ chọn cửa sổ* |
+| Đặt cửa sổ nửa màn hình / lấp đầy | Kéo cửa sổ chạm mép màn hình (xem *Đặt cửa sổ nhanh*) |
+| Toàn cảnh (mọi workspace) | Đưa chuột vào góc trên trái (góc nóng), vuốt 3 ngón lên, menu hệ thống, hoặc chuột phải trên màn hình nền |
+| Chuyển workspace, chuyển cửa sổ sang workspace khác | Bấm số trên thanh trên; trong Toàn cảnh kéo cửa sổ sang ô khác |
+| Wi-Fi, Bluetooth, âm lượng, độ sáng, chụp màn hình, chơi game | Bấm viên trạng thái bên phải thanh trên (trung tâm điều khiển) |
+| Lịch, thời tiết, ghi chú | Bấm đồng hồ ở giữa thanh trên |
+| Đổi hình nền, giao diện, xem bảng phím tắt, mở terminal | Chuột phải vào chỗ trống trên màn hình nền |
+| Dừng quay màn hình | Bấm đảo động ở giữa thanh trên khi đang quay |
+
+### Phím tắt
+
 `Super` là phím Windows (hoặc Command).
 
 | Phím | Việc |
@@ -124,7 +144,7 @@ Sau đó đăng xuất, chọn phiên **Hyprland** ở màn hình đăng nhập.
 
 Dùng `↑ ↓` hoặc `Tab` để chọn, `Esc` để đóng.
 
-**Thanh trên:** bấm số workspace để chuyển, cuộn chuột trên viên bên trái để đổi workspace. Bấm `VOL` để tắt/bật tiếng, cuộn chuột trên đó để chỉnh âm lượng. Bấm chỗ khác trên viên bên phải để mở trung tâm điều khiển.
+**Thanh trên:** nút giọt nước ở góc trái mở menu hệ thống. Bấm số workspace để chuyển, cuộn chuột trên viên bên trái để đổi workspace. Bấm `VOL` để tắt/bật tiếng, cuộn chuột trên đó để chỉnh âm lượng. Bấm chỗ khác trên viên bên phải để mở trung tâm điều khiển.
 
 **Biểu tượng ứng dụng trên thanh trên** (như menu bar extras của macOS): ứng dụng chạy nền (Discord, Steam, Telegram, trình quản lý mạng…) đặt biểu tượng trong một viên kính nằm bên trái viên trạng thái. Bấm để mở ứng dụng (ứng dụng chỉ có menu thì mở menu), chuột phải để mở menu của ứng dụng, chuột giữa cho việc phụ, cuộn chuột tuỳ ứng dụng. Menu là menu thật của ứng dụng, vẽ lại thành viên kính lỏng; mục có menu con thì bấm để đi vào, bấm hàng trên cùng để quay ra. Chấm cam ở góc biểu tượng nghĩa là ứng dụng cần bạn chú ý. Không có ứng dụng nào chạy nền thì viên này tự ẩn.
 
@@ -387,6 +407,8 @@ config/
     MinimizeFx.qml    hiệu ứng thu nhỏ vào dock
     DesktopMenu.qml   menu chuột phải trên màn hình nền
     TrayMenu.qml      menu kính lỏng của biểu tượng ứng dụng trên thanh trên
+    GlassMenuCard.qml thẻ menu kính lỏng dùng chung (menu hệ thống, menu cửa sổ), có menu con
+    GlassMenu.qml     cửa sổ chứa thẻ menu, mở dưới thanh trên
     HotCorners.qml    góc nóng
     SafeShot.qml, CaptureGate.js   chụp cửa sổ an toàn (tránh làm sập shell)
     Icon.qml, Icons.qml   biểu tượng nét mảnh

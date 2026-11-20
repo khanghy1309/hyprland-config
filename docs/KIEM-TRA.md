@@ -119,6 +119,35 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20: dùng được hoàn toàn bằng chuột
+
+Đã rà từng phím tắt trong `lg_keybinds.lua` và thêm cách bấm chuột cho những việc trước đó chỉ làm được bằng phím. Bảng đối chiếu nằm trong README, mục *Không cần nhớ phím tắt*.
+
+**Thêm mới**
+- Menu hệ thống ở góc trái thanh trên (`Bar.qml`, `GlassMenu.qml`, `GlassMenuCard.qml`). Khởi động lại, tắt máy và đăng xuất phải bấm thêm một mục con mới làm.
+- Menu cửa sổ khi chuột phải trong Toàn cảnh (`Overview.qml`) và trên dock → *Tuỳ chọn cửa sổ* (`Dock.qml`). Các mục do `WinOps.menuFor` tạo.
+- Nút Ứng dụng ở cuối dock.
+- Hàng nút chế độ trong launcher, nút × xoá mục bộ nhớ tạm, nút Esc bấm được.
+- Ba mục mới trong menu chuột phải trên màn hình nền.
+
+**Đã kiểm tra**
+- Kiểm tra tự động không báo lỗi.
+- Chạy trong bản giả các trạng thái: menu hệ thống và menu con xác nhận; menu cửa sổ trong Toàn cảnh và menu con *Đặt cửa sổ*; dock → *Tuỳ chọn cửa sổ*; launcher; cùng các màn hình cũ.
+- Đặt cửa sổ từ menu gọi `hyprctl eval 'LG_snap(…)'`.
+  - Đối chiếu với `src/ipc/s1/Commands.cpp` của Hyprland 0.57: `eval` chạy mã Lua tuỳ ý.
+  - `hl.get_window` nhận chuỗi `address:0x…`.
+  - Đã thử `LG_snap` trong Hyprland giả bằng Lua.
+- Nút thu nhỏ trên thanh tiêu đề (GTK) chưa dùng được, đã đối chiếu với mã nguồn:
+  - Hyprland 0.57 ghi lại yêu cầu `xdg_toplevel.set_minimized` nhưng không đọc tới;
+  - chỉ yêu cầu từ thanh tác vụ (foreign-toplevel) mới phát sự kiện `minimized`;
+  - vì vậy không thêm nút thu nhỏ vào thanh tiêu đề ứng dụng; thu nhỏ bằng menu cửa sổ.
+
+**Sửa nhờ chạy thử:**
+- Menu cửa sổ trong Toàn cảnh nằm chung lớp với ảnh cửa sổ, nên đã đổi sang nền gần đặc.
+- Dòng nhắc trong launcher chồng lên hàng nút, đã bỏ.
+
+**Báo động nhầm của bản giả:** menu trên dock tự đóng sau 0,9 giây vì bản giả không có chuột rê trên dock. Trên máy thật menu chỉ tự đóng khi chuột rời dock.
+
 ### 2026-11-19 (chiều): thêm tính năng học từ macOS
 
 Thêm: biểu tượng ứng dụng trên thanh trên, xem nhanh bằng Space, đặt cửa sổ nhanh, góc nóng, màn hình đăng nhập kiểu macOS.

@@ -385,6 +385,12 @@ PanelWindow {
                         font.pixelSize: 12
                         color: Theme.dim
                     }
+                    // bấm để đóng, như bấm Esc
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.close()
+                    }
                 }
             }
 
@@ -459,6 +465,27 @@ PanelWindow {
                         color: row.isSel ? Theme.inkDim : Theme.dim
                     }
 
+                    // mục bộ nhớ tạm: nút xoá khi rê chuột (như Shift + Delete)
+                    Rectangle {
+                        visible: !!row.modelData.clip && (rowMouse.containsMouse || delArea.containsMouse)
+                        z: 2
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 28
+                        height: 28
+                        radius: 14
+                        color: delArea.containsMouse ? "#ff8a80" : Theme.chip
+                        Icon { anchors.centerIn: parent; path: Icons.close; size: 12; stroke: 2.2; color: delArea.containsMouse ? Theme.ink : Theme.fg }
+                        MouseArea {
+                            id: delArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.deleteClip(row.index)
+                        }
+                    }
+
                     MouseArea {
                         id: rowMouse
                         anchors.fill: parent
@@ -474,31 +501,64 @@ PanelWindow {
                 }
             }
 
-            // gợi ý tiền tố
+            // chế độ tìm: bấm để chuyển, không cần nhớ ký tự đầu (ký tự vẫn hiện nhỏ để gõ cho nhanh)
             Rectangle { width: parent.width; height: 1; color: Theme.line }
 
-            Row {
-                x: 18
-                height: 40
-                spacing: 22
-                Repeater {
-                    model: [["=", "tính toán"], [">", "chạy lệnh"], ["/", "tìm tệp"], [";", "bộ nhớ tạm"], [":", "emoji"], ["Ctrl P", "ghim vào dock"]]
-                    delegate: Row {
-                        required property var modelData
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 6
-                        Text {
-                            text: parent.modelData[0]
-                            font.family: Theme.mono
-                            font.pixelSize: 13
-                            font.weight: Font.Bold
-                            color: Theme.fg
-                        }
-                        Text {
-                            text: parent.modelData[1]
-                            font.family: Theme.font
-                            font.pixelSize: 13
-                            color: Theme.dim
+            Item {
+                width: parent.width
+                height: 46
+                Row {
+                    x: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 6
+                    Repeater {
+                        model: [["", "Ứng dụng", Icons.apps], ["/", "Tệp", Icons.file], [";", "Bộ nhớ tạm", Icons.clipboard],
+                                [":", "Emoji", Icons.smile], ["=", "Máy tính", Icons.calc], [">", "Lệnh", Icons.terminal]]
+                        delegate: Rectangle {
+                            id: chip
+                            required property var modelData
+                            readonly property string pre: modelData[0]
+                            readonly property bool on: pre === "" ? !/^[\/;:=>]/.test(root.query) : root.query.startsWith(pre)
+                            width: chipRow.implicitWidth + 20
+                            height: 30
+                            radius: 15
+                            color: on ? Theme.accent : chipArea.containsMouse ? Theme.chip : "transparent"
+                            Behavior on color { ColorAnimation { duration: Theme.fast } }
+                            Row {
+                                id: chipRow
+                                anchors.centerIn: parent
+                                spacing: 6
+                                Icon {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    path: chip.modelData[2]
+                                    size: 14
+                                    color: chip.on ? Theme.ink : Theme.fg
+                                }
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: chip.modelData[1]
+                                    font.family: Theme.font
+                                    font.pixelSize: 13
+                                    font.weight: Font.Medium
+                                    color: chip.on ? Theme.ink : Theme.fg
+                                }
+                                Text {
+                                    visible: chip.pre !== ""
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: chip.pre
+                                    font.family: Theme.mono
+                                    font.pixelSize: 11
+                                    font.weight: Font.Bold
+                                    color: chip.on ? Theme.inkDim : Theme.dim
+                                }
+                            }
+                            MouseArea {
+                                id: chipArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: { input.text = chip.pre; input.cursorPosition = input.text.length; input.forceActiveFocus(); }
+                            }
                         }
                     }
                 }

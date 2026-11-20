@@ -22,6 +22,9 @@ Scope {
     readonly property var items: [
         { icon: Icons.terminal, label: "Mở Terminal",          run: () => Quickshell.execDetached(["kitty", "--directory", Quickshell.env("HOME")]) },
         { icon: Icons.folder,   label: "Mở thư mục nhà",        run: () => Quickshell.execDetached(["nautilus", "--new-window", Quickshell.env("HOME")]) },
+        { icon: Icons.search,   label: "Tìm ứng dụng, tệp…",    run: () => root.ipc(["launcher", "open"]) },
+        { icon: Icons.clipboard, label: "Lịch sử bộ nhớ tạm",   run: () => root.ipc(["launcher", "clipboard"]) },
+        { icon: Icons.grid,     label: "Toàn cảnh",             run: () => root.ipc(["overview", "open"]) },
         { sep: true },
         { icon: Icons.image,    label: "Đổi hình nền…",         run: () => root.ipc(["settings", "page", "wallpaper"]) },
         { icon: Icons.shuffle,  label: "Hình nền ngẫu nhiên",   run: () => Quickshell.execDetached([Settings.wallScript, "random"]) },

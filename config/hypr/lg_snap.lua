@@ -165,6 +165,17 @@ key("Return", "fill")         -- lấp đầy (vẫn chừa thanh trên và kho�
 hl.bind(S .. " + C", onActive(center), { description = "Đặt cửa sổ: giữa" })
 hl.bind(S .. " + BackSpace", onActive(restore), { description = "Đặt cửa sổ: trả về như cũ" })
 
+-- Cho Quickshell gọi (menu cửa sổ trong Toàn cảnh và trên Dock), không cần phím tắt:
+--   hyprctl eval 'LG_snap("left", "address:0x…")'
+-- name: một vùng ở AREAS, hoặc "center", "restore". Không ghi cửa sổ thì là cửa sổ đang dùng.
+function LG_snap(name, window)
+    local w = window and hl.get_window(window) or hl.get_active_window()
+    if not w then return end
+    if name == "restore" then restore(w)
+    elseif name == "center" then center(w)
+    else snap(w, name) end
+end
+
 -------------------------------------------------------------------
 -- Kéo chạm mép
 -------------------------------------------------------------------

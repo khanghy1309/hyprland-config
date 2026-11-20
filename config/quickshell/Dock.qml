@@ -205,8 +205,8 @@ PanelWindow {
 
     // ───────────────── bố cục & phóng to ─────────────────
 
-    // số ô: ứng dụng + thùng rác; vạch ngăn tính riêng
-    readonly property int slots: apps.length + 1
+    // số ô: ứng dụng + nút Ứng dụng + thùng rác; vạch ngăn tính riêng
+    readonly property int slots: apps.length + 2
     readonly property int dividers: 1 + (hasUnpinned ? 1 : 0)
     readonly property real baseRowWidth: slots * base + (slots - 1) * spacing + dividers * (spacing + 1)
 
@@ -375,10 +375,49 @@ PanelWindow {
                 color: Theme.line
             }
 
+            // nút Ứng dụng (như Launchpad / Apps của macOS): mở launcher để tìm và mở ứng dụng bằng chuột
+            Item {
+                id: appsBtn
+                readonly property string name: "Ứng dụng"
+                readonly property real s: dock.scaleAt(dock.centerOf(dock.apps.length))
+                width: dock.base * s
+                height: dock.base
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    width: dock.base * appsBtn.s * 0.9
+                    height: width
+                    anchors.rightMargin: dock.base * appsBtn.s * 0.05
+                    anchors.bottomMargin: dock.base * appsBtn.s * 0.05
+                    radius: width * 0.26
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: "#8f9ba6" }
+                        GradientStop { position: 1; color: "#4b5560" }
+                    }
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.3)
+                    Icon {
+                        anchors.centerIn: parent
+                        path: Icons.apps
+                        size: parent.width * 0.62
+                        filled: true
+                        color: "white"
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onEntered: dock.hoveredItem = appsBtn
+                    onExited: if (dock.hoveredItem === appsBtn) dock.hoveredItem = null
+                    onClicked: { menu.close(); Quickshell.execDetached(["qs", "ipc", "call", "launcher", "toggle"]); }
+                }
+            }
+
             Item {
                 id: trash
                 readonly property string name: "Thùng rác"
-                readonly property real s: dock.scaleAt(dock.centerOf(dock.apps.length))
+                readonly property real s: dock.scaleAt(dock.centerOf(dock.apps.length + 1))
                 width: dock.base * s
                 height: dock.base
                 Image {
@@ -469,18 +508,26 @@ PanelWindow {
 
     // ───────────────── menu chuột phải ─────────────────
 
-    GlassPill {
+    // dùng chung thẻ menu kính lỏng với menu hệ thống và Toàn cảnh (GlassMenuCard.qml),
+    // để có menu con "Tuỳ chọn cửa sổ" (thu nhỏ, toàn màn hình, đặt cửa sổ, chuyển workspace...)
+    GlassMenuCard {
         id: menu
-        tone: "strong"
-        radius: 16
         visible: false
-        width: Math.max(220, menuCol.implicitWidth + 16)
-        height: menuCol.implicitHeight + 16
         y: body.y - height - 12
+        onDone: close()
 
         property var app: null
         property bool forTrash: false
         property var items: []
+        // vạch ngăn giữa danh sách cửa sổ và các việc khác
+        entries: {
+            const out = [];
+            items.forEach((it, i) => {
+                if (i > 0 && !it.win && items[i - 1].win) out.push({ sep: true });
+                out.push(it);
+            });
+            return out;
+        }
 
         function place(anchorItem) {
             const p = anchorItem.mapToItem(body.parent, anchorItem.width - dock.base * anchorItem.s / 2, 0);
@@ -493,12 +540,18 @@ PanelWindow {
             for (const w of a.wins)
                 list.push({ label: (WinOps.isMinimized(w) ? "(thu nhỏ) " : "") + (w.title || a.cls || "Cửa sổ"),
                             run: () => dock.focusWin(w), win: true });
+            if (a.wins.length === 1)
+                list.push({ label: "Tuỳ chọn cửa sổ", sub: () => WinOps.menuFor(a.wins[0]).slice(0, -2) });   // bỏ vạch và "Đóng": dock đã có "Đóng"
+            else if (a.wins.length > 1)
+                list.push({ label: "Tuỳ chọn cửa sổ", sub: () => a.wins.map(w => ({
+                    label: w.title || a.cls || "Cửa sổ", sub: () => WinOps.menuFor(w) })) });
             if (a.entry) list.push({ label: "Mở cửa sổ mới", run: () => dock.launch(a) });
             if (a.entry) list.push({ label: a.pinned ? "Bỏ ghim khỏi Dock" : "Ghim vào Dock", run: () => dock.setPinned(a.id, !a.pinned) });
             if (a.wins.length > 0)
                 list.push({ label: a.wins.length > 1 ? "Đóng " + a.wins.length + " cửa sổ" : "Đóng",
                             run: () => a.wins.forEach(w => dock.closeWin(w)) });
             items = list;
+            reset();
             visible = true;
             place(anchorItem);
         }
@@ -506,6 +559,7 @@ PanelWindow {
             forTrash = true;
             items = [{ label: "Mở thùng rác", run: () => Quickshell.execDetached(["gio", "open", "trash:///"]) },
                      { label: "Dọn sạch thùng rác", run: () => Quickshell.execDetached(["gio", "trash", "--empty"]) }];
+            reset();
             visible = true;
             place(anchorItem);
         }
@@ -516,58 +570,6 @@ PanelWindow {
             running: menu.visible && !hoverDock.hovered
             interval: 900
             onTriggered: menu.close()
-        }
-
-        Column {
-            id: menuCol
-            x: 8
-            y: 8
-            Repeater {
-                model: menu.items
-                delegate: Rectangle {
-                    id: mi
-                    required property var modelData
-                    required property int index
-                    readonly property bool sepAbove: index > 0 && !modelData.win && menu.items[index - 1].win
-                    width: menu.width - 16
-                    height: 34 + (sepAbove ? 9 : 0)
-                    radius: 10
-                    color: "transparent"
-                    Rectangle {
-                        visible: mi.sepAbove
-                        x: 8
-                        y: 4
-                        width: parent.width - 16
-                        height: 1
-                        color: Theme.line
-                    }
-                    Rectangle {
-                        y: mi.sepAbove ? 9 : 0
-                        width: parent.width
-                        height: 34
-                        radius: 10
-                        color: mim.containsMouse ? Theme.accent : "transparent"
-                        Text {
-                            x: 12
-                            width: parent.width - 24
-                            anchors.verticalCenter: parent.verticalCenter
-                            elide: Text.ElideRight
-                            text: mi.modelData.label
-                            font.family: Theme.font
-                            font.pixelSize: 13
-                            font.weight: mi.modelData.win ? Font.Normal : Font.Medium
-                            color: mim.containsMouse ? Theme.ink : Theme.fg
-                        }
-                        MouseArea {
-                            id: mim
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: { menu.close(); mi.modelData.run(); }
-                        }
-                    }
-                }
-            }
         }
     }
 }

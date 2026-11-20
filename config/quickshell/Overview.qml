@@ -85,8 +85,19 @@ PanelWindow {
         visible = true;
         keys.forceActiveFocus();
     }
-    function close() { visible = false; }
+    function close() { closeMenu(); visible = false; }
     function toggle() { visible ? close() : open(); }
+
+    // menu cửa sổ (chuột phải vào một cửa sổ): thu nhỏ, toàn màn hình, đặt cửa sổ, chuyển workspace...
+    function openMenu(w, x, y) {
+        winMenu.reset();
+        winMenu.entries = WinOps.menuFor(w, () => root.close(), () => refreshTimer.restart());
+        winMenu.title = (w.lastIpcObject && w.lastIpcObject.title) || w.title || "";
+        winMenu.ax = x;
+        winMenu.ay = y;
+        winMenu.visible = true;
+    }
+    function closeMenu() { winMenu.visible = false; keys.forceActiveFocus(); }
 
     // vị trí cửa sổ không tự cập nhật qua sự kiện, hỏi lại sau khi kéo/đóng
     Timer { id: refreshTimer; interval: 120; onTriggered: Hyprland.refreshToplevels() }
@@ -114,7 +125,8 @@ PanelWindow {
         focus: true
         Keys.onPressed: event => {
             const k = event.key, n = root.wsIds.length;
-            if (k === Qt.Key_Escape || (k === Qt.Key_Tab && (event.modifiers & Qt.MetaModifier))) root.close();
+            if (k === Qt.Key_Escape && winMenu.visible) { if (winMenu.stack.length) winMenu.back(); else root.closeMenu(); }
+            else if (k === Qt.Key_Escape || (k === Qt.Key_Tab && (event.modifiers & Qt.MetaModifier))) root.close();
             else if (k === Qt.Key_Right || k === Qt.Key_Tab) root.selected = (root.selected + 1) % n;
             else if (k === Qt.Key_Left || k === Qt.Key_Backtab) root.selected = (root.selected + n - 1) % n;
             else if (k === Qt.Key_Down) root.selected = Math.min(n - 1, root.selected + root.perRow);
@@ -288,8 +300,14 @@ PanelWindow {
                                     cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.PointingHandCursor
                                     drag.target: win
                                     drag.threshold: 6
+                                    acceptedButtons: Qt.LeftButton | Qt.RightButton
                                     onEntered: root.selected = card.index
-                                    onClicked: root.focusWindow(win.addr)
+                                    onClicked: mouse => {
+                                        if (mouse.button === Qt.RightButton) {
+                                            const p = win.mapToItem(null, mouse.x, mouse.y);
+                                            root.openMenu(win.modelData, p.x, p.y);
+                                        } else root.focusWindow(win.addr);
+                                    }
                                     onReleased: {
                                         if (!drag.active) return;
                                         win.Drag.drop();
@@ -356,5 +374,25 @@ PanelWindow {
     Item {
         id: dragLayer
         anchors.fill: parent
+    }
+
+    // bấm ra ngoài menu cửa sổ thì chỉ đóng menu, không đóng Toàn cảnh
+    MouseArea {
+        anchors.fill: parent
+        visible: winMenu.visible
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: root.closeMenu()
+    }
+    GlassMenuCard {
+        id: winMenu
+        visible: false
+        // nằm chung lớp với ảnh các cửa sổ nên Hyprland không làm mờ được phần dưới: dùng nền gần đặc
+        color: Qt.rgba(0.09, 0.10, 0.12, 0.95)
+        property real ax: 0
+        property real ay: 0
+        // mở về phía còn chỗ
+        x: Math.max(8, ax + width + 8 > root.width ? ax - width : ax)
+        y: Math.max(8, ay + height + 8 > root.height ? ay - height : ay)
+        onDone: root.closeMenu()
     }
 }

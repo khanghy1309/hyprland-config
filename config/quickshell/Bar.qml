@@ -94,10 +94,70 @@ PanelWindow {
     }
 
     // ───────────────── trái: workspace ─────────────────
+    // ───────────────── menu hệ thống (như menu quả táo của macOS) ─────────────────
+    // Mọi việc của máy bấm được bằng chuột: cài đặt, cập nhật, Toàn cảnh, tìm ứng dụng,
+    // buộc thoát, ngủ / khởi động lại / tắt máy, khóa, đăng xuất.
+    GlassMenu { id: barMenu; screen: bar.screen }
+
+    function ipc(args) { Quickshell.execDetached(["qs", "ipc", "call"].concat(args)); }
+    // hỏi lại trước khi làm việc không quay lại được: menu con chỉ có một nút làm thật
+    function confirm(label, icon, question, run) {
+        return { label: label + "…", icon: icon, sub: [{ label: question, icon: icon, danger: true, run: run }] };
+    }
+    readonly property var systemEntries: [
+        { label: "Giới thiệu máy này", icon: Icons.info, run: () => bar.ipc(["settings", "page", "about"]) },
+        { label: "Cài đặt hệ thống…", icon: Icons.gear, run: () => bar.ipc(["settings", "open"]) },
+        { label: Updates.count > 0 ? "Cập nhật phần mềm (" + Updates.count + ")" : "Kiểm tra cập nhật",
+          icon: Icons.download, run: () => Updates.count > 0 ? Updates.run() : Updates.check() },
+        { sep: true },
+        { label: "Toàn cảnh", icon: Icons.grid, run: () => bar.ipc(["overview", "open"]) },
+        { label: "Tìm ứng dụng, tệp…", icon: Icons.search, run: () => bar.ipc(["launcher", "open"]) },
+        { label: "Bảng phím tắt", icon: Icons.keyboard, run: () => bar.ipc(["cheatsheet", "open"]) },
+        { label: "Buộc thoát ứng dụng…", icon: Icons.close, run: () => Quickshell.execDetached(["missioncenter"]) },
+        { sep: true },
+        { label: "Ngủ", icon: Icons.moon, run: () => Quickshell.execDetached(["systemctl", "suspend"]) },
+        bar.confirm("Khởi động lại", Icons.restart, "Khởi động lại ngay", () => Quickshell.execDetached(["systemctl", "reboot"])),
+        bar.confirm("Tắt máy", Icons.power, "Tắt máy ngay", () => Quickshell.execDetached(["systemctl", "poweroff"])),
+        { sep: true },
+        { label: "Khóa màn hình", icon: Icons.lock, run: () => Quickshell.execDetached(["sh", "-c", "pidof hyprlock || hyprlock"]) },
+        bar.confirm("Đăng xuất", Icons.logout, "Đăng xuất ngay", () => Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.exit()"]))
+    ]
+
+    GlassPill {
+        id: sysPill
+        tone: bar.pillTone
+        x: Theme.edge
+        y: Theme.barTop
+        height: Theme.barHeight
+        width: Theme.barHeight
+        radius: height / 2
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: 4
+            radius: height / 2
+            color: barMenu.owner === sysPill ? bar.selBg : sysArea.containsMouse ? Theme.chip : "transparent"
+            Behavior on color { ColorAnimation { duration: Theme.fast } }
+        }
+        Icon {
+            anchors.centerIn: parent
+            path: Icons.drop
+            size: 17
+            stroke: 2
+            color: barMenu.owner === sysPill ? bar.selFg : bar.fg
+        }
+        MouseArea {
+            id: sysArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: barMenu.toggle(sysPill, bar.systemEntries, sysPill.mapToItem(null, 0, 0).x, "")
+        }
+    }
+
     GlassPill {
         id: wsPill
         tone: bar.pillTone
-        x: Theme.edge
+        x: sysPill.x + sysPill.width + 8
         y: Theme.barTop
         height: Theme.barHeight
         width: wsRow.width + 16 + (titleText.text.length > 0 ? titleText.width + 22 : 0)
