@@ -280,8 +280,8 @@ Rectangle {
                     font.pixelSize: Math.round(15 * root.k)
                     font.letterSpacing: 1
                     color: root.fg
-                    selectionColor: root.accent
-                    selectedTextColor: root.ink
+                    selectionColor: Qt.rgba(1, 1, 1, 0.32)
+                    selectedTextColor: root.fg
                     clip: true
                     focus: true
                     enabled: !root.busy
@@ -322,14 +322,17 @@ Rectangle {
                     width: parent.height - 10
                     height: width
                     radius: width / 2
-                    color: root.busy ? Qt.rgba(1, 1, 1, 0.18) : root.accent
+                    // viên kính sáng có viền (cùng kiểu điểm nhấn với Quickshell)
+                    color: root.busy ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(1, 1, 1, 0.28)
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.42)
                     Icon {
                         visible: !root.busy
                         anchors.centerIn: parent
                         path: "M5 12h14M13 6l6 6-6 6"
                         size: parent.width * 0.6
                         stroke: 2.4
-                        color: root.ink
+                        color: root.fg
                     }
                     // đang kiểm tra mật khẩu: vòng xoay
                     Icon {

@@ -257,8 +257,8 @@ FloatingWindow {
                     onMoved: v => Settings.look.panelAlpha = v
                 }
                 SegRow {
-                    label: "Mục đang chọn"
-                    note: "Viên đánh dấu mục đang chọn, đang rê chuột trong menu, launcher, Cài đặt"
+                    label: "Điểm nhấn"
+                    note: "Mục đang chọn, đang rê chuột, công tắc và ô đang bật, nút chính (Chụp, Cập nhật…)"
                     options: [["glass", "Kính trong"], ["white", "Trắng đục"]]
                     current: Settings.look.selStyle
                     onPicked: v => Settings.look.selStyle = v
@@ -961,7 +961,7 @@ FloatingWindow {
                                     radius: 12
                                     color: "transparent"
                                     border.width: cell.on ? 3 : 1
-                                    border.color: cell.on ? Theme.accent : Theme.line
+                                    border.color: cell.on ? Theme.mark : Theme.line
                                 }
                                 Rectangle {
                                     visible: cell.modelData.video || /\.gif$/i.test(cell.modelData.file)
@@ -2747,7 +2747,7 @@ FloatingWindow {
                     readonly property bool on: (Settings.hotCorners[modelData] || "none") !== "none"
                     visible: on
                     width: 14; height: 14; radius: 7
-                    color: Theme.accent
+                    color: Theme.mark
                     x: modelData.endsWith("Left") ? miniWall.x - 4 : miniWall.x + miniWall.width - 10
                     y: modelData.startsWith("top") ? miniWall.y - 4 : miniWall.y + miniWall.height - 10
                 }
@@ -2882,9 +2882,10 @@ FloatingWindow {
         width: sbt.implicitWidth + 26
         height: 34
         radius: 11
-        color: strong ? Theme.accent : sbm.containsMouse ? Qt.rgba(1, 1, 1, 0.2) : Theme.chip
+        color: strong ? (Theme.glassSel ? "transparent" : Theme.accent) : sbm.containsMouse ? Qt.rgba(1, 1, 1, 0.2) : Theme.chip
         border.width: strong ? 0 : 1
         border.color: Theme.line
+        GlassHighlight { anchors.fill: parent; on: sb.strong && Theme.glassSel; strong: true; radius: 11 }
         Text {
             id: sbt
             anchors.centerIn: parent
@@ -2892,7 +2893,7 @@ FloatingWindow {
             font.family: Theme.font
             font.pixelSize: 13
             font.weight: Font.Medium
-            color: sb.strong ? Theme.ink : Theme.fg
+            color: sb.strong ? Theme.onFg : Theme.fg
         }
         MouseArea {
             id: sbm

@@ -30,9 +30,9 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: height / 2
-        color: sw.mix(Theme.chip, Theme.accent, sw.pos)
+        color: sw.mix(Theme.chip, Theme.onFill, sw.pos)
         border.width: 1
-        border.color: Theme.line
+        border.color: Theme.glassSel ? sw.mix(Theme.line, Theme.selRim, sw.pos) : Theme.line
     }
 
     // núm
@@ -56,7 +56,9 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: height / 2
-            color: sw.mix(sw.on ? Theme.ink : Theme.fg, Qt.rgba(1, 1, 1, 0.16), sw.glass)
+            // kiểu kính: núm là viên kính sáng (đặc hơn khi bật); kiểu trắng đục: núm trắng, bật thì tối
+            readonly property color rest: Theme.glassSel ? Qt.rgba(1, 1, 1, sw.on ? 0.78 : 0.55) : sw.on ? Theme.ink : Theme.fg
+            color: sw.mix(rest, Qt.rgba(1, 1, 1, 0.16), sw.glass)
             border.width: 1
             border.color: Qt.rgba(1, 1, 1, 0.25 + 0.45 * sw.glass)
             // ánh sáng: vệt sáng nửa trên, quầng mờ ở dưới như ánh sáng đi xuyên qua kính

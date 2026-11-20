@@ -336,8 +336,8 @@ PanelWindow {
                     font.pixelSize: 22
                     font.weight: Font.Medium
                     color: Theme.fg
-                    selectionColor: Theme.accent
-                    selectedTextColor: Theme.ink
+                    selectionColor: Theme.glassSel ? Qt.rgba(1, 1, 1, 0.32) : Theme.accent
+                    selectedTextColor: Theme.onFg
                     clip: true
                     focus: true
                     onTextChanged: root.query = text

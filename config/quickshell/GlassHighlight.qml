@@ -13,6 +13,8 @@ Item {
     property Item follow: null
     property real radius: 11
     property bool danger: false
+    // true: kính sáng hơn (ô đang bật, nút chính)
+    property bool strong: false
     // khi trượt: lề so với mục
     property real inset: 0
 
@@ -56,7 +58,7 @@ Item {
             id: body
             anchors.fill: parent
             radius: hl.radius
-            color: hl.danger ? Theme.selDanger : Theme.selFill
+            color: hl.danger ? Theme.selDanger : hl.strong ? Theme.onFill : Theme.selFill
             border.width: Theme.glassSel ? 1 : 0
             border.color: hl.danger ? Qt.rgba(1, 0.7, 0.68, 0.5) : Theme.selRim
             // ánh sáng phía trên rõ hơn phía dưới, như mặt kính cong

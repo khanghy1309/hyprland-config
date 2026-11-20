@@ -199,8 +199,9 @@ PanelWindow {
                 width: goText.implicitWidth + 40
                 height: 52
                 radius: 18
-                color: root.task === "record" ? "#ff5a5f" : Theme.accent
+                color: root.task === "record" ? "#ff5a5f" : Theme.glassSel ? "transparent" : Theme.accent
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
+                GlassHighlight { anchors.fill: parent; on: root.task !== "record" && Theme.glassSel; strong: true; radius: 18 }
                 Text {
                     id: goText
                     anchors.centerIn: parent
@@ -208,7 +209,7 @@ PanelWindow {
                     font.family: Theme.font
                     font.pixelSize: 15
                     font.weight: Font.DemiBold
-                    color: root.task === "record" ? "white" : Theme.ink
+                    color: root.task === "record" ? "white" : Theme.onFg
                 }
                 MouseArea {
                     anchors.fill: parent

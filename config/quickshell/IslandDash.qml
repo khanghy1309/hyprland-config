@@ -218,7 +218,7 @@ Item {
                                 color: day.modelData.today && !Theme.glassSel ? Theme.accent : "transparent"
                                 border.width: day.isPicked && !day.modelData.today ? 1.5 : 0
                                 border.color: Theme.fg
-                                GlassHighlight { anchors.fill: parent; on: day.modelData.today && Theme.glassSel; radius: 12 }
+                                GlassHighlight { anchors.fill: parent; on: day.modelData.today && Theme.glassSel; strong: true; radius: 12 }
                             }
                             Column {
                                 anchors.centerIn: parent
@@ -330,8 +330,8 @@ Item {
                             font.family: Theme.font
                             font.pixelSize: 14
                             color: Theme.fg
-                            selectionColor: Theme.accent
-                            selectedTextColor: Theme.ink
+                            selectionColor: Theme.glassSel ? Qt.rgba(1, 1, 1, 0.32) : Theme.accent
+                            selectedTextColor: Theme.onFg
                             property bool loaded: false
                             Keys.onEscapePressed: dash.closeRequested()
                             onTextChanged: if (loaded) saveTimer.restart()
@@ -462,7 +462,7 @@ Item {
                 width: parent.width * Math.max(0, Math.min(1, mt.value))
                 height: parent.height
                 radius: 3
-                color: Theme.fg
+                color: Theme.mark
                 Behavior on width { NumberAnimation { duration: Theme.normal } }
             }
         }

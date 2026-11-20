@@ -81,7 +81,7 @@ Item {
                         width: 4
                         height: Math.max(3, 36 * Math.min(1, modelData))
                         radius: 2
-                        color: Theme.accent
+                        color: Theme.mark
                         Behavior on height { NumberAnimation { duration: Theme.ms(60) } }
                     }
                 }
@@ -120,7 +120,7 @@ Item {
                            ? parent.width * Math.min(1, card.player.position / card.player.length) : 0
                     height: 5
                     radius: 3
-                    color: Theme.accent
+                    color: Theme.mark
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -175,14 +175,15 @@ Item {
         height: size
         radius: size / 2
         opacity: enabled ? 1 : 0.4
-        color: primary ? Theme.accent : btnMouse.containsMouse ? Theme.chip : "transparent"
+        color: primary ? (Theme.glassSel ? "transparent" : Theme.accent) : btnMouse.containsMouse ? Theme.chip : "transparent"
+        GlassHighlight { anchors.fill: parent; on: btn.primary && Theme.glassSel; strong: true; radius: btn.size / 2 }
 
         Icon {
             anchors.centerIn: parent
             path: btn.iconPath
             size: btn.primary ? 18 : 18
             filled: true
-            color: btn.primary ? Theme.ink : Theme.fg
+            color: btn.primary ? Theme.onFg : Theme.fg
         }
         MouseArea {
             id: btnMouse

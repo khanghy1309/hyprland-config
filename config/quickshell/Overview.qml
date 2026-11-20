@@ -187,7 +187,7 @@ PanelWindow {
                         radius: 16
                         color: Qt.rgba(1, 1, 1, 0.06)
                         border.width: card.isSel || drop.containsDrag ? 2 : 1
-                        border.color: card.isSel || drop.containsDrag ? Theme.accent : Theme.rim
+                        border.color: card.isSel || drop.containsDrag ? Theme.mark : Theme.rim
 
                         Image {
                             anchors.fill: parent
@@ -255,7 +255,7 @@ PanelWindow {
                                     radius: 6
                                     color: Theme.panelStrong
                                     border.width: win.focused ? 2 : 1
-                                    border.color: win.focused ? Theme.accent : Qt.rgba(1, 1, 1, 0.22)
+                                    border.color: win.focused ? Theme.mark : Qt.rgba(1, 1, 1, 0.22)
 
                                     SafeShot {
                                         id: shot
@@ -285,8 +285,9 @@ PanelWindow {
                                     width: 22
                                     height: 22
                                     radius: 11
-                                    color: Theme.accent
-                                    Icon { anchors.centerIn: parent; path: Icons.close; size: 12; stroke: 2.4; color: Theme.ink }
+                                    color: Theme.glassSel ? Qt.rgba(0.09, 0.10, 0.12, 0.45) : Theme.accent
+                                    GlassHighlight { anchors.fill: parent; on: Theme.glassSel; strong: true; radius: 11 }
+                                    Icon { anchors.centerIn: parent; path: Icons.close; size: 12; stroke: 2.4; color: Theme.onFg }
                                     z: 3
                                     MouseArea {
                                         anchors.fill: parent

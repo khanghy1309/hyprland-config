@@ -119,6 +119,26 @@ Các bước này đã làm cho mọi tệp trong mốc. Khi một tệp đổi,
 
 ## Nhật ký kiểm tra
 
+### 2026-11-20 (khuya, muộn): bỏ hết mảng trắng đặc, sửa bản giả lấy sai hình nền
+
+- **Màu mới trong Theme** (đều theo Cài đặt → Giao diện → Điểm nhấn):
+  - `onFill` / `onFg` / `onDim`: ô đang bật, nút chính.
+  - `mark`: vạch, chấm, viền đánh dấu, trắng 62%.
+  - Có thêm `GlassHighlight.strong`.
+- **Chỗ đổi:**
+  - Nút chính: Chụp, Cập nhật, nút chính của Cài đặt, Phát nhạc.
+  - Ô bật / tắt của trung tâm điều khiển; công tắc (rãnh kính, núm kính sáng); thanh trượt (phần đầy là kính có viền, biểu tượng sáng); nút đóng cửa sổ trong Toàn cảnh.
+  - Vạch: thanh tiến trình nhạc, cột sóng nhạc, thanh âm lượng ở đảo động, thanh CPU / RAM / ổ đĩa, chấm báo thông báo, chấm ứng dụng đang chạy trên dock, vạch thả khi kéo icon dock, chấm góc nóng, viền chọn của Toàn cảnh / Alt + Tab.
+  - Vùng chọn chữ trong ô nhập.
+  - Nút đăng nhập và vùng chọn chữ của SDDM. SDDM không đọc settings.json nên luôn dùng kiểu kính.
+  - Còn lại các chỗ dùng `Theme.ink` / `accent` đều là chủ ý: chữ tối trên thanh trên khi dải hình nền sáng, nút xoá màu đỏ.
+- **Menu nguồn:** ô đang chọn trước là kính 30% cộng ánh sáng viền 1, trông gần như trắng. Giờ là 17% cộng 0,45.
+- **Lỗi của bản giả (không phải lỗi trên máy):** kính trong ảnh ghép mang màu của hình nền khác với hình nền bên dưới.
+  - Nguyên nhân: FileView giả luôn trả `ridge.png` cho tệp trạng thái hình nền. Glass.qml lấy ảnh đó để khúc xạ, trong khi `compose.py` ghép trên hình nền khác.
+  - Sửa: run.py ghi đường dẫn WALL vào FileView giả trước mỗi lần chạy.
+  - Trên máy thật, Glass.qml đọc đúng tệp trạng thái mà set-wallpaper.sh ghi (theo dõi bằng watchChanges), nên kính lấy màu của hình nền đang dùng.
+- **Ảnh ghép thử** (hình nền "đêm anh đào", kính khúc xạ đúng hình đó): trung tâm điều khiển, menu chuột phải, launcher, bảng chụp, menu nguồn, Cài đặt, bảng widget. Không còn mảng trắng; ô bật vẫn phân biệt được với ô tắt nhờ viền và độ sáng.
+
 ### 2026-11-20 (khuya): mục đang chọn kiểu kính, menu trong hơn
 
 - **`GlassHighlight.qml` mới:** viên kính trong (nền trắng 20%, sáng hơn ở trên, viền sáng 1 px, vệt sáng mép trên). Có hai cách dùng: đặt trong một mục, hoặc trượt theo mục đang chọn bằng lò xo.

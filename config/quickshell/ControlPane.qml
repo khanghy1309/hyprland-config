@@ -191,7 +191,8 @@ GlassPill {
                 width: upText.implicitWidth + 26
                 height: 34
                 radius: 12
-                color: Theme.accent
+                color: Theme.glassSel ? "transparent" : Theme.accent
+                GlassHighlight { anchors.fill: parent; on: Theme.glassSel; strong: true; radius: 12 }
                 Text {
                     id: upText
                     anchors.centerIn: parent
@@ -199,7 +200,7 @@ GlassPill {
                     font.family: Theme.font
                     font.pixelSize: 13
                     font.weight: Font.DemiBold
-                    color: Theme.ink
+                    color: Theme.onFg
                 }
                 MouseArea {
                     anchors.fill: parent

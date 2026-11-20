@@ -314,7 +314,7 @@ PanelWindow {
                         width: 4
                         height: 4
                         radius: 2
-                        color: Theme.fg
+                        color: Theme.glassSel ? Theme.mark : Theme.fg
                         opacity: 0.85
                     }
 
@@ -440,7 +440,7 @@ PanelWindow {
             width: 2
             height: dock.base
             radius: 1
-            color: Theme.accent
+            color: Theme.mark
         }
     }
 

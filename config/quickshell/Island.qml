@@ -144,7 +144,7 @@ PanelWindow {
                 width: 6
                 height: 6
                 radius: 3
-                color: Theme.accent
+                color: Theme.mark
             }
         }
 
@@ -198,7 +198,7 @@ PanelWindow {
                             width: 3
                             height: Math.max(3, 20 * Math.min(1, modelData))
                             radius: 2
-                            color: Theme.accent
+                            color: Theme.mark
                         }
                     }
                 }
@@ -237,7 +237,7 @@ PanelWindow {
                         width: parent.width * Math.min(1, Osd.muted ? 0 : Osd.value)
                         height: parent.height
                         radius: 3
-                        color: Theme.accent
+                        color: Theme.mark
                         Behavior on width { NumberAnimation { duration: Theme.fast } }
                     }
                 }

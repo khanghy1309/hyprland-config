@@ -35,6 +35,12 @@ Singleton {
     readonly property color selRim: Qt.rgba(1, 1, 1, 0.42)
     readonly property color selFg: glassSel ? fg : ink
     readonly property color selDim: glassSel ? dim : inkDim
+    // Công tắc / ô đang bật, nút chính (Chụp, Cập nhật, Phát nhạc): kính sáng hơn mục đang chọn một chút
+    readonly property color onFill: glassSel ? Qt.rgba(1, 1, 1, 0.28) : accent
+    readonly property color onFg: glassSel ? fg : ink
+    readonly property color onDim: glassSel ? dim : inkDim
+    // vạch nhỏ, thanh tiến trình, chấm báo, viền đánh dấu: kính sáng (vẫn thấy rõ trên nền tối)
+    readonly property color mark: glassSel ? Qt.rgba(1, 1, 1, 0.62) : accent
 
     // Nền của menu chuột phải, menu khay, menu dock…: trong hơn bảng kính một chút (Hyprland làm mờ
     // phía sau nên chữ vẫn đọc được), đậm theo thanh "Độ đậm của các bảng kính" trong Cài đặt

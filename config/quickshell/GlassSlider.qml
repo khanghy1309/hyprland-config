@@ -37,7 +37,9 @@ Item {
             width: Math.max(height, body.width * Math.max(0, Math.min(1, fill.value)))
             height: parent.height
             radius: height / 2
-            color: Theme.accent
+            color: Theme.glassSel ? Qt.rgba(1, 1, 1, 0.34) : Theme.accent
+            border.width: Theme.glassSel ? 1 : 0
+            border.color: Theme.selRim
         }
         // viên kính ở đầu phần sáng, chỉ hiện khi đang giữ
         Rectangle {
@@ -65,7 +67,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         path: slider.iconPath
         size: 15
-        color: Theme.ink
+        color: Theme.onFg
     }
 
     MouseArea {

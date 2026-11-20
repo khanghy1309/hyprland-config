@@ -117,8 +117,8 @@ PanelWindow {
                 height: 200
                 radius: 40
                 // ô đang chọn: kính sáng hơn, viền sáng rõ (Cài đặt chọn "Trắng đục" thì trắng như trước)
-                color: isSel ? (Theme.glassSel ? Qt.rgba(1, 1, 1, 0.30) : Theme.accent) : Theme.panelStrong
-                glow: isSel && Theme.glassSel ? 1 : tileHover.hovered && !isSel ? 1 : 0
+                color: isSel ? (Theme.glassSel ? Qt.rgba(1, 1, 1, 0.17) : Theme.accent) : Theme.panelStrong
+                glow: isSel && Theme.glassSel ? 0.45 : tileHover.hovered && !isSel ? 0.6 : 0
                 glowPos: tileHover.point.position
                 HoverHandler { id: tileHover }
                 Behavior on color { ColorAnimation { duration: Theme.fast } }

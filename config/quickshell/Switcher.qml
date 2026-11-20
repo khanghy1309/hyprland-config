@@ -130,7 +130,7 @@ PanelWindow {
                 radius: 20
                 color: sel ? Qt.rgba(1, 1, 1, 0.16) : "transparent"
                 border.width: sel ? 2 : 0
-                border.color: Theme.accent
+                border.color: Theme.mark
 
                 ClippingRectangle {
                     id: thumb
